@@ -1,0 +1,251 @@
+{
+  "reportId": "org-sintergia-demo::site-001::2026-W11::diagnostic_snapshot::weekly_report",
+  "reportType": "weekly_report",
+  "generatedAt": "2026-03-15T19:11:32.475Z",
+  "unitKey": {
+    "organizationId": "org-sintergia-demo",
+    "siteId": "site-001",
+    "sectorType": "restaurants",
+    "operationalWeek": {
+      "weekId": "site-001::2026-W11",
+      "weekStart": "2026-03-09",
+      "weekEnd": "2026-03-15",
+      "timezone": "America/Denver",
+      "calendarYear": 2026,
+      "weekNumber": 11
+    }
+  },
+  "snapshotId": "org-sintergia-demo::site-001::2026-W11::diagnostic_snapshot",
+  "twinId": "org-sintergia-demo::site-001::2026-W11",
+  "title": "Weekly Operational Report — site-001",
+  "subtitle": "2026-03-09 to 2026-03-15",
+  "executiveSummary": "The site is currently in a constrained state. 5 active signal(s) and 3 active constraint(s) were detected during the weekly diagnostic cycle.",
+  "priorityActions": [
+    "Inspect flow bottlenecks and reduce operational delay sources.",
+    "Audit revenue capture points and leakage-prone handoffs.",
+    "Stabilize reporting discipline and reduce missing operational inputs.",
+    "Prepare operating buffers for unstable demand conditions.",
+    "Review cross-role coordination points and operational handoff failures."
+  ],
+  "sections": [
+    {
+      "sectionCode": "executive_summary",
+      "title": "Executive Summary",
+      "content": "The site is currently in a constrained state. 5 active signal(s) and 3 active constraint(s) were detected during the weekly diagnostic cycle."
+    },
+    {
+      "sectionCode": "metric_overview",
+      "title": "Metric Overview",
+      "content": "Throughput: 1480 units/week | Utilization: 0.9262 ratio | Latency: 34 minutes | Revenue Leakage: 630 | Staffing Pressure: 18.9009 / 100 | Reporting Reliability: 71.3643 / 100"
+    },
+    {
+      "sectionCode": "signal_overview",
+      "title": "Signal Overview",
+      "content": "latency_signal [MEDIUM]: Average cycle time shows moderate delay. | leakage_signal [HIGH]: Revenue leakage is materially high. | volatility_signal [MEDIUM]: Demand volatility is moderate. | reporting_gap_signal [MEDIUM]: Reporting reliability is below target. | constraint_signal [HIGH]: Structural constraints are affecting operational performance."
+    },
+    {
+      "sectionCode": "constraints",
+      "title": "Constraints",
+      "content": "flow [MEDIUM]: Flow constraint driven by elevated latency. | reporting [MEDIUM]: Reporting constraint driven by weak reporting reliability. | coordination [HIGH]: Coordination constraint inferred from simultaneous leakage and latency."
+    },
+    {
+      "sectionCode": "priority_actions",
+      "title": "Priority Actions",
+      "content": "Inspect flow bottlenecks and reduce operational delay sources. | Audit revenue capture points and leakage-prone handoffs. | Stabilize reporting discipline and reduce missing operational inputs. | Prepare operating buffers for unstable demand conditions. | Review cross-role coordination points and operational handoff failures."
+    }
+  ],
+  "linkedSnapshot": {
+    "snapshotId": "org-sintergia-demo::site-001::2026-W11::diagnostic_snapshot",
+    "twinId": "org-sintergia-demo::site-001::2026-W11",
+    "unitKey": {
+      "organizationId": "org-sintergia-demo",
+      "siteId": "site-001",
+      "sectorType": "restaurants",
+      "operationalWeek": {
+        "weekId": "site-001::2026-W11",
+        "weekStart": "2026-03-09",
+        "weekEnd": "2026-03-15",
+        "timezone": "America/Denver",
+        "calendarYear": 2026,
+        "weekNumber": 11
+      }
+    },
+    "generatedAt": "2026-03-15T19:11:32.475Z",
+    "stateLabel": "constrained",
+    "metrics": [
+      {
+        "code": "throughput",
+        "value": 1480,
+        "unit": "units/week",
+        "computedAt": "2026-03-15T19:11:32.475Z",
+        "sourcePayloadId": "payload-resto-week-001",
+        "confidence": 1
+      },
+      {
+        "code": "utilization",
+        "value": 0.9262,
+        "unit": "ratio",
+        "computedAt": "2026-03-15T19:11:32.475Z",
+        "sourcePayloadId": "payload-resto-week-001",
+        "confidence": 0.9
+      },
+      {
+        "code": "latency",
+        "value": 34,
+        "unit": "minutes",
+        "computedAt": "2026-03-15T19:11:32.475Z",
+        "sourcePayloadId": "payload-resto-week-001",
+        "confidence": 0.95
+      },
+      {
+        "code": "revenue_leakage",
+        "value": 630,
+        "unit": "USD",
+        "computedAt": "2026-03-15T19:11:32.475Z",
+        "sourcePayloadId": "payload-resto-week-001",
+        "confidence": 0.9
+      },
+      {
+        "code": "staffing_pressure",
+        "value": 18.9009,
+        "unit": "score_0_100",
+        "computedAt": "2026-03-15T19:11:32.475Z",
+        "sourcePayloadId": "payload-resto-week-001",
+        "confidence": 0.86
+      },
+      {
+        "code": "reporting_reliability",
+        "value": 71.3643,
+        "unit": "score_0_100",
+        "computedAt": "2026-03-15T19:11:32.475Z",
+        "sourcePayloadId": "payload-resto-week-001",
+        "confidence": 0.88
+      }
+    ],
+    "signals": [
+      {
+        "code": "latency_signal",
+        "active": true,
+        "severity": "MEDIUM",
+        "message": "Average cycle time shows moderate delay.",
+        "evidence": [
+          "latency=34 minutes"
+        ],
+        "relatedMetricCodes": [
+          "latency"
+        ],
+        "generatedAt": "2026-03-15T19:11:32.475Z"
+      },
+      {
+        "code": "leakage_signal",
+        "active": true,
+        "severity": "HIGH",
+        "message": "Revenue leakage is materially high.",
+        "evidence": [
+          "revenue_leakage=630 USD"
+        ],
+        "relatedMetricCodes": [
+          "revenue_leakage"
+        ],
+        "generatedAt": "2026-03-15T19:11:32.475Z"
+      },
+      {
+        "code": "volatility_signal",
+        "active": true,
+        "severity": "MEDIUM",
+        "message": "Demand volatility is moderate.",
+        "evidence": [
+          "volatility_index=0.42",
+          "peak_to_baseline_ratio=1.587837837837838"
+        ],
+        "relatedMetricCodes": [],
+        "generatedAt": "2026-03-15T19:11:32.475Z"
+      },
+      {
+        "code": "staffing_pressure_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Staffing pressure is within acceptable range.",
+        "evidence": [
+          "staffing_pressure=18.9009"
+        ],
+        "relatedMetricCodes": [
+          "staffing_pressure"
+        ],
+        "generatedAt": "2026-03-15T19:11:32.475Z"
+      },
+      {
+        "code": "reporting_gap_signal",
+        "active": true,
+        "severity": "MEDIUM",
+        "message": "Reporting reliability is below target.",
+        "evidence": [
+          "reporting_reliability=71.3643"
+        ],
+        "relatedMetricCodes": [
+          "reporting_reliability"
+        ],
+        "generatedAt": "2026-03-15T19:11:32.475Z"
+      },
+      {
+        "code": "constraint_signal",
+        "active": true,
+        "severity": "HIGH",
+        "message": "Structural constraints are affecting operational performance.",
+        "evidence": [
+          "flow:MEDIUM",
+          "reporting:MEDIUM",
+          "coordination:HIGH"
+        ],
+        "relatedMetricCodes": [],
+        "generatedAt": "2026-03-15T19:11:32.475Z"
+      }
+    ],
+    "constraints": [
+      {
+        "code": "flow",
+        "active": true,
+        "severity": "MEDIUM",
+        "description": "Flow constraint driven by elevated latency."
+      },
+      {
+        "code": "capacity",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material capacity constraint detected."
+      },
+      {
+        "code": "reporting",
+        "active": true,
+        "severity": "MEDIUM",
+        "description": "Reporting constraint driven by weak reporting reliability."
+      },
+      {
+        "code": "coordination",
+        "active": true,
+        "severity": "HIGH",
+        "description": "Coordination constraint inferred from simultaneous leakage and latency."
+      }
+    ],
+    "diagnosticType": "weekly_operational_diagnostic",
+    "diagnosticSummary": "Operational state is constrained. Active signals: latency_signal, leakage_signal, volatility_signal, reporting_gap_signal, constraint_signal. Active constraints: flow, reporting, coordination.",
+    "decisionOutput": {
+      "decisionLabel": "corrective_focus",
+      "summary": "Targeted corrective action is required to prevent deeper operational decline.",
+      "recommendedActions": [
+        "Inspect flow bottlenecks and reduce operational delay sources.",
+        "Audit revenue capture points and leakage-prone handoffs.",
+        "Stabilize reporting discipline and reduce missing operational inputs.",
+        "Prepare operating buffers for unstable demand conditions.",
+        "Review cross-role coordination points and operational handoff failures."
+      ],
+      "priority": "P2"
+    },
+    "sourcePayloadIds": [
+      "payload-resto-week-001"
+    ],
+    "version": "1.0.0"
+  },
+  "deliveryStatus": "draft",
+  "version": "1.0.0"
+}

@@ -1,0 +1,65 @@
+{
+  "payloadId": "payload-resto-week-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-001",
+  "siteName": "Sintergia Downtown Kitchen",
+  "operationalWeek": {
+    "weekId": "site-001::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 1480,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 18250,
+    "capturedRevenue": 17620,
+    "estimatedLeakage": 630,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 420,
+    "workedHours": 389,
+    "headcountScheduled": 14,
+    "headcountActual": 11
+  },
+  "time": {
+    "avgCycleTimeMinutes": 34,
+    "avgWaitTimeMinutes": 11,
+    "avgServiceTimeMinutes": 23
+  },
+  "demand": {
+    "demandUnits": 1480,
+    "peakDemandUnits": 2350,
+    "volatilityIndex": 0.42
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 5,
+    "missingFieldsCount": 9,
+    "lateSubmissionsCount": 2,
+    "sourceReliabilityScore": 71
+  },
+  "notes": [
+    "Weekend dinner service experienced kitchen bottlenecks.",
+    "Two team members missed one peak shift."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase1_demo"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-001",
+    "actorName": "Operations Manager",
+    "actorRole": "site_manager"
+  }
+}

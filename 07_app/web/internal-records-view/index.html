@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXUS Internal Records View</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1020;
+        --panel: #121a31;
+        --panel-2: #17213d;
+        --line: #2a365c;
+        --text: #e8eefc;
+        --muted: #9fb0da;
+        --good: #67d28f;
+        --warn: #f2c14e;
+        --bad: #ff7b7b;
+        --chip: #1d2848;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      .sub {
+        color: var(--muted);
+        margin-bottom: 18px;
+      }
+
+      .context-bar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 24px;
+        padding: 14px 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+
+      .context-title {
+        font-size: 13px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .context-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .context-item {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 10px;
+        padding: 10px 12px;
+      }
+
+      .context-item-label {
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      .context-item-value {
+        font-size: 14px;
+        word-break: break-word;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+      }
+
+      .card h2 {
+        margin: 0 0 14px;
+        font-size: 18px;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 8px;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .row:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        color: var(--muted);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        background: var(--chip);
+        border: 1px solid var(--line);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .status.active {
+        background: rgba(103, 210, 143, 0.14);
+        color: var(--good);
+        border: 1px solid rgba(103, 210, 143, 0.32);
+      }
+
+      .status.superseded {
+        background: rgba(242, 193, 78, 0.14);
+        color: var(--warn);
+        border: 1px solid rgba(242, 193, 78, 0.32);
+      }
+
+      .list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .list-item {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .list-item-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .mono {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .muted-mono {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 11px;
+        color: var(--muted);
+        word-break: break-all;
+        margin-top: 6px;
+      }
+
+      .delta {
+        display: grid;
+        gap: 10px;
+      }
+
+      .delta-block {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .delta-block h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+
+      .exec {
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+      }
+
+      .error {
+        color: var(--bad);
+        white-space: pre-wrap;
+      }
+
+      .empty {
+        color: var(--muted);
+      }
+
+      .flag-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .flag {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .flag-label {
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+
+      .flag-value {
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .flag-value.no {
+        color: var(--good);
+      }
+
+      .flag-value.yes {
+        color: var(--warn);
+      }
+
+      @media (min-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .grid .card:nth-child(3) {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 820px) {
+        .context-grid,
+        .flag-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>NEXUS™ Internal Records View</h1>
+      <div class="sub">
+        Phase 4 consumer validation surface for active summary, historical summaries,
+        and record comparison.
+      </div>
+
+      <section class="context-bar">
+        <div class="context-title">Current Consumer Context</div>
+        <div class="context-grid">
+          <div class="context-item">
+            <div class="context-item-label">Organization</div>
+            <div id="ctx-organization" class="context-item-value">Loading...</div>
+          </div>
+          <div class="context-item">
+            <div class="context-item-label">Site</div>
+            <div id="ctx-site" class="context-item-value">Loading...</div>
+          </div>
+          <div class="context-item">
+            <div class="context-item-label">Week</div>
+            <div id="ctx-week" class="context-item-value">Loading...</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Block A — Active Record Summary</h2>
+          <div id="active-meta" class="meta">Loading...</div>
+          <div id="active-content"></div>
+        </section>
+
+        <section class="card">
+          <h2>Block B — Historical Record Summaries</h2>
+          <div id="history-meta" class="meta">Loading...</div>
+          <div id="history-content"></div>
+        </section>
+
+        <section class="card">
+          <h2>Block C — Comparison Panel</h2>
+          <div id="compare-meta" class="meta">Loading...</div>
+          <div id="compare-content"></div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const CONTEXT = {
+        organizationId: "org-sintergia-demo",
+        siteId: "site-004",
+        weekId: "site-004::2026-W11",
+      };
+
+      const COMPARE = {
+        leftRecordId:
+          "pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0001",
+        rightRecordId:
+          "pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0002",
+      };
+
+      function statusClass(status) {
+        return status === "active" ? "status active" : "status superseded";
+      }
+
+      function chips(values) {
+        if (!values || values.length === 0) {
+          return '<div class="empty">(none)</div>';
+        }
+        return `<div class="chips">${values
+          .map((value) => `<span class="chip">${escapeHtml(value)}</span>`)
+          .join("")}</div>`;
+      }
+
+      function row(label, value) {
+        return `
+          <div class="row">
+            <div class="label">${escapeHtml(label)}</div>
+            <div>${value}</div>
+          </div>
+        `;
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function truncateId(value, head = 28, tail = 14) {
+        const str = String(value);
+        if (str.length <= head + tail + 3) {
+          return str;
+        }
+        return `${str.slice(0, head)}...${str.slice(-tail)}`;
+      }
+
+      function yesNo(value) {
+        return value ? "yes" : "no";
+      }
+
+      function flag(label, changed) {
+        return `
+          <div class="flag">
+            <div class="flag-label">${escapeHtml(label)}</div>
+            <div class="flag-value ${changed ? "yes" : "no"}">${escapeHtml(yesNo(changed))}</div>
+          </div>
+        `;
+      }
+
+      async function fetchJson(url, options) {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        return { response, data };
+      }
+
+      function renderContextHeader() {
+        document.getElementById("ctx-organization").textContent = CONTEXT.organizationId;
+        document.getElementById("ctx-site").textContent = CONTEXT.siteId;
+        document.getElementById("ctx-week").textContent = CONTEXT.weekId;
+      }
+
+      async function loadActiveSummary() {
+        const meta = document.getElementById("active-meta");
+        const content = document.getElementById("active-content");
+
+        try {
+          const qs = new URLSearchParams({
+            organizationId: CONTEXT.organizationId,
+            siteId: CONTEXT.siteId,
+            weekId: CONTEXT.weekId,
+            view: "summary",
+          });
+
+          const { data } = await fetchJson(`/internal/api/records/active?${qs}`);
+
+          meta.textContent = `servedAt: ${data.servedAt || "unknown"}`;
+
+          if (!data.found || data.error || !data.record) {
+            content.innerHTML = `<div class="error">Active record not available for this context.</div>`;
+            return;
+          }
+
+          const record = data.record;
+          const shortId = truncateId(record.persistedBundleId);
+
+          content.innerHTML = `
+            ${row(
+              "Persisted Bundle ID",
+              `<div class="mono" title="${escapeHtml(record.persistedBundleId)}">${escapeHtml(shortId)}</div>
+               <div class="muted-mono">${escapeHtml(record.persistedBundleId)}</div>`
+            )}
+            ${row("Status", `<span class="${statusClass(record.recordStatus)}">${escapeHtml(record.recordStatus)}</span>`)}
+            ${row("Context", `${escapeHtml(record.organizationId)} / ${escapeHtml(record.siteId)} / ${escapeHtml(record.weekId)}`)}
+            ${row("State", escapeHtml(record.stateLabel))}
+            ${row("Decision", escapeHtml(record.decisionLabel))}
+            ${row("Priority", escapeHtml(record.priority))}
+            ${row("Active Signals", chips(record.activeSignals))}
+            ${row("Active Constraints", chips(record.activeConstraints))}
+            ${row("Stored At", escapeHtml(record.storedAt))}
+          `;
+        } catch (error) {
+          meta.textContent = "load failed";
+          content.innerHTML = `<div class="error">${escapeHtml(error.message || error)}</div>`;
+        }
+      }
+
+      async function loadHistorySummaries() {
+        const meta = document.getElementById("history-meta");
+        const content = document.getElementById("history-content");
+
+        try {
+          const qs = new URLSearchParams({
+            siteId: CONTEXT.siteId,
+            view: "summary",
+          });
+
+          const { data } = await fetchJson(`/internal/api/records/query?${qs}`);
+
+          if (data.error) {
+            meta.textContent = `servedAt: ${data.servedAt || "unknown"}`;
+            content.innerHTML = `<div class="error">Historical record list could not be loaded.</div>`;
+            return;
+          }
+
+          const records = Array.isArray(data.records) ? [...data.records] : [];
+
+          records.sort((a, b) => {
+            if (a.recordStatus !== b.recordStatus) {
+              if (a.recordStatus === "active") return -1;
+              if (b.recordStatus === "active") return 1;
+            }
+            return String(b.storedAt).localeCompare(String(a.storedAt));
+          });
+
+          meta.textContent = `resultCount: ${records.length} | servedAt: ${data.servedAt || "unknown"}`;
+
+          if (records.length === 0) {
+            content.innerHTML = `<div class="empty">No historical records found.</div>`;
+            return;
+          }
+
+          content.innerHTML = `
+            <div class="list">
+              ${records
+                .map(
+                  (record) => `
+                  <div class="list-item">
+                    <div class="list-item-top">
+                      <div>
+                        <div class="mono" title="${escapeHtml(record.persistedBundleId)}">${escapeHtml(truncateId(record.persistedBundleId))}</div>
+                        <div class="muted-mono">${escapeHtml(record.persistedBundleId)}</div>
+                      </div>
+                      <span class="${statusClass(record.recordStatus)}">${escapeHtml(record.recordStatus)}</span>
+                    </div>
+                    ${row("Week", escapeHtml(record.weekId))}
+                    ${row("State", escapeHtml(record.stateLabel))}
+                    ${row("Decision", escapeHtml(record.decisionLabel))}
+                    ${row("Priority", escapeHtml(record.priority))}
+                    ${row("Stored At", escapeHtml(record.storedAt))}
+                  </div>
+                `
+                )
+                .join("")}
+            </div>
+          `;
+        } catch (error) {
+          meta.textContent = "load failed";
+          content.innerHTML = `<div class="error">${escapeHtml(error.message || error)}</div>`;
+        }
+      }
+
+      async function loadComparison() {
+        const meta = document.getElementById("compare-meta");
+        const content = document.getElementById("compare-content");
+
+        try {
+          const { data } = await fetchJson(`/internal/api/records/compare`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(COMPARE),
+          });
+
+          meta.textContent = `servedAt: ${data.servedAt || "unknown"}`;
+
+          if (data.error) {
+            content.innerHTML = `<div class="error">Comparison could not be completed.</div>`;
+            return;
+          }
+
+          const metrics =
+            data.metricDifferences && data.metricDifferences.length > 0
+              ? `<div class="list">${data.metricDifferences
+                  .map(
+                    (m) => `
+                      <div class="list-item">
+                        ${row("Metric", escapeHtml(m.code))}
+                        ${row("Left", escapeHtml(m.leftValue))}
+                        ${row("Right", escapeHtml(m.rightValue))}
+                      </div>
+                    `
+                  )
+                  .join("")}</div>`
+              : `<div class="empty">No metric differences detected.</div>`;
+
+          content.innerHTML = `
+            <div class="delta">
+              <div class="exec">${escapeHtml(data.executiveReading)}</div>
+
+              <div class="flag-grid">
+                ${flag("State changed", data.postureComparison.stateLabelChanged)}
+                ${flag("Decision changed", data.postureComparison.decisionLabelChanged)}
+                ${flag("Priority changed", data.postureComparison.priorityChanged)}
+              </div>
+
+              <div class="delta-block">
+                <h3>Posture Comparison</h3>
+                ${row("Left Status", escapeHtml(data.contextSummary.left.recordStatus))}
+                ${row("Right Status", escapeHtml(data.contextSummary.right.recordStatus))}
+                ${row("Left State", escapeHtml(data.postureComparison.leftStateLabel))}
+                ${row("Right State", escapeHtml(data.postureComparison.rightStateLabel))}
+                ${row("Left Decision", escapeHtml(data.postureComparison.leftDecisionLabel))}
+                ${row("Right Decision", escapeHtml(data.postureComparison.rightDecisionLabel))}
+                ${row("Left Priority", escapeHtml(data.postureComparison.leftPriority))}
+                ${row("Right Priority", escapeHtml(data.postureComparison.rightPriority))}
+              </div>
+
+              <div class="delta-block">
+                <h3>Signal Comparison</h3>
+                ${row("Left Active Signals", chips(data.signalComparison.leftActiveSignals))}
+                ${row("Right Active Signals", chips(data.signalComparison.rightActiveSignals))}
+                ${row("Added Signals", chips(data.signalComparison.addedSignals))}
+                ${row("Removed Signals", chips(data.signalComparison.removedSignals))}
+              </div>
+
+              <div class="delta-block">
+                <h3>Constraint Comparison</h3>
+                ${row("Left Active Constraints", chips(data.constraintComparison.leftActiveConstraints))}
+                ${row("Right Active Constraints", chips(data.constraintComparison.rightActiveConstraints))}
+                ${row("Added Constraints", chips(data.constraintComparison.addedConstraints))}
+                ${row("Removed Constraints", chips(data.constraintComparison.removedConstraints))}
+              </div>
+
+              <div class="delta-block">
+                <h3>Metric Differences</h3>
+                ${metrics}
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          meta.textContent = "load failed";
+          content.innerHTML = `<div class="error">${escapeHtml(error.message || error)}</div>`;
+        }
+      }
+
+      async function main() {
+        renderContextHeader();
+        await Promise.all([
+          loadActiveSummary(),
+          loadHistorySummaries(),
+          loadComparison(),
+        ]);
+      }
+
+      main();
+    </script>
+  </body>
+</html>

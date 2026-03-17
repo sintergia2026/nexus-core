@@ -1,0 +1,59 @@
+{
+  "indexType": "persisted_record_index",
+  "indexVersion": "1.0.0",
+  "generatedAt": "2026-03-17T08:24:06.943Z",
+  "recordCount": 3,
+  "entries": [
+    {
+      "persistedBundleId": "pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0",
+      "recordStatus": "superseded",
+      "organizationId": "org-sintergia-demo",
+      "siteId": "site-004",
+      "sectorType": "restaurants",
+      "weekId": "site-004::2026-W11",
+      "calendarYear": 2026,
+      "weekNumber": 11,
+      "snapshotId": "org-sintergia-demo::site-004::2026-W11::diagnostic_snapshot",
+      "twinId": "org-sintergia-demo::site-004::2026-W11",
+      "reportId": "org-sintergia-demo::site-004::2026-W11::diagnostic_snapshot::weekly_report",
+      "bundleVersion": "1.0.0",
+      "persistenceVersion": "1.0.0",
+      "storagePath": "/Users/furiocesaru/Desktop/SINTERGIA/nexus-core/10_examples/persisted_records/pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0.json",
+      "storedAt": "2026-03-17T07:43:50.603Z"
+    },
+    {
+      "persistedBundleId": "pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0001",
+      "recordStatus": "superseded",
+      "organizationId": "org-sintergia-demo",
+      "siteId": "site-004",
+      "sectorType": "restaurants",
+      "weekId": "site-004::2026-W11",
+      "calendarYear": 2026,
+      "weekNumber": 11,
+      "snapshotId": "org-sintergia-demo::site-004::2026-W11::diagnostic_snapshot",
+      "twinId": "org-sintergia-demo::site-004::2026-W11",
+      "reportId": "org-sintergia-demo::site-004::2026-W11::diagnostic_snapshot::weekly_report",
+      "bundleVersion": "1.0.0",
+      "persistenceVersion": "1.0.0",
+      "storagePath": "/Users/furiocesaru/Desktop/SINTERGIA/nexus-core/10_examples/persisted_records/pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0001.json",
+      "storedAt": "2026-03-17T08:08:29.902Z"
+    },
+    {
+      "persistedBundleId": "pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0002",
+      "recordStatus": "active",
+      "organizationId": "org-sintergia-demo",
+      "siteId": "site-004",
+      "sectorType": "restaurants",
+      "weekId": "site-004::2026-W11",
+      "calendarYear": 2026,
+      "weekNumber": 11,
+      "snapshotId": "org-sintergia-demo::site-004::2026-W11::diagnostic_snapshot",
+      "twinId": "org-sintergia-demo::site-004::2026-W11",
+      "reportId": "org-sintergia-demo::site-004::2026-W11::diagnostic_snapshot::weekly_report",
+      "bundleVersion": "1.0.0",
+      "persistenceVersion": "1.0.0",
+      "storagePath": "/Users/furiocesaru/Desktop/SINTERGIA/nexus-core/10_examples/persisted_records/pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0002.json",
+      "storedAt": "2026-03-17T08:19:43.054Z"
+    }
+  ]
+}

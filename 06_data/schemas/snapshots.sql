@@ -1,0 +1,2 @@
+-- snapshots
+-- nexus-core canonical schema placeholder

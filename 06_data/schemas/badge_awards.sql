@@ -1,0 +1,2 @@
+-- badge_awards
+-- nexus-core canonical schema placeholder

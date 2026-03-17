@@ -1,0 +1,67 @@
+{
+  "payloadId": "payload-resto-week-leakage-heavy-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-005",
+  "siteName": "Sintergia Leakage Control Kitchen",
+  "operationalWeek": {
+    "weekId": "site-005::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 1455,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 18900,
+    "capturedRevenue": 16750,
+    "estimatedLeakage": 2150,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 405,
+    "workedHours": 398,
+    "headcountScheduled": 13,
+    "headcountActual": 13
+  },
+  "time": {
+    "avgCycleTimeMinutes": 17,
+    "avgWaitTimeMinutes": 5,
+    "avgServiceTimeMinutes": 12
+  },
+  "demand": {
+    "demandUnits": 1455,
+    "peakDemandUnits": 1605,
+    "volatilityIndex": 0.13
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 7,
+    "missingFieldsCount": 2,
+    "lateSubmissionsCount": 0,
+    "sourceReliabilityScore": 93
+  },
+  "notes": [
+    "Service execution remained stable across the week.",
+    "Revenue reconciliation exposed repeated capture inconsistencies.",
+    "Cash and discount control anomalies suggest systematic leakage points."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase2_edge_case",
+    "leakage_heavy_case"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-005",
+    "actorName": "Revenue Control Manager",
+    "actorRole": "site_manager"
+  }
+}

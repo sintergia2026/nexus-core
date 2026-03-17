@@ -1,0 +1,2 @@
+-- governance_scores
+-- nexus-core canonical schema placeholder

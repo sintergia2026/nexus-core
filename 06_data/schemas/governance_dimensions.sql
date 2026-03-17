@@ -1,0 +1,2 @@
+-- governance_dimensions
+-- nexus-core canonical schema placeholder

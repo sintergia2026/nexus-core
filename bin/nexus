@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+COMMAND="${1:-}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+case "$COMMAND" in
+  init)
+    bash "$ROOT_DIR/scripts/nexus-init.sh" "$ROOT_DIR"
+    ;;
+  doctor)
+    bash "$ROOT_DIR/scripts/nexus-doctor.sh" "$ROOT_DIR"
+    ;;
+  validate)
+    bash "$ROOT_DIR/scripts/nexus-validate.sh" "$ROOT_DIR"
+    ;;
+  *)
+    echo "NEXUS CLI"
+    echo
+    echo "Usage:"
+    echo "  ./bin/nexus init"
+    echo "  ./bin/nexus doctor"
+    echo "  ./bin/nexus validate"
+    exit 1
+    ;;
+esac

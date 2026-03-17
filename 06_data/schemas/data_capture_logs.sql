@@ -1,0 +1,2 @@
+-- data_capture_logs
+-- nexus-core canonical schema placeholder

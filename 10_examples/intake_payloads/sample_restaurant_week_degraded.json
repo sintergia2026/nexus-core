@@ -1,0 +1,67 @@
+{
+  "payloadId": "payload-resto-week-degraded-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-003",
+  "siteName": "Sintergia Crisis Kitchen",
+  "operationalWeek": {
+    "weekId": "site-003::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 920,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 17300,
+    "capturedRevenue": 15400,
+    "estimatedLeakage": 1900,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 430,
+    "workedHours": 301,
+    "headcountScheduled": 15,
+    "headcountActual": 9
+  },
+  "time": {
+    "avgCycleTimeMinutes": 68,
+    "avgWaitTimeMinutes": 24,
+    "avgServiceTimeMinutes": 44
+  },
+  "demand": {
+    "demandUnits": 1620,
+    "peakDemandUnits": 2980,
+    "volatilityIndex": 1.08
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 3,
+    "missingFieldsCount": 21,
+    "lateSubmissionsCount": 4,
+    "sourceReliabilityScore": 38
+  },
+  "notes": [
+    "Repeated kitchen breakdowns created severe delivery delays.",
+    "Critical staffing shortfall occurred across peak service windows.",
+    "Cash handling and order reconciliation inconsistencies increased leakage risk."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase1_demo",
+    "degraded_case"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-003",
+    "actorName": "Acting Operations Lead",
+    "actorRole": "site_manager"
+  }
+}

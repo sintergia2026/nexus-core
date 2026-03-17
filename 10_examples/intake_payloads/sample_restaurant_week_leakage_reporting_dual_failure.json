@@ -1,0 +1,67 @@
+{
+  "payloadId": "payload-resto-week-leakage-reporting-dual-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-007",
+  "siteName": "Sintergia Dual Failure Kitchen",
+  "operationalWeek": {
+    "weekId": "site-007::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 1385,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 18750,
+    "capturedRevenue": 16120,
+    "estimatedLeakage": 2630,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 402,
+    "workedHours": 390,
+    "headcountScheduled": 13,
+    "headcountActual": 12
+  },
+  "time": {
+    "avgCycleTimeMinutes": 18,
+    "avgWaitTimeMinutes": 6,
+    "avgServiceTimeMinutes": 12
+  },
+  "demand": {
+    "demandUnits": 1385,
+    "peakDemandUnits": 1590,
+    "volatilityIndex": 0.18
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 3,
+    "missingFieldsCount": 22,
+    "lateSubmissionsCount": 4,
+    "sourceReliabilityScore": 29
+  },
+  "notes": [
+    "Frontline service remained partially functional, but reconciliation exposure increased sharply.",
+    "Revenue capture anomalies persisted across multiple closeout cycles.",
+    "Reporting discipline collapsed, weakening confidence in weekly operational truth."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase2_edge_case",
+    "leakage_reporting_dual_failure_case"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-007",
+    "actorName": "Site Control Supervisor",
+    "actorRole": "site_manager"
+  }
+}

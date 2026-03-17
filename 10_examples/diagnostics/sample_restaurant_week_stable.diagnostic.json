@@ -1,0 +1,565 @@
+{
+  "normalizedPayload": {
+    "payloadId": "payload-resto-week-stable-001",
+    "capturedAt": "2026-03-15T10:00:00.000Z",
+    "source": "manual_form",
+    "sectorType": "restaurants",
+    "organizationId": "org-sintergia-demo",
+    "organizationName": "Sintergia Demo Restaurant Group",
+    "siteId": "site-002",
+    "siteName": "Sintergia Stable Kitchen",
+    "operationalWeek": {
+      "weekId": "site-002::2026-W11",
+      "weekStart": "2026-03-09",
+      "weekEnd": "2026-03-15",
+      "timezone": "America/Denver",
+      "calendarYear": 2026,
+      "weekNumber": 11
+    },
+    "throughput": {
+      "unitsCompleted": 1360,
+      "unitLabel": "orders"
+    },
+    "revenue": {
+      "grossRevenue": 16400,
+      "capturedRevenue": 16290,
+      "estimatedLeakage": 110,
+      "currency": "USD"
+    },
+    "staffing": {
+      "scheduledHours": 390,
+      "workedHours": 384,
+      "headcountScheduled": 12,
+      "headcountActual": 12
+    },
+    "time": {
+      "avgCycleTimeMinutes": 14,
+      "avgWaitTimeMinutes": 4,
+      "avgServiceTimeMinutes": 10
+    },
+    "demand": {
+      "demandUnits": 1360,
+      "peakDemandUnits": 1540,
+      "volatilityIndex": 0.12
+    },
+    "reporting": {
+      "expectedReports": 7,
+      "submittedReports": 7,
+      "missingFieldsCount": 1,
+      "lateSubmissionsCount": 0,
+      "sourceReliabilityScore": 95
+    },
+    "notes": [
+      "Service flow remained stable across peak periods.",
+      "Full staffing coverage maintained throughout the week."
+    ],
+    "tags": [
+      "restaurant",
+      "weekly_diagnostic",
+      "phase1_demo",
+      "stable_case"
+    ],
+    "submittedBy": {
+      "actorId": "mgr-002",
+      "actorName": "General Manager",
+      "actorRole": "site_manager"
+    },
+    "normalizationMeta": {
+      "normalizedAt": "2026-03-15T19:11:33.137Z",
+      "warnings": [],
+      "sourceValidation": {
+        "valid": true,
+        "errors": [],
+        "warnings": []
+      }
+    }
+  },
+  "metrics": [
+    {
+      "code": "throughput",
+      "value": 1360,
+      "unit": "units/week",
+      "computedAt": "2026-03-15T19:11:33.137Z",
+      "sourcePayloadId": "payload-resto-week-stable-001",
+      "confidence": 1
+    },
+    {
+      "code": "utilization",
+      "value": 0.9846,
+      "unit": "ratio",
+      "computedAt": "2026-03-15T19:11:33.137Z",
+      "sourcePayloadId": "payload-resto-week-stable-001",
+      "confidence": 0.9
+    },
+    {
+      "code": "latency",
+      "value": 14,
+      "unit": "minutes",
+      "computedAt": "2026-03-15T19:11:33.137Z",
+      "sourcePayloadId": "payload-resto-week-stable-001",
+      "confidence": 0.95
+    },
+    {
+      "code": "revenue_leakage",
+      "value": 110,
+      "unit": "USD",
+      "computedAt": "2026-03-15T19:11:33.137Z",
+      "sourcePayloadId": "payload-resto-week-stable-001",
+      "confidence": 0.9
+    },
+    {
+      "code": "staffing_pressure",
+      "value": 2.5238,
+      "unit": "score_0_100",
+      "computedAt": "2026-03-15T19:11:33.137Z",
+      "sourcePayloadId": "payload-resto-week-stable-001",
+      "confidence": 0.86
+    },
+    {
+      "code": "reporting_reliability",
+      "value": 97.95,
+      "unit": "score_0_100",
+      "computedAt": "2026-03-15T19:11:33.137Z",
+      "sourcePayloadId": "payload-resto-week-stable-001",
+      "confidence": 0.88
+    }
+  ],
+  "signals": [
+    {
+      "code": "latency_signal",
+      "active": false,
+      "severity": "LOW",
+      "message": "Latency is within expected operating range.",
+      "evidence": [
+        "latency=14 minutes"
+      ],
+      "relatedMetricCodes": [
+        "latency"
+      ],
+      "generatedAt": "2026-03-15T19:11:33.137Z"
+    },
+    {
+      "code": "leakage_signal",
+      "active": false,
+      "severity": "LOW",
+      "message": "Revenue leakage remains within acceptable range.",
+      "evidence": [
+        "revenue_leakage=110 USD"
+      ],
+      "relatedMetricCodes": [
+        "revenue_leakage"
+      ],
+      "generatedAt": "2026-03-15T19:11:33.137Z"
+    },
+    {
+      "code": "volatility_signal",
+      "active": false,
+      "severity": "LOW",
+      "message": "Demand volatility is within acceptable range.",
+      "evidence": [
+        "volatility_index=0.12",
+        "peak_to_baseline_ratio=1.1323529411764706"
+      ],
+      "relatedMetricCodes": [],
+      "generatedAt": "2026-03-15T19:11:33.137Z"
+    },
+    {
+      "code": "staffing_pressure_signal",
+      "active": false,
+      "severity": "LOW",
+      "message": "Staffing pressure is within acceptable range.",
+      "evidence": [
+        "staffing_pressure=2.5238"
+      ],
+      "relatedMetricCodes": [
+        "staffing_pressure"
+      ],
+      "generatedAt": "2026-03-15T19:11:33.137Z"
+    },
+    {
+      "code": "reporting_gap_signal",
+      "active": false,
+      "severity": "LOW",
+      "message": "Reporting reliability is acceptable.",
+      "evidence": [
+        "reporting_reliability=97.95"
+      ],
+      "relatedMetricCodes": [
+        "reporting_reliability"
+      ],
+      "generatedAt": "2026-03-15T19:11:33.137Z"
+    },
+    {
+      "code": "constraint_signal",
+      "active": false,
+      "severity": "LOW",
+      "message": "No major structural constraints detected.",
+      "evidence": [],
+      "relatedMetricCodes": [],
+      "generatedAt": "2026-03-15T19:11:33.137Z"
+    }
+  ],
+  "twin": {
+    "twinId": "org-sintergia-demo::site-002::2026-W11",
+    "unitKey": {
+      "organizationId": "org-sintergia-demo",
+      "siteId": "site-002",
+      "sectorType": "restaurants",
+      "operationalWeek": {
+        "weekId": "site-002::2026-W11",
+        "weekStart": "2026-03-09",
+        "weekEnd": "2026-03-15",
+        "timezone": "America/Denver",
+        "calendarYear": 2026,
+        "weekNumber": 11
+      }
+    },
+    "stateLabel": "stable",
+    "metrics": [
+      {
+        "code": "throughput",
+        "value": 1360,
+        "unit": "units/week",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 1
+      },
+      {
+        "code": "utilization",
+        "value": 0.9846,
+        "unit": "ratio",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.9
+      },
+      {
+        "code": "latency",
+        "value": 14,
+        "unit": "minutes",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.95
+      },
+      {
+        "code": "revenue_leakage",
+        "value": 110,
+        "unit": "USD",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.9
+      },
+      {
+        "code": "staffing_pressure",
+        "value": 2.5238,
+        "unit": "score_0_100",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.86
+      },
+      {
+        "code": "reporting_reliability",
+        "value": 97.95,
+        "unit": "score_0_100",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.88
+      }
+    ],
+    "signals": [
+      {
+        "code": "latency_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Latency is within expected operating range.",
+        "evidence": [
+          "latency=14 minutes"
+        ],
+        "relatedMetricCodes": [
+          "latency"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "leakage_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Revenue leakage remains within acceptable range.",
+        "evidence": [
+          "revenue_leakage=110 USD"
+        ],
+        "relatedMetricCodes": [
+          "revenue_leakage"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "volatility_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Demand volatility is within acceptable range.",
+        "evidence": [
+          "volatility_index=0.12",
+          "peak_to_baseline_ratio=1.1323529411764706"
+        ],
+        "relatedMetricCodes": [],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "staffing_pressure_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Staffing pressure is within acceptable range.",
+        "evidence": [
+          "staffing_pressure=2.5238"
+        ],
+        "relatedMetricCodes": [
+          "staffing_pressure"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "reporting_gap_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Reporting reliability is acceptable.",
+        "evidence": [
+          "reporting_reliability=97.95"
+        ],
+        "relatedMetricCodes": [
+          "reporting_reliability"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "constraint_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "No major structural constraints detected.",
+        "evidence": [],
+        "relatedMetricCodes": [],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      }
+    ],
+    "constraints": [
+      {
+        "code": "flow",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material flow constraint detected."
+      },
+      {
+        "code": "capacity",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material capacity constraint detected."
+      },
+      {
+        "code": "reporting",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material reporting constraint detected."
+      },
+      {
+        "code": "coordination",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material coordination constraint detected."
+      }
+    ],
+    "diagnosticSummary": "Operational state is stable. No material structural or reporting disruptions detected.",
+    "decisionOutput": {
+      "decisionLabel": "monitor_and_preserve",
+      "summary": "Maintain current performance and preserve structural stability.",
+      "recommendedActions": [
+        "Maintain current operating discipline and continue weekly monitoring."
+      ],
+      "priority": "P3"
+    },
+    "snapshotRef": "org-sintergia-demo::site-002::2026-W11::diagnostic_snapshot",
+    "lastUpdatedAt": "2026-03-15T19:11:33.137Z"
+  },
+  "snapshot": {
+    "snapshotId": "org-sintergia-demo::site-002::2026-W11::diagnostic_snapshot",
+    "twinId": "org-sintergia-demo::site-002::2026-W11",
+    "unitKey": {
+      "organizationId": "org-sintergia-demo",
+      "siteId": "site-002",
+      "sectorType": "restaurants",
+      "operationalWeek": {
+        "weekId": "site-002::2026-W11",
+        "weekStart": "2026-03-09",
+        "weekEnd": "2026-03-15",
+        "timezone": "America/Denver",
+        "calendarYear": 2026,
+        "weekNumber": 11
+      }
+    },
+    "generatedAt": "2026-03-15T19:11:33.138Z",
+    "stateLabel": "stable",
+    "metrics": [
+      {
+        "code": "throughput",
+        "value": 1360,
+        "unit": "units/week",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 1
+      },
+      {
+        "code": "utilization",
+        "value": 0.9846,
+        "unit": "ratio",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.9
+      },
+      {
+        "code": "latency",
+        "value": 14,
+        "unit": "minutes",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.95
+      },
+      {
+        "code": "revenue_leakage",
+        "value": 110,
+        "unit": "USD",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.9
+      },
+      {
+        "code": "staffing_pressure",
+        "value": 2.5238,
+        "unit": "score_0_100",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.86
+      },
+      {
+        "code": "reporting_reliability",
+        "value": 97.95,
+        "unit": "score_0_100",
+        "computedAt": "2026-03-15T19:11:33.137Z",
+        "sourcePayloadId": "payload-resto-week-stable-001",
+        "confidence": 0.88
+      }
+    ],
+    "signals": [
+      {
+        "code": "latency_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Latency is within expected operating range.",
+        "evidence": [
+          "latency=14 minutes"
+        ],
+        "relatedMetricCodes": [
+          "latency"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "leakage_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Revenue leakage remains within acceptable range.",
+        "evidence": [
+          "revenue_leakage=110 USD"
+        ],
+        "relatedMetricCodes": [
+          "revenue_leakage"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "volatility_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Demand volatility is within acceptable range.",
+        "evidence": [
+          "volatility_index=0.12",
+          "peak_to_baseline_ratio=1.1323529411764706"
+        ],
+        "relatedMetricCodes": [],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "staffing_pressure_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Staffing pressure is within acceptable range.",
+        "evidence": [
+          "staffing_pressure=2.5238"
+        ],
+        "relatedMetricCodes": [
+          "staffing_pressure"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "reporting_gap_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "Reporting reliability is acceptable.",
+        "evidence": [
+          "reporting_reliability=97.95"
+        ],
+        "relatedMetricCodes": [
+          "reporting_reliability"
+        ],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      },
+      {
+        "code": "constraint_signal",
+        "active": false,
+        "severity": "LOW",
+        "message": "No major structural constraints detected.",
+        "evidence": [],
+        "relatedMetricCodes": [],
+        "generatedAt": "2026-03-15T19:11:33.137Z"
+      }
+    ],
+    "constraints": [
+      {
+        "code": "flow",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material flow constraint detected."
+      },
+      {
+        "code": "capacity",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material capacity constraint detected."
+      },
+      {
+        "code": "reporting",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material reporting constraint detected."
+      },
+      {
+        "code": "coordination",
+        "active": false,
+        "severity": "LOW",
+        "description": "No material coordination constraint detected."
+      }
+    ],
+    "diagnosticType": "weekly_operational_diagnostic",
+    "diagnosticSummary": "Operational state is stable. No material structural or reporting disruptions detected.",
+    "decisionOutput": {
+      "decisionLabel": "monitor_and_preserve",
+      "summary": "Maintain current performance and preserve structural stability.",
+      "recommendedActions": [
+        "Maintain current operating discipline and continue weekly monitoring."
+      ],
+      "priority": "P3"
+    },
+    "sourcePayloadIds": [
+      "payload-resto-week-stable-001"
+    ],
+    "version": "1.0.0"
+  }
+}

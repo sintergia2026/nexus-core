@@ -1,0 +1,42 @@
+{
+  "name": "nexus-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Canonical sovereign core for NEXUS operational intelligence system",
+  "type": "commonjs",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "phase1:demo": "npx ts-node scripts/run-phase1-demo.ts",
+    "phase1:demo:summary": "npx ts-node scripts/run-phase1-demo-summary.ts",
+    "phase1:test": "npx ts-node scripts/run-phase1-test.ts",
+    "phase1:validate": "npm run typecheck && npm run phase1:test && npm run phase1:demo && npm run phase1:demo -- sample_restaurant_week_stable.json",
+    "phase1:contrast": "npx ts-node scripts/run-phase1-contrast-test.ts",
+    "phase1:contrast:all": "npx ts-node scripts/run-phase1-contrast-all-test.ts",
+    "phase2:candidates": "npx ts-node scripts/run-phase2-candidate-review.ts",
+    "phase2:leakage-probe": "npx ts-node scripts/run-phase2-leakage-probe.ts",
+    "phase2:leakage-sim": "npx ts-node scripts/run-phase2-leakage-simulation.ts",
+    "phase2:full-check": "npm run typecheck && npm run phase1:contrast && npm run phase2:candidates && npm run phase2:leakage-probe",
+    "phase2:contracts-check": "npx ts-node scripts/run-phase2-output-contract-check.ts",
+    "phase2:bundle": "npx ts-node scripts/run-phase2-bundle-assembly.ts",
+    "phase2:bundle-check": "npx ts-node scripts/run-phase2-bundle-check.ts",
+    "phase2:system-check": "npx ts-node scripts/run-phase2-system-check.ts",
+    "phase3:persist-bundle": "npx ts-node scripts/run-phase3-persist-bundle.ts",
+    "phase3:load-persisted-bundle": "npx ts-node scripts/run-phase3-load-persisted-bundle.ts",
+    "phase3:persistence-check": "npx ts-node scripts/run-phase3-persistence-check.ts",
+    "phase3:system-check": "npx ts-node scripts/run-phase3-system-check.ts",
+    "phase3:rebuild-index": "npx ts-node scripts/run-phase3-rebuild-persistence-index.ts",
+    "phase3:query-index": "npx ts-node scripts/run-phase3-query-index.ts",
+    "phase3:superseding-persist": "npx ts-node scripts/run-phase3-superseding-persist.ts",
+    "phase3:normalize-legacy-status": "npx ts-node scripts/run-phase3-legacy-status-normalization.ts",
+    "phase3:compare-records": "npx ts-node scripts/run-phase3-compare-records.ts",
+    "phase3:compare-records-executive": "npx ts-node scripts/run-phase3-compare-records-executive.ts",
+    "phase4:api-demo": "npx ts-node scripts/run-phase4-api-service-demo.ts",
+    "phase4:route-contract-check": "npx ts-node scripts/run-phase4-route-contract-check.ts",
+    "phase4:local-view-server": "npx ts-node scripts/run-phase4-local-view-server.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}

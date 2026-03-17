@@ -1,0 +1,2 @@
+-- events
+-- nexus-core canonical schema placeholder

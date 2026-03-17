@@ -1,0 +1,66 @@
+{
+  "payloadId": "payload-resto-week-stable-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-002",
+  "siteName": "Sintergia Stable Kitchen",
+  "operationalWeek": {
+    "weekId": "site-002::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 1360,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 16400,
+    "capturedRevenue": 16290,
+    "estimatedLeakage": 110,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 390,
+    "workedHours": 384,
+    "headcountScheduled": 12,
+    "headcountActual": 12
+  },
+  "time": {
+    "avgCycleTimeMinutes": 14,
+    "avgWaitTimeMinutes": 4,
+    "avgServiceTimeMinutes": 10
+  },
+  "demand": {
+    "demandUnits": 1360,
+    "peakDemandUnits": 1540,
+    "volatilityIndex": 0.12
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 7,
+    "missingFieldsCount": 1,
+    "lateSubmissionsCount": 0,
+    "sourceReliabilityScore": 95
+  },
+  "notes": [
+    "Service flow remained stable across peak periods.",
+    "Full staffing coverage maintained throughout the week."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase1_demo",
+    "stable_case"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-002",
+    "actorName": "General Manager",
+    "actorRole": "site_manager"
+  }
+}

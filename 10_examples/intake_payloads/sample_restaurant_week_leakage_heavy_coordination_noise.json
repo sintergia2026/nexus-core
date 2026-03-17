@@ -1,0 +1,67 @@
+{
+  "payloadId": "payload-resto-week-leakage-heavy-coordination-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-006",
+  "siteName": "Sintergia Leakage Coordination Kitchen",
+  "operationalWeek": {
+    "weekId": "site-006::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 1435,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 19150,
+    "capturedRevenue": 16820,
+    "estimatedLeakage": 2330,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 410,
+    "workedHours": 392,
+    "headcountScheduled": 13,
+    "headcountActual": 12
+  },
+  "time": {
+    "avgCycleTimeMinutes": 24,
+    "avgWaitTimeMinutes": 8,
+    "avgServiceTimeMinutes": 16
+  },
+  "demand": {
+    "demandUnits": 1435,
+    "peakDemandUnits": 1715,
+    "volatilityIndex": 0.22
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 7,
+    "missingFieldsCount": 3,
+    "lateSubmissionsCount": 1,
+    "sourceReliabilityScore": 89
+  },
+  "notes": [
+    "Frontline service remained mostly functional but reconciliation anomalies persisted.",
+    "Shift handoffs created mild coordination friction during peak windows.",
+    "Discount controls, void handling, and closeout reconciliation indicate severe leakage exposure."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase2_edge_case",
+    "leakage_heavy_coordination_noise_case"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-006",
+    "actorName": "Operations Control Lead",
+    "actorRole": "site_manager"
+  }
+}

@@ -1,0 +1,2 @@
+-- diagnostics
+-- nexus-core canonical schema placeholder

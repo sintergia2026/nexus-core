@@ -1,0 +1,67 @@
+{
+  "payloadId": "payload-resto-week-reporting-failure-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-004",
+  "siteName": "Sintergia Reporting Failure Kitchen",
+  "operationalWeek": {
+    "weekId": "site-004::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 1410,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 16850,
+    "capturedRevenue": 16690,
+    "estimatedLeakage": 160,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 400,
+    "workedHours": 392,
+    "headcountScheduled": 12,
+    "headcountActual": 12
+  },
+  "time": {
+    "avgCycleTimeMinutes": 16,
+    "avgWaitTimeMinutes": 5,
+    "avgServiceTimeMinutes": 11
+  },
+  "demand": {
+    "demandUnits": 1410,
+    "peakDemandUnits": 1575,
+    "volatilityIndex": 0.11
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 2,
+    "missingFieldsCount": 26,
+    "lateSubmissionsCount": 5,
+    "sourceReliabilityScore": 24
+  },
+  "notes": [
+    "Operations remained mostly stable, but reporting discipline collapsed across the week.",
+    "Multiple daily logs were incomplete or missing key fields.",
+    "Submitted reports arrived late and could not be trusted for governance review."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase2_edge_case",
+    "reporting_failure_case"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-004",
+    "actorName": "Floor Operations Supervisor",
+    "actorRole": "site_manager"
+  }
+}

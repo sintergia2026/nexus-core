@@ -1,0 +1,2 @@
+-- report_assets
+-- nexus-core canonical schema placeholder

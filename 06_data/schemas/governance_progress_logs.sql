@@ -1,0 +1,2 @@
+-- governance_progress_logs
+-- nexus-core canonical schema placeholder

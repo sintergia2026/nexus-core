@@ -1,0 +1,67 @@
+{
+  "payloadId": "payload-resto-week-latency-staffing-stress-001",
+  "capturedAt": "2026-03-15T10:00:00.000Z",
+  "source": "manual_form",
+  "sectorType": "restaurants",
+  "organizationId": "org-sintergia-demo",
+  "organizationName": "Sintergia Demo Restaurant Group",
+  "siteId": "site-008",
+  "siteName": "Sintergia Flow Pressure Kitchen",
+  "operationalWeek": {
+    "weekId": "site-008::2026-W11",
+    "weekStart": "2026-03-09",
+    "weekEnd": "2026-03-15",
+    "timezone": "America/Denver",
+    "calendarYear": 2026,
+    "weekNumber": 11
+  },
+  "throughput": {
+    "unitsCompleted": 1295,
+    "unitLabel": "orders"
+  },
+  "revenue": {
+    "grossRevenue": 17180,
+    "capturedRevenue": 17040,
+    "estimatedLeakage": 140,
+    "currency": "USD"
+  },
+  "staffing": {
+    "scheduledHours": 415,
+    "workedHours": 332,
+    "headcountScheduled": 14,
+    "headcountActual": 10
+  },
+  "time": {
+    "avgCycleTimeMinutes": 38,
+    "avgWaitTimeMinutes": 13,
+    "avgServiceTimeMinutes": 25
+  },
+  "demand": {
+    "demandUnits": 1295,
+    "peakDemandUnits": 1580,
+    "volatilityIndex": 0.24
+  },
+  "reporting": {
+    "expectedReports": 7,
+    "submittedReports": 7,
+    "missingFieldsCount": 2,
+    "lateSubmissionsCount": 0,
+    "sourceReliabilityScore": 93
+  },
+  "notes": [
+    "Service flow slowed materially during peak windows.",
+    "Undercoverage across key shifts increased workload concentration.",
+    "Revenue capture remained mostly stable despite operational stress."
+  ],
+  "tags": [
+    "restaurant",
+    "weekly_diagnostic",
+    "phase2_edge_case",
+    "latency_staffing_stress_case"
+  ],
+  "submittedBy": {
+    "actorId": "mgr-008",
+    "actorName": "Operations Shift Lead",
+    "actorRole": "site_manager"
+  }
+}

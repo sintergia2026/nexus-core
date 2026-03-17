@@ -1,0 +1,536 @@
+.
+├── 00_registry
+│   ├── ai_governance_registry.json
+│   ├── badge_registry.json
+│   ├── contract_registry.json
+│   ├── engine_registry.json
+│   ├── governance_score_registry.json
+│   ├── maturity_level_registry.json
+│   ├── module_registry.json
+│   ├── report_registry.json
+│   ├── sector_registry.json
+│   ├── system_ids.json
+│   └── twin_registry.json
+├── 01_docs
+│   ├── AI_GOVERNANCE_PRINCIPLE.md
+│   ├── ARCHITECTURE_PRINCIPLES.md
+│   ├── BADGE_SYSTEM_PRINCIPLE.md
+│   ├── CANONICAL_SYSTEM_FLOW.md
+│   ├── DATA_CAPTURE_PRINCIPLE.md
+│   ├── DECISION_LOG.md
+│   ├── DIGITAL_TWIN_PRINCIPLE.md
+│   ├── DOMAIN_MODEL_OVERVIEW.md
+│   ├── GOVERNANCE_SCORING_PRINCIPLE.md
+│   ├── MATURITY_LEVELS_PRINCIPLE.md
+│   ├── MODULE_BOUNDARIES.md
+│   ├── REPORTING_PRINCIPLE.md
+│   ├── REPO_GOVERNANCE.md
+│   ├── SECTOR_ARCHITECTURE_PRINCIPLE.md
+│   └── SYSTEM_FILES_LOCK.md
+├── 02_contracts
+│   ├── ai_agent_types.json
+│   ├── ai_policy_types.json
+│   ├── badge_types.json
+│   ├── chart_types.json
+│   ├── constraint_types.json
+│   ├── data_capture_types.json
+│   ├── decision_labels.json
+│   ├── delivery_types.json
+│   ├── diagnostic_types.json
+│   ├── entity_types.json
+│   ├── event_types.json
+│   ├── governance_dimensions.json
+│   ├── governance_progress_types.json
+│   ├── governance_score_types.json
+│   ├── intake_frequencies.json
+│   ├── maturity_levels.json
+│   ├── metric_types.json
+│   ├── relationship_types.json
+│   ├── report_sections.json
+│   ├── report_types.json
+│   ├── risk_types.json
+│   ├── role_responsibility_types.json
+│   ├── scoring_weight_types.json
+│   ├── sector_diagnostic_profiles.json
+│   ├── sector_layers.json
+│   ├── sector_metric_profiles.json
+│   ├── sector_reporting_profiles.json
+│   ├── sector_types.json
+│   ├── sector_workflow_profiles.json
+│   ├── signal_types.json
+│   ├── snapshot_types.json
+│   ├── state_labels.json
+│   ├── twin_layers.json
+│   ├── twin_state_types.json
+│   ├── validation_rule_types.json
+│   └── workflow_types.json
+├── 03_ontology
+│   ├── constraints
+│   │   ├── capacity.constraint.ts
+│   │   ├── coordination.constraint.ts
+│   │   ├── flow.constraint.ts
+│   │   ├── maturity.constraint.ts
+│   │   └── reporting.constraint.ts
+│   ├── entities
+│   │   ├── ai_agent.entity.ts
+│   │   ├── badge.entity.ts
+│   │   ├── data_capture_actor.entity.ts
+│   │   ├── demand_unit.entity.ts
+│   │   ├── governance_score.entity.ts
+│   │   ├── maturity_level.entity.ts
+│   │   ├── organization.entity.ts
+│   │   ├── report.entity.ts
+│   │   ├── resource.entity.ts
+│   │   ├── role.entity.ts
+│   │   ├── sector.entity.ts
+│   │   ├── site.entity.ts
+│   │   └── workflow.entity.ts
+│   ├── registry
+│   │   └── ontology_registry.ts
+│   ├── relationships
+│   │   ├── awarded_badge.relationship.ts
+│   │   ├── belongs_to_sector.relationship.ts
+│   │   ├── blockage.relationship.ts
+│   │   ├── classified_as.relationship.ts
+│   │   ├── consumption.relationship.ts
+│   │   ├── dependency.relationship.ts
+│   │   ├── execution.relationship.ts
+│   │   ├── monitors.relationship.ts
+│   │   ├── reports_on.relationship.ts
+│   │   ├── scored_by.relationship.ts
+│   │   └── submitted_by.relationship.ts
+│   ├── sectors
+│   │   ├── construction.sector.ts
+│   │   ├── education.sector.ts
+│   │   ├── general_ops.sector.ts
+│   │   ├── healthcare.sector.ts
+│   │   ├── logistics.sector.ts
+│   │   ├── restaurants.sector.ts
+│   │   ├── retail.sector.ts
+│   │   ├── services.sector.ts
+│   │   └── technology.sector.ts
+│   ├── signals
+│   │   ├── capture_failure.signal.ts
+│   │   ├── governance_drop.signal.ts
+│   │   ├── governance_gain.signal.ts
+│   │   ├── latency.signal.ts
+│   │   ├── leakage.signal.ts
+│   │   ├── maturity_transition.signal.ts
+│   │   ├── reporting_gap.signal.ts
+│   │   └── volatility.signal.ts
+│   ├── states
+│   │   ├── constrained.state.ts
+│   │   ├── degraded.state.ts
+│   │   ├── fragile.state.ts
+│   │   ├── level_0_unstructured.state.ts
+│   │   ├── level_1_observable.state.ts
+│   │   ├── level_2_structured.state.ts
+│   │   ├── level_3_governed.state.ts
+│   │   ├── level_4_adaptive.state.ts
+│   │   ├── level_5_ai_governed.state.ts
+│   │   ├── recovering.state.ts
+│   │   ├── saturated.state.ts
+│   │   └── stable.state.ts
+│   ├── types
+│   │   └── ontology_types.ts
+│   └── workflows
+│       ├── data_capture.workflow.ts
+│       ├── governance_progress.workflow.ts
+│       ├── operational_cycle.workflow.ts
+│       ├── reporting_cycle.workflow.ts
+│       └── service_delivery.workflow.ts
+├── 04_twin
+│   ├── behavioral
+│   │   ├── behavioral_builder.ts
+│   │   ├── behavioral_model.ts
+│   │   └── behavioral_validator.ts
+│   ├── crcp
+│   │   ├── crcp_builder.ts
+│   │   ├── crcp_model.ts
+│   │   └── crcp_validator.ts
+│   ├── governance
+│   │   ├── governance_builder.ts
+│   │   ├── governance_model.ts
+│   │   ├── governance_progress_model.ts
+│   │   └── governance_validator.ts
+│   ├── lineage
+│   │   ├── lineage_audit.ts
+│   │   ├── lineage_resolver.ts
+│   │   └── twin_lineage.ts
+│   ├── operational
+│   │   ├── operational_builder.ts
+│   │   ├── operational_model.ts
+│   │   └── operational_validator.ts
+│   ├── snapshots
+│   │   ├── diagnostic_snapshot.ts
+│   │   ├── governance_snapshot.ts
+│   │   ├── maturity_snapshot.ts
+│   │   ├── reporting_snapshot.ts
+│   │   ├── simulation_snapshot.ts
+│   │   ├── structural_snapshot.ts
+│   │   └── twin_snapshot.ts
+│   ├── state_models
+│   │   ├── governance_transition_rules.ts
+│   │   ├── maturity_state_machine.ts
+│   │   ├── state_classifier.ts
+│   │   ├── state_transition_rules.ts
+│   │   └── twin_state_machine.ts
+│   ├── strategic
+│   │   ├── strategic_builder.ts
+│   │   ├── strategic_model.ts
+│   │   └── strategic_validator.ts
+│   ├── structural
+│   │   ├── structural_builder.ts
+│   │   ├── structural_model.ts
+│   │   └── structural_validator.ts
+│   ├── twin_builder
+│   │   ├── build_twin.ts
+│   │   ├── publish_twin.ts
+│   │   ├── twin_integrity_checks.ts
+│   │   └── validate_twin.ts
+│   └── types
+│       └── twin_types.ts
+├── 05_engine
+│   ├── data_capture
+│   │   ├── assignments
+│   │   ├── capture_completeness_score.ts
+│   │   ├── capture_engine.ts
+│   │   ├── daily_capture_validator.ts
+│   │   ├── daily_logs
+│   │   ├── reminders
+│   │   ├── role_capture_builder.ts
+│   │   ├── role_inputs
+│   │   └── validation
+│   ├── diagnostics
+│   │   ├── classifiers
+│   │   ├── detectors
+│   │   ├── diagnostic_engine.ts
+│   │   └── interpreters
+│   ├── intake
+│   │   ├── connectors
+│   │   ├── intake_orchestrator.ts
+│   │   ├── loaders
+│   │   └── parsers
+│   ├── mapping
+│   │   ├── entity_mapper.ts
+│   │   ├── mapping_engine.ts
+│   │   └── relationship_mapper.ts
+│   ├── metrics
+│   │   ├── latency
+│   │   ├── leakage
+│   │   ├── metrics_engine.ts
+│   │   ├── throughput
+│   │   └── utilization
+│   ├── normalization
+│   │   ├── field_mapping.ts
+│   │   ├── normalization_engine.ts
+│   │   ├── normalization_rules.ts
+│   │   └── standardizers.ts
+│   ├── orchestration
+│   │   ├── engine_orchestrator.ts
+│   │   ├── run_diagnostic.ts
+│   │   ├── run_governance_score.ts
+│   │   ├── run_maturity_update.ts
+│   │   ├── run_monthly_report.ts
+│   │   ├── run_simulation.ts
+│   │   ├── run_snapshot.ts
+│   │   └── run_weekly_report.ts
+│   ├── reporting
+│   │   ├── charts
+│   │   │   ├── chart_engine.ts
+│   │   │   ├── governance_score_chart.ts
+│   │   │   ├── maturity_progress_chart.ts
+│   │   │   ├── progress_chart.ts
+│   │   │   ├── risk_exposure_chart.ts
+│   │   │   ├── state_transition_chart.ts
+│   │   │   └── trend_chart.ts
+│   │   ├── comparators
+│   │   │   ├── baseline_comparator.ts
+│   │   │   ├── governance_level_comparator.ts
+│   │   │   ├── month_over_month.ts
+│   │   │   ├── rolling_window.ts
+│   │   │   └── week_over_week.ts
+│   │   ├── delivery
+│   │   │   ├── delivery_log.ts
+│   │   │   ├── email_delivery.ts
+│   │   │   └── secure_download.ts
+│   │   ├── executive
+│   │   │   ├── executive_recommendation_builder.ts
+│   │   │   └── executive_summary_builder.ts
+│   │   ├── governance
+│   │   │   ├── badge_status_section.ts
+│   │   │   ├── governance_chart_builder.ts
+│   │   │   ├── governance_section_builder.ts
+│   │   │   └── maturity_progress_section.ts
+│   │   ├── memory
+│   │   │   ├── governance_history_builder.ts
+│   │   │   ├── recommendation_tracking.ts
+│   │   │   ├── report_comparison.ts
+│   │   │   ├── report_history_builder.ts
+│   │   │   └── report_memory_engine.ts
+│   │   ├── monthly
+│   │   │   ├── monthly_payload.ts
+│   │   │   ├── monthly_report_builder.ts
+│   │   │   └── monthly_validator.ts
+│   │   ├── narratives
+│   │   │   ├── executive_tone_rules.ts
+│   │   │   ├── governance_narrative.ts
+│   │   │   ├── monthly_narrative.ts
+│   │   │   ├── narrative_engine.ts
+│   │   │   └── weekly_narrative.ts
+│   │   ├── pdf
+│   │   │   ├── footer_builder.ts
+│   │   │   ├── header_builder.ts
+│   │   │   ├── pdf_layout.ts
+│   │   │   ├── pdf_renderer.ts
+│   │   │   └── style_tokens.ts
+│   │   ├── report_builder.ts
+│   │   ├── reporting_orchestrator.ts
+│   │   ├── serializers
+│   │   │   ├── chart_asset_serializer.ts
+│   │   │   └── report_payload_serializer.ts
+│   │   ├── templates
+│   │   │   ├── executive_template.ts
+│   │   │   ├── governance_template.ts
+│   │   │   ├── monthly_template.ts
+│   │   │   └── weekly_template.ts
+│   │   └── weekly
+│   │       ├── weekly_payload.ts
+│   │       ├── weekly_report_builder.ts
+│   │       └── weekly_validator.ts
+│   ├── scoring
+│   │   ├── governance
+│   │   │   ├── badge_generator.ts
+│   │   │   ├── dimension_scores.ts
+│   │   │   ├── governance_progress.ts
+│   │   │   ├── governance_score_engine.ts
+│   │   │   ├── governance_snapshot_builder.ts
+│   │   │   ├── governance_validator.ts
+│   │   │   ├── maturity_level_classifier.ts
+│   │   │   └── scoring_weights.ts
+│   │   ├── operational_score.ts
+│   │   ├── score_engine.ts
+│   │   └── structural_score.ts
+│   ├── simulation
+│   │   ├── scenario_runner.ts
+│   │   ├── scenarios
+│   │   ├── simulation_engine.ts
+│   │   └── simulation_models.ts
+│   └── types
+│       └── engine_types.ts
+├── 06_data
+│   ├── fixtures
+│   ├── migrations
+│   ├── schemas
+│   │   ├── badge_awards.sql
+│   │   ├── data_capture_logs.sql
+│   │   ├── diagnostics.sql
+│   │   ├── entities.sql
+│   │   ├── events.sql
+│   │   ├── governance_dimensions.sql
+│   │   ├── governance_progress_logs.sql
+│   │   ├── governance_scores.sql
+│   │   ├── intake_sessions.sql
+│   │   ├── maturity_levels.sql
+│   │   ├── metrics.sql
+│   │   ├── organizations.sql
+│   │   ├── relationships.sql
+│   │   ├── report_assets.sql
+│   │   ├── report_delivery_logs.sql
+│   │   ├── report_memory.sql
+│   │   ├── reports.sql
+│   │   ├── role_assignments.sql
+│   │   ├── simulations.sql
+│   │   ├── snapshots.sql
+│   │   ├── twins.sql
+│   │   └── validation_failures.sql
+│   ├── seeds
+│   └── storage
+├── 07_app
+│   ├── api
+│   │   ├── ai-governance
+│   │   │   ├── audit
+│   │   │   ├── control
+│   │   │   ├── policies
+│   │   │   └── registry
+│   │   ├── data-capture
+│   │   │   ├── completeness
+│   │   │   ├── daily
+│   │   │   ├── role-input
+│   │   │   └── validations
+│   │   ├── diagnostics
+│   │   ├── governance
+│   │   │   ├── badges
+│   │   │   ├── history
+│   │   │   ├── levels
+│   │   │   ├── progress
+│   │   │   └── score
+│   │   ├── health
+│   │   ├── reports
+│   │   │   ├── download
+│   │   │   ├── generate
+│   │   │   ├── monthly
+│   │   │   ├── send
+│   │   │   └── weekly
+│   │   ├── simulations
+│   │   └── twins
+│   ├── shared
+│   │   ├── types
+│   │   ├── ui
+│   │   └── utils
+│   └── web
+│       ├── badge-view
+│       ├── daily-capture-view
+│       ├── dashboard
+│       ├── diagnostics-view
+│       ├── governance-admin-view
+│       ├── governance-progress-view
+│       ├── governance-view
+│       ├── reports-view
+│       ├── role-capture-view
+│       ├── simulation-view
+│       └── twin-view
+├── 08_agents
+│   ├── governance
+│   │   ├── action_validator
+│   │   ├── audit_agent
+│   │   ├── badge_integrity_agent
+│   │   ├── explainability_guard
+│   │   ├── governance_progress_agent
+│   │   └── policy_guard
+│   ├── monitoring
+│   │   ├── anomaly_detection
+│   │   ├── capture_watch
+│   │   └── reporting_watch
+│   ├── operational
+│   │   ├── inventory_risk
+│   │   ├── kitchen_optimization
+│   │   ├── revenue_patterns
+│   │   └── staffing_analysis
+│   ├── orchestration
+│   │   ├── agent_registry.ts
+│   │   ├── agent_router.ts
+│   │   └── agent_supervisor.ts
+│   └── prompts
+├── 09_governance
+│   ├── ai
+│   │   ├── audit_rules
+│   │   ├── escalation
+│   │   ├── model_governance
+│   │   ├── permissions
+│   │   └── policies
+│   ├── architecture
+│   ├── change_control
+│   ├── compliance
+│   ├── contract_policy
+│   ├── reporting
+│   │   ├── delivery_policy
+│   │   ├── document_classification
+│   │   └── template_control
+│   ├── scoring
+│   │   ├── badge_award_policy
+│   │   ├── dimension_policy
+│   │   ├── level_thresholds
+│   │   └── weight_policy
+│   ├── standards
+│   └── versioning
+├── 10_examples
+│   ├── badge_examples
+│   ├── diagnostics
+│   ├── governance_scores
+│   ├── intake_payloads
+│   ├── monthly_reports
+│   ├── role_capture_samples
+│   ├── simulations
+│   ├── twin_states
+│   └── weekly_reports
+├── 11_tests
+│   ├── ai_governance
+│   ├── api
+│   ├── badge_system
+│   ├── contracts
+│   ├── data_capture
+│   ├── engine
+│   ├── governance_scoring
+│   ├── integration
+│   ├── ontology
+│   ├── reporting
+│   └── twin
+├── 12_sectors
+│   ├── construction
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   ├── education
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   ├── general_ops
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   ├── healthcare
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   ├── logistics
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   ├── restaurants
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   ├── retail
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   ├── services
+│   │   ├── diagnostics
+│   │   ├── examples
+│   │   ├── metrics
+│   │   ├── ontology
+│   │   ├── reporting
+│   │   └── workflows
+│   └── technology
+│       ├── diagnostics
+│       ├── examples
+│       ├── metrics
+│       ├── ontology
+│       ├── reporting
+│       └── workflows
+├── README.md
+├── bin
+│   └── nexus
+├── package-lock.json
+├── package.json
+├── repo_structure.txt
+├── scripts
+│   ├── nexus-doctor.sh
+│   ├── nexus-init.sh
+│   └── nexus-validate.sh
+├── tsconfig.json
+└── turbo.json
+
+246 directories, 288 files

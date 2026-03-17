@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": ["ES2019"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "rootDir": ".",
+    "baseUrl": "."
+  },
+  "include": [
+    "02_contracts/**/*.ts",
+    "03_ontology/**/*.ts",
+    "04_twin/**/*.ts",
+    "05_engine/**/*.ts",
+    "07_app/**/*.ts",
+    "07_app/**/*.tsx",
+    "08_agents/**/*.ts",
+    "11_tests/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
+}

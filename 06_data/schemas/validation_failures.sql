@@ -1,0 +1,2 @@
+-- validation_failures
+-- nexus-core canonical schema placeholder
