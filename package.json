@@ -6,12 +6,15 @@
   "type": "commonjs",
   "scripts": {
     "typecheck": "tsc --noEmit",
+
     "phase1:demo": "npx ts-node scripts/run-phase1-demo.ts",
     "phase1:demo:summary": "npx ts-node scripts/run-phase1-demo-summary.ts",
     "phase1:test": "npx ts-node scripts/run-phase1-test.ts",
     "phase1:validate": "npm run typecheck && npm run phase1:test && npm run phase1:demo && npm run phase1:demo -- sample_restaurant_week_stable.json",
+
     "phase1:contrast": "npx ts-node scripts/run-phase1-contrast-test.ts",
     "phase1:contrast:all": "npx ts-node scripts/run-phase1-contrast-all-test.ts",
+
     "phase2:candidates": "npx ts-node scripts/run-phase2-candidate-review.ts",
     "phase2:leakage-probe": "npx ts-node scripts/run-phase2-leakage-probe.ts",
     "phase2:leakage-sim": "npx ts-node scripts/run-phase2-leakage-simulation.ts",
@@ -20,6 +23,7 @@
     "phase2:bundle": "npx ts-node scripts/run-phase2-bundle-assembly.ts",
     "phase2:bundle-check": "npx ts-node scripts/run-phase2-bundle-check.ts",
     "phase2:system-check": "npx ts-node scripts/run-phase2-system-check.ts",
+
     "phase3:persist-bundle": "npx ts-node scripts/run-phase3-persist-bundle.ts",
     "phase3:load-persisted-bundle": "npx ts-node scripts/run-phase3-load-persisted-bundle.ts",
     "phase3:persistence-check": "npx ts-node scripts/run-phase3-persistence-check.ts",
@@ -30,9 +34,27 @@
     "phase3:normalize-legacy-status": "npx ts-node scripts/run-phase3-legacy-status-normalization.ts",
     "phase3:compare-records": "npx ts-node scripts/run-phase3-compare-records.ts",
     "phase3:compare-records-executive": "npx ts-node scripts/run-phase3-compare-records-executive.ts",
+
     "phase4:api-demo": "npx ts-node scripts/run-phase4-api-service-demo.ts",
     "phase4:route-contract-check": "npx ts-node scripts/run-phase4-route-contract-check.ts",
-    "phase4:local-view-server": "npx ts-node scripts/run-phase4-local-view-server.ts"
+    "phase4:local-view-server": "npx ts-node scripts/run-phase4-local-view-server.ts",
+
+    "crcp:select": "npx ts-node scripts/run-crcp-question-selection.ts",
+    "crcp:select:restaurant": "npx ts-node scripts/run-crcp-question-selection.ts restaurant",
+    "crcp:select:retail": "npx ts-node scripts/run-crcp-question-selection.ts retail",
+    "crcp:select:services": "npx ts-node scripts/run-crcp-question-selection.ts services",
+    "crcp:select:construction": "npx ts-node scripts/run-crcp-question-selection.ts construction",
+    "crcp:select:health": "npx ts-node scripts/run-crcp-question-selection.ts health",
+    "crcp:select:technology": "npx ts-node scripts/run-crcp-question-selection.ts technology",
+    "crcp:select:education": "npx ts-node scripts/run-crcp-question-selection.ts education",
+    "crcp:select:logistics": "npx ts-node scripts/run-crcp-question-selection.ts logistics",
+    "crcp:scoring-check": "npx ts-node scripts/run-crcp-scoring-check.ts",
+    "crcp:decision-check": "npx ts-node scripts/run-crcp-decision-check.ts",
+    "crcp:snapshot-check": "npx ts-node scripts/run-crcp-snapshot-check.ts",
+    "crcp:twin-seed-check": "npx ts-node scripts/run-crcp-twin-seed-check.ts",
+    "crcp:pipeline-check": "npx ts-node scripts/run-crcp-pipeline-check.ts",
+
+    "crcp:normalize-check": "npx ts-node scripts/run-crcp-normalizer-check.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

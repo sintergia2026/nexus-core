@@ -5,11 +5,14 @@
       "staffing",
       "inventory",
       "customer_flow",
-      "reporting"
+      "reporting",
+      "finance",
+      "sales",
+      "planning"
     ],
     "question_mix": {
-      "cross_sector": 25,
-      "sector_specific": 17
+      "cross_sector": 28,
+      "sector_specific": 14
     }
   },
   "retail": {
@@ -18,11 +21,14 @@
       "inventory",
       "operations",
       "customer_flow",
-      "reporting"
+      "reporting",
+      "finance",
+      "planning",
+      "staffing"
     ],
     "question_mix": {
-      "cross_sector": 25,
-      "sector_specific": 17
+      "cross_sector": 28,
+      "sector_specific": 14
     }
   },
   "services": {
@@ -30,11 +36,14 @@
       "operations",
       "staffing",
       "sales",
-      "reporting"
+      "reporting",
+      "customer_flow",
+      "finance",
+      "planning"
     ],
     "question_mix": {
-      "cross_sector": 28,
-      "sector_specific": 14
+      "cross_sector": 30,
+      "sector_specific": 12
     }
   },
   "construction": {
@@ -42,11 +51,13 @@
       "operations",
       "planning",
       "staffing",
-      "finance"
+      "finance",
+      "reporting",
+      "inventory"
     ],
     "question_mix": {
-      "cross_sector": 26,
-      "sector_specific": 16
+      "cross_sector": 30,
+      "sector_specific": 12
     }
   },
   "health": {
@@ -54,11 +65,61 @@
       "operations",
       "staffing",
       "reporting",
-      "customer_flow"
+      "customer_flow",
+      "finance",
+      "planning",
+      "inventory",
+      "sales"
     ],
     "question_mix": {
-      "cross_sector": 27,
-      "sector_specific": 15
+      "cross_sector": 29,
+      "sector_specific": 13
+    }
+  },
+  "technology": {
+    "domains_priority": [
+      "operations",
+      "staffing",
+      "reporting",
+      "planning",
+      "sales",
+      "customer_flow",
+      "finance"
+    ],
+    "question_mix": {
+      "cross_sector": 31,
+      "sector_specific": 11
+    }
+  },
+  "education": {
+    "domains_priority": [
+      "operations",
+      "staffing",
+      "planning",
+      "reporting",
+      "customer_flow",
+      "finance",
+      "sales"
+    ],
+    "question_mix": {
+      "cross_sector": 31,
+      "sector_specific": 11
+    }
+  },
+  "logistics": {
+    "domains_priority": [
+      "operations",
+      "planning",
+      "staffing",
+      "reporting",
+      "inventory",
+      "finance",
+      "customer_flow",
+      "sales"
+    ],
+    "question_mix": {
+      "cross_sector": 30,
+      "sector_specific": 12
     }
   }
 }
