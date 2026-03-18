@@ -28,6 +28,28 @@ function metricValue(
   return metric ? String(metric.value) : "n/a";
 }
 
+function metricNumber(
+  metrics: Array<{ code: string; value: number | string }>,
+  code: string
+): number {
+  const metric = metrics.find((m) => m.code === code);
+  if (!metric) return 0;
+  const parsed = Number(metric.value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function reportingRiskLabel(value: number): string {
+  if (value < 40) return "Critical";
+  if (value < 70) return "Weak";
+  return "Acceptable";
+}
+
+function latencyLabel(value: number): string {
+  if (value >= 15) return "Elevated";
+  if (value >= 10) return "Moderate";
+  return "Controlled";
+}
+
 export default async function ExecutiveReportPage({
   searchParams,
 }: {
@@ -70,6 +92,14 @@ export default async function ExecutiveReportPage({
       (constraint) => `${constraint.code}:${constraint.severity}`
     ) ?? [];
 
+  const revenueLeakage = diagnostic ? metricNumber(diagnostic.metrics, "revenue_leakage") : 0;
+  const reportingReliability = diagnostic
+    ? metricNumber(diagnostic.metrics, "reporting_reliability")
+    : 0;
+  const latency = diagnostic ? metricNumber(diagnostic.metrics, "latency") : 0;
+  const throughput = diagnostic ? metricNumber(diagnostic.metrics, "throughput") : 0;
+  const utilization = diagnostic ? metricNumber(diagnostic.metrics, "utilization") : 0;
+
   return (
     <AppShell
       title="NEXUS™ Executive Report"
@@ -102,6 +132,12 @@ export default async function ExecutiveReportPage({
               operational state.
             </p>
 
+            <p>
+              The system detected structural weakness in the reporting and control
+              layer, which is reducing decision quality and allowing inefficiencies
+              to persist under active operating volume.
+            </p>
+
             <div className={styles.list} style={{ marginTop: 16 }}>
               <div className={styles.listItem}>
                 <Row label="Key Decision">{activeRecord.decisionLabel}</Row>
@@ -120,15 +156,13 @@ export default async function ExecutiveReportPage({
             <div className={styles.list}>
               <div className={styles.listItem}>
                 <Row label="Revenue Leakage Level">
-                  {Number(metricValue(diagnostic.metrics, "revenue_leakage")) > 0
-                    ? "Material"
-                    : "Low"}
+                  {revenueLeakage > 0 ? "Material" : "Low"}
                 </Row>
-                <Row label="Reporting Reliability">
-                  {metricValue(diagnostic.metrics, "reporting_reliability")}
+                <Row label="Reporting Control Risk">
+                  {reportingRiskLabel(reportingReliability)}
                 </Row>
                 <Row label="Operational Latency">
-                  {metricValue(diagnostic.metrics, "latency")}
+                  {latencyLabel(latency)}
                 </Row>
                 <Row label="Structural Risk Exposure">
                   {activeConstraints.length > 0 ? "High" : "Low"}
@@ -155,30 +189,47 @@ export default async function ExecutiveReportPage({
 
             <div className={styles.list}>
               <div className={styles.listItem}>
-                <Row label="Throughput">
-                  {metricValue(diagnostic.metrics, "throughput")}
-                </Row>
-                <Row label="Utilization">
-                  {metricValue(diagnostic.metrics, "utilization")}
-                </Row>
-                <Row label="Latency">
-                  {metricValue(diagnostic.metrics, "latency")}
-                </Row>
-                <Row label="Revenue Leakage">
-                  {metricValue(diagnostic.metrics, "revenue_leakage")}
-                </Row>
+                <Row label="Throughput">{throughput}</Row>
+                <Row label="Utilization">{utilization}</Row>
+                <Row label="Latency">{latency}</Row>
+                <Row label="Revenue Leakage">{revenueLeakage}</Row>
                 <Row label="Staffing Pressure">
                   {metricValue(diagnostic.metrics, "staffing_pressure")}
                 </Row>
-                <Row label="Reporting Reliability">
-                  {metricValue(diagnostic.metrics, "reporting_reliability")}
+                <Row label="Reporting Reliability">{reportingReliability}</Row>
+              </div>
+            </div>
+          </section>
+
+          <section className={`${styles.card} ${styles.fullWidth}`}>
+            <h2 className={styles.cardTitle}>5. Financial Exposure This Week</h2>
+            <div className={styles.meta}>money and control exposure</div>
+
+            <div className={styles.list}>
+              <div className={styles.listItem}>
+                <Row label="Detected Leakage">
+                  {revenueLeakage > 0 ? `$${revenueLeakage}` : "No direct leakage detected"}
+                </Row>
+                <Row label="Control Condition">
+                  {reportingReliability < 40
+                    ? "The business is operating with weak reporting control."
+                    : "The reporting layer remains usable."}
+                </Row>
+                <Row label="Immediate Financial Reading">
+                  {revenueLeakage > 0
+                    ? "Money is already being lost during active operation."
+                    : "No measurable direct leakage detected this week."}
+                </Row>
+                <Row label="Why This Matters Now">
+                  The operation is still producing, but it is no longer producing
+                  with reliable control.
                 </Row>
               </div>
             </div>
           </section>
 
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>5. What This Means In Business Terms</h2>
+            <h2 className={styles.cardTitle}>6. What This Means In Business Terms</h2>
             <div className={styles.meta}>executive reading</div>
 
             <div className={styles.exec}>
@@ -190,20 +241,20 @@ export default async function ExecutiveReportPage({
           </section>
 
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>6. Immediate Actions Required</h2>
+            <h2 className={styles.cardTitle}>7. Immediate Actions Required</h2>
             <div className={styles.meta}>next 7 days</div>
 
             <div className={styles.list}>
               <div className={styles.listItem}>
-                <p><strong>1.</strong> Stabilize the reporting layer.</p>
-                <p><strong>2.</strong> Investigate revenue leakage sources.</p>
-                <p><strong>3.</strong> Reduce structural flow friction.</p>
+                <p><strong>Owner / Manager:</strong> enforce complete daily reporting with zero missing fields before end-of-day close.</p>
+                <p><strong>Shift Lead:</strong> verify that each shift submits complete operational inputs and flag discrepancies the same day.</p>
+                <p><strong>Operations Review:</strong> audit where leakage is occurring and compare expected vs captured value daily for the next 7 days.</p>
               </div>
             </div>
           </section>
 
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>7. Risk If No Action Is Taken</h2>
+            <h2 className={styles.cardTitle}>8. Risk If No Action Is Taken</h2>
             <div className={styles.meta}>forward risk</div>
 
             <div className={styles.exec}>
@@ -214,7 +265,7 @@ export default async function ExecutiveReportPage({
           </section>
 
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>8. System Position</h2>
+            <h2 className={styles.cardTitle}>9. System Position</h2>
             <div className={styles.meta}>structural judgment</div>
 
             <div className={styles.exec}>
@@ -224,14 +275,15 @@ export default async function ExecutiveReportPage({
           </section>
 
           <section className={`${styles.card} ${styles.fullWidth}`}>
-            <h2 className={styles.cardTitle}>9. Closing Note</h2>
+            <h2 className={styles.cardTitle}>10. Closing Note</h2>
             <div className={styles.meta}>NEXUS interpretation layer</div>
 
             <div className={styles.exec}>
               This report is generated by NEXUS™, a domain-driven operational
               intelligence system designed to translate structural inefficiencies,
               governing constraints, and diagnostic posture into executive-level
-              action guidance.
+              action guidance. The goal is not only to observe the business, but
+              to help leadership recover control before hidden loss becomes normal.
             </div>
           </section>
         </div>
