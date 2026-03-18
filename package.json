@@ -53,6 +53,7 @@
     "crcp:snapshot-check": "npx ts-node scripts/run-crcp-snapshot-check.ts",
     "crcp:twin-seed-check": "npx ts-node scripts/run-crcp-twin-seed-check.ts",
     "crcp:pipeline-check": "npx ts-node scripts/run-crcp-pipeline-check.ts",
+    "crcp:persisted-check": "npx ts-node scripts/run-crcp-persisted-check.ts",
 
     "crcp:normalize-check": "npx ts-node scripts/run-crcp-normalizer-check.ts"
   },

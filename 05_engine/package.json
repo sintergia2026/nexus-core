@@ -1,0 +1,5 @@
+{
+  "name": "@nexus/engine",
+  "private": true,
+  "type": "module"
+}
