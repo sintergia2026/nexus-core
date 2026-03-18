@@ -1,0 +1,64 @@
+{
+  "restaurant": {
+    "domains_priority": [
+      "operations",
+      "staffing",
+      "inventory",
+      "customer_flow",
+      "reporting"
+    ],
+    "question_mix": {
+      "cross_sector": 25,
+      "sector_specific": 17
+    }
+  },
+  "retail": {
+    "domains_priority": [
+      "sales",
+      "inventory",
+      "operations",
+      "customer_flow",
+      "reporting"
+    ],
+    "question_mix": {
+      "cross_sector": 25,
+      "sector_specific": 17
+    }
+  },
+  "services": {
+    "domains_priority": [
+      "operations",
+      "staffing",
+      "sales",
+      "reporting"
+    ],
+    "question_mix": {
+      "cross_sector": 28,
+      "sector_specific": 14
+    }
+  },
+  "construction": {
+    "domains_priority": [
+      "operations",
+      "planning",
+      "staffing",
+      "finance"
+    ],
+    "question_mix": {
+      "cross_sector": 26,
+      "sector_specific": 16
+    }
+  },
+  "health": {
+    "domains_priority": [
+      "operations",
+      "staffing",
+      "reporting",
+      "customer_flow"
+    ],
+    "question_mix": {
+      "cross_sector": 27,
+      "sector_specific": 15
+    }
+  }
+}

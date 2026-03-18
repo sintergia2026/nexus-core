@@ -1,0 +1,18 @@
+{
+  "stabilize_now": {
+    "priority": "P1",
+    "description": "Immediate stabilization required"
+  },
+  "contain_risk": {
+    "priority": "P1",
+    "description": "High structural risk detected"
+  },
+  "standardize_operations": {
+    "priority": "P2",
+    "description": "Operational structure needs alignment"
+  },
+  "optimize_growth": {
+    "priority": "P3",
+    "description": "System is stable, focus on optimization"
+  }
+}
