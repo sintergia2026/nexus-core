@@ -42,5 +42,5 @@
     }
   ],
   "executive_summary": "The client is currently in a CRITICAL operational state. Recommended decision: stabilize_now. Primary signals detected: reporting_gap_signal, operational_instability_signal, financial_stress_signal. Primary constraints: reporting_visibility_constraint.",
-  "created_at": "2026-03-18T21:34:48.341Z"
+  "created_at": "2026-03-18T22:37:43.062Z"
 }

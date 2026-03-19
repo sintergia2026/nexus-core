@@ -1,18 +1,18 @@
 {
-  "twin_seed_id": "twin_seed::org-sintergia-demo::restaurant::1773869688341",
+  "twin_seed_id": "twin_seed::::logistics::1773863935899",
   "context": {
-    "organization_id": "org-sintergia-demo",
-    "sector": "restaurant",
-    "subsector": "casual_dining",
-    "country": "CO"
+    "organization_id": "",
+    "sector": "logistics",
+    "subsector": "Service",
+    "country": "USA/COLORADO"
   },
   "baseline_state": {
     "state_label": "critical",
     "scores": {
-      "operational_maturity": 45.8,
+      "operational_maturity": 54.65,
       "financial_pressure": 50,
       "reporting_reliability": 12.5,
-      "structural_risk": 47.7,
+      "structural_risk": 54.28,
       "commercial_strength": 48.55
     }
   },
@@ -40,5 +40,5 @@
     }
   ],
   "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps.",
-  "created_at": "2026-03-18T21:34:48.341Z"
+  "created_at": "2026-03-18T19:58:55.899Z"
 }

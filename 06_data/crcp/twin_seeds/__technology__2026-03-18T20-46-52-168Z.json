@@ -1,19 +1,19 @@
 {
-  "twin_seed_id": "twin_seed::org-sintergia-demo::restaurant::1773869688341",
+  "twin_seed_id": "twin_seed::::technology::1773866812194",
   "context": {
-    "organization_id": "org-sintergia-demo",
-    "sector": "restaurant",
-    "subsector": "casual_dining",
+    "organization_id": "",
+    "sector": "technology",
+    "subsector": "service",
     "country": "CO"
   },
   "baseline_state": {
     "state_label": "critical",
     "scores": {
-      "operational_maturity": 45.8,
-      "financial_pressure": 50,
+      "operational_maturity": 43.36,
+      "financial_pressure": 12.84,
       "reporting_reliability": 12.5,
-      "structural_risk": 47.7,
-      "commercial_strength": 48.55
+      "structural_risk": 45.89,
+      "commercial_strength": 36.23
     }
   },
   "active_signals": [
@@ -29,16 +29,25 @@
     },
     {
       "code": "financial_stress_signal",
-      "severity": "MEDIUM",
+      "severity": "HIGH",
       "source_metric": "financial_pressure"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
     }
   ],
   "active_constraints": [
     {
       "code": "reporting_visibility_constraint",
       "severity": "CRITICAL"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "CRITICAL"
     }
   ],
   "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps.",
-  "created_at": "2026-03-18T21:34:48.341Z"
+  "created_at": "2026-03-18T20:46:52.194Z"
 }

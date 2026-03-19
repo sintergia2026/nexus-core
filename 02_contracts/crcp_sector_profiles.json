@@ -1,83 +1,102 @@
 {
   "restaurant": {
-    "domains_priority": [
+    "sector": "restaurant",
+    "priority_domains": [
       "operations",
       "staffing",
       "inventory",
       "customer_flow",
       "reporting",
       "finance",
-      "sales",
-      "planning"
-    ],
-    "question_mix": {
-      "cross_sector": 28,
-      "sector_specific": 14
-    }
-  },
-  "retail": {
-    "domains_priority": [
-      "sales",
-      "inventory",
-      "operations",
-      "customer_flow",
-      "reporting",
-      "finance",
-      "planning",
-      "staffing"
-    ],
-    "question_mix": {
-      "cross_sector": 28,
-      "sector_specific": 14
-    }
-  },
-  "services": {
-    "domains_priority": [
-      "operations",
-      "staffing",
-      "sales",
-      "reporting",
-      "customer_flow",
-      "finance",
-      "planning"
-    ],
-    "question_mix": {
-      "cross_sector": 30,
-      "sector_specific": 12
-    }
-  },
-  "construction": {
-    "domains_priority": [
-      "operations",
-      "planning",
-      "staffing",
-      "finance",
-      "reporting",
-      "inventory"
-    ],
-    "question_mix": {
-      "cross_sector": 30,
-      "sector_specific": 12
-    }
-  },
-  "health": {
-    "domains_priority": [
-      "operations",
-      "staffing",
-      "reporting",
-      "customer_flow",
-      "finance",
-      "planning",
-      "inventory",
       "sales"
     ],
-    "question_mix": {
-      "cross_sector": 29,
-      "sector_specific": 13
-    }
+    "required_sector_questions": [
+      "OPS_R_01",
+      "STF_R_01",
+      "INV_R_01",
+      "CF_R_01",
+      "REP_R_01",
+      "FIN_R_01",
+      "SAL_R_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "OPS_02",
+      "OPS_08",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "FIN_02",
+      "CF_04",
+      "PLN_04"
+    ],
+    "adaptive_question_target": 42
   },
-  "technology": {
-    "domains_priority": [
+  "retail": {
+    "sector": "retail",
+    "priority_domains": [
+      "sales",
+      "inventory",
+      "operations",
+      "customer_flow",
+      "reporting",
+      "finance",
+      "planning"
+    ],
+    "required_sector_questions": [
+      "SAL_RET_01",
+      "INV_RET_01",
+      "OPS_RET_01",
+      "CF_RET_01",
+      "REP_R_01",
+      "FIN_RET_01",
+      "PLN_R_01"
+    ],
+    "preferred_cross_questions": [
+      "SAL_07",
+      "SAL_08",
+      "OPS_03",
+      "REP_02",
+      "REP_06",
+      "FIN_02",
+      "CF_04",
+      "PLN_04"
+    ],
+    "adaptive_question_target": 42
+  },
+  "health": {
+    "sector": "health",
+    "priority_domains": [
+      "operations",
+      "staffing",
+      "reporting",
+      "customer_flow",
+      "finance",
+      "planning",
+      "inventory"
+    ],
+    "required_sector_questions": [
+      "OPS_H_01",
+      "STF_H_01",
+      "REP_H_01",
+      "CF_H_01",
+      "PLN_H_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "REP_07",
+      "FIN_02",
+      "CF_04",
+      "PLN_04"
+    ],
+    "adaptive_question_target": 42
+  },
+  "services": {
+    "sector": "services",
+    "priority_domains": [
       "operations",
       "staffing",
       "reporting",
@@ -86,40 +105,210 @@
       "customer_flow",
       "finance"
     ],
-    "question_mix": {
-      "cross_sector": 31,
-      "sector_specific": 11
-    }
-  },
-  "education": {
-    "domains_priority": [
-      "operations",
-      "staffing",
-      "planning",
-      "reporting",
-      "customer_flow",
-      "finance",
-      "sales"
+    "required_sector_questions": [
+      "OPS_S_01",
+      "STF_S_01",
+      "REP_T_01",
+      "CF_S_01",
+      "SAL_S_01",
+      "PLN_L_01"
     ],
-    "question_mix": {
-      "cross_sector": 31,
-      "sector_specific": 11
-    }
+    "preferred_cross_questions": [
+      "OPS_03",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "FIN_02",
+      "CF_04",
+      "PLN_04"
+    ],
+    "adaptive_question_target": 42
   },
-  "logistics": {
-    "domains_priority": [
+  "construction": {
+    "sector": "construction",
+    "priority_domains": [
       "operations",
       "planning",
       "staffing",
       "reporting",
       "inventory",
-      "finance",
+      "finance"
+    ],
+    "required_sector_questions": [
+      "OPS_CON_01",
+      "STF_CON_01",
+      "REP_CON_01",
+      "INV_CON_01",
+      "FIN_CON_01",
+      "PLN_L_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "PLN_03",
+      "PLN_04",
+      "STF_06",
+      "REP_02",
+      "FIN_02"
+    ],
+    "adaptive_question_target": 42
+  },
+  "logistics": {
+    "sector": "logistics",
+    "priority_domains": [
+      "operations",
+      "planning",
+      "staffing",
+      "reporting",
+      "inventory",
+      "finance"
+    ],
+    "required_sector_questions": [
+      "OPS_L_01",
+      "STF_L_01",
+      "REP_CON_01",
+      "INV_CON_01",
+      "FIN_CON_01",
+      "PLN_L_01",
+      "SAL_S_01",
+      "CF_S_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "PLN_03",
+      "PLN_04",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "FIN_02"
+    ],
+    "adaptive_question_target": 42
+  },
+  "technology": {
+    "sector": "technology",
+    "priority_domains": [
+      "operations",
+      "staffing",
+      "reporting",
+      "planning",
+      "sales",
       "customer_flow",
+      "finance"
+    ],
+    "required_sector_questions": [
+      "OPS_S_01",
+      "STF_T_01",
+      "REP_T_01",
+      "SAL_S_01",
+      "CF_S_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "PLN_04",
+      "SAL_07",
+      "FIN_02"
+    ],
+    "adaptive_question_target": 42
+  },
+  "education": {
+    "sector": "education",
+    "priority_domains": [
+      "operations",
+      "staffing",
+      "planning",
+      "reporting",
+      "customer_flow",
+      "finance",
       "sales"
     ],
-    "question_mix": {
-      "cross_sector": 30,
-      "sector_specific": 12
-    }
+    "required_sector_questions": [
+      "OPS_S_01",
+      "STF_S_01",
+      "PLN_H_01",
+      "REP_T_01",
+      "CF_S_01",
+      "SAL_S_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "PLN_04",
+      "FIN_02"
+    ],
+    "adaptive_question_target": 42
+  },
+  "hospitality": {
+    "sector": "hospitality",
+    "priority_domains": [
+      "operations",
+      "staffing",
+      "customer_flow",
+      "reporting",
+      "finance",
+      "sales",
+      "planning"
+    ],
+    "required_sector_questions": [
+      "OPS_HSP_01",
+      "STF_HSP_01",
+      "CF_HSP_01",
+      "REP_HSP_01",
+      "FIN_HSP_01",
+      "SAL_HSP_01",
+      "PLN_HSP_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "OPS_02",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "FIN_02",
+      "CF_04",
+      "PLN_04",
+      "SAL_07"
+    ],
+    "adaptive_question_target": 42
+  },
+  "general": {
+    "sector": "general",
+    "priority_domains": [
+      "operations",
+      "reporting",
+      "finance",
+      "staffing",
+      "sales",
+      "customer_flow",
+      "planning"
+    ],
+    "required_sector_questions": [
+      "OPS_GEN_01",
+      "STF_GEN_01",
+      "REP_GEN_01",
+      "FIN_GEN_01",
+      "SAL_GEN_01",
+      "PLN_GEN_01"
+    ],
+    "preferred_cross_questions": [
+      "OPS_03",
+      "OPS_02",
+      "OPS_08",
+      "STF_06",
+      "REP_02",
+      "REP_06",
+      "FIN_02",
+      "FIN_03",
+      "SAL_02",
+      "SAL_07",
+      "CF_04",
+      "CF_05",
+      "PLN_01",
+      "PLN_04"
+    ],
+    "adaptive_question_target": 42
   }
 }

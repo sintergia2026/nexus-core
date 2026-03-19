@@ -1,0 +1,55 @@
+{
+  "context": {
+    "organization_id": "",
+    "sector": "technology",
+    "subsector": "service",
+    "country": "CO"
+  },
+  "scores": {
+    "operational_maturity": 43.36,
+    "financial_pressure": 12.84,
+    "reporting_reliability": 12.5,
+    "structural_risk": 45.89,
+    "commercial_strength": 36.23
+  },
+  "decision": {
+    "decision_label": "stabilize_now",
+    "priority": "P1",
+    "readiness_level": "low"
+  },
+  "state_label": "critical",
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "CRITICAL",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "HIGH",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "CRITICAL"
+    }
+  ],
+  "executive_summary": "The client is currently in a CRITICAL operational state. Recommended decision: stabilize_now. Primary signals detected: reporting_gap_signal, operational_instability_signal, financial_stress_signal, commercial_weakness_signal. Primary constraints: reporting_visibility_constraint, financial_control_constraint.",
+  "created_at": "2026-03-18T20:46:52.194Z"
+}

@@ -4,27 +4,31 @@ import { CrcpIntakePayload } from "../../../../../../../../05_engine/types/CrcpI
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as CrcpIntakePayload;
+    const payload = (await request.json()) as CrcpIntakePayload;
+    const result = runCrcp(payload, { persist: true });
 
-    const result = runCrcp(body, { persist: true });
+    if ("validation_issues" in result) {
+      return NextResponse.json(
+        {
+          ok: false,
+          result,
+          error: "CRCP intake validation failed.",
+        },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json(
-      {
-        ok: true,
-        result,
-        error: null,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      ok: true,
+      result,
+      error: null,
+    });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown CRCP execution error";
-
     return NextResponse.json(
       {
         ok: false,
         result: null,
-        error: message,
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

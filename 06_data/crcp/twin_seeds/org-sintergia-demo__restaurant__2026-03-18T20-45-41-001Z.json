@@ -1,23 +1,21 @@
 {
+  "twin_seed_id": "twin_seed::org-sintergia-demo::restaurant::1773866741019",
   "context": {
     "organization_id": "org-sintergia-demo",
     "sector": "restaurant",
     "subsector": "casual_dining",
     "country": "CO"
   },
-  "scores": {
-    "operational_maturity": 45.8,
-    "financial_pressure": 50,
-    "reporting_reliability": 12.5,
-    "structural_risk": 47.7,
-    "commercial_strength": 48.55
+  "baseline_state": {
+    "state_label": "critical",
+    "scores": {
+      "operational_maturity": 45.8,
+      "financial_pressure": 50,
+      "reporting_reliability": 12.5,
+      "structural_risk": 47.7,
+      "commercial_strength": 48.55
+    }
   },
-  "decision": {
-    "decision_label": "stabilize_now",
-    "priority": "P1",
-    "readiness_level": "medium"
-  },
-  "state_label": "critical",
   "active_signals": [
     {
       "code": "reporting_gap_signal",
@@ -41,6 +39,6 @@
       "severity": "CRITICAL"
     }
   ],
-  "executive_summary": "The client is currently in a CRITICAL operational state. Recommended decision: stabilize_now. Primary signals detected: reporting_gap_signal, operational_instability_signal, financial_stress_signal. Primary constraints: reporting_visibility_constraint.",
-  "created_at": "2026-03-18T21:34:48.341Z"
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps.",
+  "created_at": "2026-03-18T20:45:41.019Z"
 }

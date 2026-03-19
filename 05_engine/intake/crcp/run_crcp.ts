@@ -14,6 +14,10 @@ import {
   CrcpPersistenceResult,
   persistCrcpArtifacts,
 } from "./crcp_persistence";
+import {
+  validateCrcpIntake,
+  CrcpValidationIssue,
+} from "./crcp_intake_validator";
 
 export interface CrcpRunResult {
   intake: CrcpIntakePayload;
@@ -26,10 +30,39 @@ export interface CrcpRunResult {
   executed_at: string;
 }
 
+export interface CrcpRunErrorResult {
+  intake: CrcpIntakePayload;
+  normalized: null;
+  scores: null;
+  decision: null;
+  snapshot: null;
+  twin_seed: null;
+  persisted?: undefined;
+  executed_at: string;
+  validation_issues: CrcpValidationIssue[];
+}
+
+export type CrcpRunPipelineResult = CrcpRunResult | CrcpRunErrorResult;
+
 export function runCrcp(
   payload: CrcpIntakePayload,
   options?: { persist?: boolean }
-): CrcpRunResult {
+): CrcpRunPipelineResult {
+  const validation = validateCrcpIntake(payload);
+
+  if (!validation.ok) {
+    return {
+      intake: payload,
+      normalized: null,
+      scores: null,
+      decision: null,
+      snapshot: null,
+      twin_seed: null,
+      executed_at: new Date().toISOString(),
+      validation_issues: validation.issues,
+    };
+  }
+
   const normalized = normalizeCrcpIntake(payload);
   const scores = computeCrcpBaselineScores(normalized);
   const decision = computeCrcpDecision(scores);
@@ -37,7 +70,11 @@ export function runCrcp(
   const twinSeed = buildCrcpTwinSeed(snapshot);
 
   const persisted = options?.persist
-    ? persistCrcpArtifacts(payload, snapshot, twinSeed)
+    ? persistCrcpArtifacts({
+        intake: payload,
+        snapshot,
+        twinSeed,
+      })
     : undefined;
 
   return {

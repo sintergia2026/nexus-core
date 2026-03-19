@@ -1,0 +1,72 @@
+{
+  "restaurant": [
+    "casual_dining",
+    "fast_casual",
+    "fine_dining",
+    "cafe",
+    "bakery"
+  ],
+  "retail": [
+    "convenience",
+    "apparel",
+    "grocery",
+    "electronics",
+    "specialty"
+  ],
+  "services": [
+    "handyman",
+    "cleaning",
+    "agency",
+    "consulting",
+    "maintenance"
+  ],
+  "construction": [
+    "residential",
+    "commercial",
+    "subcontractor",
+    "general_contractor",
+    "remodeling"
+  ],
+  "health": [
+    "clinic",
+    "dental",
+    "therapy",
+    "outpatient",
+    "urgent_care"
+  ],
+  "logistics": [
+    "last_mile",
+    "warehousing",
+    "transport",
+    "dispatch",
+    "fleet_ops"
+  ],
+  "technology": [
+    "saas",
+    "agency_tech",
+    "dev_shop",
+    "managed_services",
+    "platform"
+  ],
+  "education": [
+    "academy",
+    "tutoring",
+    "training_center",
+    "school_support",
+    "institute"
+  ],
+  "hospitality": [
+    "hotel",
+    "hostel",
+    "travel_agency",
+    "tour_operator",
+    "vacation_rental"
+  ],
+  "general": [
+    "general_service",
+    "multi_service",
+    "hybrid_operation",
+    "other",
+    "custom"
+  ]
+}

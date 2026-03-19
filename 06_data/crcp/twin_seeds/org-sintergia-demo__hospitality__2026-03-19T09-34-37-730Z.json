@@ -1,9 +1,9 @@
 {
-  "twin_seed_id": "twin_seed::org-sintergia-demo::restaurant::1773869688341",
+  "twin_seed_id": "twin_seed::org-sintergia-demo::hospitality::1773912877886",
   "context": {
     "organization_id": "org-sintergia-demo",
-    "sector": "restaurant",
-    "subsector": "casual_dining",
+    "sector": "hospitality",
+    "subsector": "hotel",
     "country": "CO"
   },
   "baseline_state": {
@@ -40,5 +40,5 @@
     }
   ],
   "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps.",
-  "created_at": "2026-03-18T21:34:48.341Z"
+  "created_at": "2026-03-19T09:34:37.887Z"
 }
