@@ -1,6 +1,7 @@
 import { CrcpIntakePayload } from "../../types/CrcpIntakePayload";
 import questionBank from "../../../02_contracts/crcp_question_bank.json";
 import subsectorProfiles from "../../../02_contracts/crcp_subsector_profiles.json";
+import { selectCrcpQuestionsForSector } from "./crcp_sector_selector";
 
 type QuestionBankItem = {
   question_id: string;
@@ -11,6 +12,7 @@ type QuestionBankItem = {
   weight: number;
   cross_sector: boolean;
   applicable_sectors: string[];
+  scoring_direction?: string;
 };
 
 type SubsectorProfiles = Record<string, string[]>;
@@ -25,48 +27,6 @@ export type CrcpValidationResult = {
   ok: boolean;
   issues: CrcpValidationIssue[];
 };
-
-const SCALE_QUESTION_IDS = new Set([
-  "OPS_02",
-  "OPS_06",
-  "STF_06",
-  "REP_02",
-  "FIN_02",
-  "SAL_02",
-  "SAL_07",
-  "CF_04",
-  "PLN_04",
-]);
-
-const REQUIRED_QUESTION_IDS = [
-  "ID_01",
-  "ID_02",
-  "OPS_01",
-  "OPS_02",
-  "OPS_06",
-  "STF_01",
-  "STF_06",
-  "REP_02",
-  "REP_06",
-  "FIN_02",
-  "FIN_03",
-  "SAL_02",
-  "SAL_07",
-  "CF_04",
-  "CF_05",
-  "PLN_01",
-  "PLN_04",
-];
-
-const YES_NO_QUESTION_IDS = new Set([
-  "OPS_01",
-  "REP_06",
-  "FIN_03",
-  "CF_05",
-  "PLN_01",
-]);
-
-const BOOLEAN_QUESTION_IDS = new Set(["STF_01"]);
 
 const questionBankTyped = questionBank as QuestionBankItem[];
 const subsectorProfilesTyped = subsectorProfiles as SubsectorProfiles;
@@ -90,6 +50,29 @@ function isValidScaleValue(value: unknown): boolean {
   );
 }
 
+function isValidNumericValue(value: unknown): boolean {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isValidStringValue(value: unknown): boolean {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isValidMultiSelectValue(value: unknown): boolean {
+  if (typeof value === "string") {
+    return value.trim().length > 0;
+  }
+
+  if (Array.isArray(value)) {
+    return (
+      value.length > 0 &&
+      value.every((item) => typeof item === "string" && item.trim().length > 0)
+    );
+  }
+
+  return false;
+}
+
 function hasDuplicateQuestionIds(payload: CrcpIntakePayload): string[] {
   const seen = new Set<string>();
   const duplicates = new Set<string>();
@@ -106,6 +89,15 @@ function hasDuplicateQuestionIds(payload: CrcpIntakePayload): string[] {
 
 function getQuestionById(questionId: string): QuestionBankItem | undefined {
   return questionBankTyped.find((q) => q.question_id === questionId);
+}
+
+function getExpectedQuestionIdsForSector(sector: string): string[] {
+  const selection = selectCrcpQuestionsForSector(sector);
+
+  return [
+    ...(selection.identityQuestions ?? []),
+    ...(selection.adaptiveQuestions ?? []),
+  ];
 }
 
 export function validateCrcpIntake(
@@ -127,16 +119,21 @@ export function validateCrcpIntake(
   }
 
   if (!payload.context) {
-    issues.push({
-      code: "MISSING_CONTEXT",
-      field: "context",
-      message: "CRCP intake context is required.",
-    });
+    return {
+      ok: false,
+      issues: [
+        {
+          code: "MISSING_CONTEXT",
+          field: "context",
+          message: "CRCP intake context is required.",
+        },
+      ],
+    };
   }
 
   const context = payload.context;
 
-  if (!context?.organization_id || context.organization_id.trim() === "") {
+  if (!isValidStringValue(context.organization_id)) {
     issues.push({
       code: "MISSING_ORGANIZATION_ID",
       field: "context.organization_id",
@@ -144,13 +141,15 @@ export function validateCrcpIntake(
     });
   }
 
-  if (!context?.sector || context.sector.trim() === "") {
+  if (!isValidStringValue(context.sector)) {
     issues.push({
       code: "MISSING_SECTOR",
       field: "context.sector",
       message: "sector is required.",
     });
-  } else if (!Object.keys(subsectorProfilesTyped).includes(context.sector)) {
+  } else if (
+    !Object.prototype.hasOwnProperty.call(subsectorProfilesTyped, context.sector)
+  ) {
     issues.push({
       code: "INVALID_SECTOR",
       field: "context.sector",
@@ -158,14 +157,14 @@ export function validateCrcpIntake(
     });
   }
 
-  if (!context?.subsector || context.subsector.trim() === "") {
+  if (!isValidStringValue(context.subsector)) {
     issues.push({
       code: "MISSING_SUBSECTOR",
       field: "context.subsector",
       message: "subsector is required.",
     });
   } else if (
-    context?.sector &&
+    isValidStringValue(context.sector) &&
     subsectorProfilesTyped[context.sector] &&
     !subsectorProfilesTyped[context.sector].includes(context.subsector)
   ) {
@@ -176,7 +175,7 @@ export function validateCrcpIntake(
     });
   }
 
-  if (!context?.country || context.country.trim() === "") {
+  if (!isValidStringValue(context.country)) {
     issues.push({
       code: "MISSING_COUNTRY",
       field: "context.country",
@@ -192,7 +191,23 @@ export function validateCrcpIntake(
     });
   }
 
+  if (!payload.captured_at || Number.isNaN(Date.parse(payload.captured_at))) {
+    issues.push({
+      code: "INVALID_CAPTURED_AT",
+      field: "captured_at",
+      message: "captured_at must be a valid ISO timestamp.",
+    });
+  }
+
+  if (issues.length > 0) {
+    return {
+      ok: false,
+      issues,
+    };
+  }
+
   const duplicateIds = hasDuplicateQuestionIds(payload);
+
   for (const duplicateId of duplicateIds) {
     issues.push({
       code: "DUPLICATE_QUESTION_ID",
@@ -201,14 +216,17 @@ export function validateCrcpIntake(
     });
   }
 
-  const answerMap = new Map(payload.answers.map((a) => [a.question_id, a]));
+  const expectedQuestionIds = getExpectedQuestionIdsForSector(context.sector);
+  const expectedQuestionIdSet = new Set(expectedQuestionIds);
+  const answerMap = new Map(payload.answers.map((answer) => [answer.question_id, answer]));
+  const answeredQuestionIds = new Set(payload.answers.map((answer) => answer.question_id));
 
-  for (const requiredQuestionId of REQUIRED_QUESTION_IDS) {
-    if (!answerMap.has(requiredQuestionId)) {
+  for (const expectedQuestionId of expectedQuestionIds) {
+    if (!answerMap.has(expectedQuestionId)) {
       issues.push({
         code: "MISSING_REQUIRED_ANSWER",
-        field: `answers.${requiredQuestionId}`,
-        message: `Required answer "${requiredQuestionId}" is missing.`,
+        field: `answers.${expectedQuestionId}`,
+        message: `Required answer "${expectedQuestionId}" is missing for sector "${context.sector}".`,
       });
     }
   }
@@ -225,15 +243,21 @@ export function validateCrcpIntake(
       continue;
     }
 
+    if (!expectedQuestionIdSet.has(answer.question_id)) {
+      issues.push({
+        code: "QUESTION_NOT_IN_CANONICAL_SELECTION",
+        field: `answers.${answer.question_id}`,
+        message: `question "${answer.question_id}" is not part of the canonical CRCP selection for sector "${context.sector}".`,
+      });
+    }
+
     if (isBlank(answer.section)) {
       issues.push({
         code: "MISSING_SECTION",
         field: `answers.${answer.question_id}.section`,
         message: `section is required for question "${answer.question_id}".`,
       });
-    }
-
-    if (answer.section !== question.domain) {
+    } else if (answer.section !== question.domain) {
       issues.push({
         code: "SECTION_DOMAIN_MISMATCH",
         field: `answers.${answer.question_id}.section`,
@@ -252,7 +276,6 @@ export function validateCrcpIntake(
 
     if (
       !question.cross_sector &&
-      context?.sector &&
       !question.applicable_sectors.includes(context.sector)
     ) {
       issues.push({
@@ -262,10 +285,34 @@ export function validateCrcpIntake(
       });
     }
 
-    if (
-      SCALE_QUESTION_IDS.has(answer.question_id) &&
-      !isValidScaleValue(answer.value)
-    ) {
+    if (answer.question_id === "ID_01") {
+      if (!isValidStringValue(answer.value)) {
+        issues.push({
+          code: "INVALID_BUSINESS_NAME",
+          field: "answers.ID_01.value",
+          message: "ID_01 must be a non-empty string.",
+        });
+      }
+      continue;
+    }
+
+    if (answer.question_id === "ID_02") {
+      const validSectorAnswer =
+        Array.isArray(answer.value) &&
+        answer.value.length === 1 &&
+        answer.value[0] === context.sector;
+
+      if (!validSectorAnswer) {
+        issues.push({
+          code: "INVALID_SECTOR_ANSWER",
+          field: "answers.ID_02.value",
+          message: "ID_02 must contain exactly the selected sector from context.",
+        });
+      }
+      continue;
+    }
+
+    if (question.type === "scale_1_5" && !isValidScaleValue(answer.value)) {
       issues.push({
         code: "INVALID_SCALE_VALUE",
         field: `answers.${answer.question_id}.value`,
@@ -274,8 +321,11 @@ export function validateCrcpIntake(
     }
 
     if (
-      YES_NO_QUESTION_IDS.has(answer.question_id) &&
-      !["yes", "no"].includes(String(answer.value).toLowerCase())
+      question.type === "yes_no" &&
+      !(
+        typeof answer.value === "string" &&
+        ["yes", "no"].includes(answer.value.toLowerCase())
+      )
     ) {
       issues.push({
         code: "INVALID_YES_NO_VALUE",
@@ -284,44 +334,39 @@ export function validateCrcpIntake(
       });
     }
 
-    if (
-      BOOLEAN_QUESTION_IDS.has(answer.question_id) &&
-      typeof answer.value !== "boolean"
-    ) {
+    if (question.type === "numeric" && !isValidNumericValue(answer.value)) {
       issues.push({
-        code: "INVALID_BOOLEAN_VALUE",
+        code: "INVALID_NUMERIC_VALUE",
         field: `answers.${answer.question_id}.value`,
-        message: `question "${answer.question_id}" must be boolean.`,
+        message: `question "${answer.question_id}" must be numeric.`,
       });
     }
 
-    if (answer.question_id === "ID_01" && typeof answer.value !== "string") {
+    if (question.type === "string" && !isValidStringValue(answer.value)) {
       issues.push({
-        code: "INVALID_BUSINESS_NAME",
-        field: "answers.ID_01.value",
-        message: "ID_01 must be a string.",
+        code: "INVALID_STRING_VALUE",
+        field: `answers.${answer.question_id}.value`,
+        message: `question "${answer.question_id}" must be a non-empty string.`,
       });
     }
 
     if (
-      answer.question_id === "ID_02" &&
-      (!Array.isArray(answer.value) ||
-        answer.value.length !== 1 ||
-        answer.value[0] !== context?.sector)
+      question.type === "multi_select" &&
+      !isValidMultiSelectValue(answer.value)
     ) {
       issues.push({
-        code: "INVALID_SECTOR_ANSWER",
-        field: "answers.ID_02.value",
-        message: "ID_02 must contain exactly the selected sector from context.",
+        code: "INVALID_MULTI_SELECT_VALUE",
+        field: `answers.${answer.question_id}.value`,
+        message: `question "${answer.question_id}" must be a non-empty string or non-empty string array.`,
       });
     }
   }
 
-  if (!payload.captured_at || Number.isNaN(Date.parse(payload.captured_at))) {
+  if (answeredQuestionIds.size !== expectedQuestionIds.length) {
     issues.push({
-      code: "INVALID_CAPTURED_AT",
-      field: "captured_at",
-      message: "captured_at must be a valid ISO timestamp.",
+      code: "ANSWER_COUNT_MISMATCH",
+      field: "answers",
+      message: `Expected ${expectedQuestionIds.length} canonical answers for sector "${context.sector}", but received ${answeredQuestionIds.size} unique answers.`,
     });
   }
 

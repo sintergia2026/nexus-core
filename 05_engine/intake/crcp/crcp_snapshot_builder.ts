@@ -8,22 +8,77 @@ import {
 } from "../../types/CrcpDiagnosticSnapshot";
 import { CrcpIntakePayload } from "../../types/CrcpIntakePayload";
 
+function clampScore(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, value));
+}
+
+function severityFromScore(
+  score: number,
+  criticalThreshold: number,
+  highThreshold: number,
+  mediumThreshold: number
+): "CRITICAL" | "HIGH" | "MEDIUM" | null {
+  if (score < criticalThreshold) {
+    return "CRITICAL";
+  }
+
+  if (score < highThreshold) {
+    return "HIGH";
+  }
+
+  if (score < mediumThreshold) {
+    return "MEDIUM";
+  }
+
+  return null;
+}
+
 function deriveStateLabel(
   scores: CrcpBaselineScores,
   decision: CrcpDecision
 ): CrcpStateLabel {
-  if (
-    decision.priority === "P1" &&
-    (scores.reporting_reliability < 25 || scores.structural_risk < 35)
-  ) {
+  const reportingReliability = clampScore(scores.reporting_reliability);
+  const structuralRisk = clampScore(scores.structural_risk);
+  const operationalMaturity = clampScore(scores.operational_maturity);
+  const financialPressure = clampScore(scores.financial_pressure);
+  const commercialStrength = clampScore(scores.commercial_strength);
+
+  const visibilityCollapse =
+    reportingReliability < 30 ||
+    (reportingReliability < 40 && structuralRisk < 40);
+
+  const structuralCollapse =
+    structuralRisk < 30 ||
+    (operationalMaturity < 35 && structuralRisk < 40);
+
+  const compoundCriticalFragility =
+    reportingReliability < 45 &&
+    structuralRisk < 45 &&
+    financialPressure < 45;
+
+  if (visibilityCollapse || structuralCollapse || compoundCriticalFragility) {
     return "critical";
   }
 
-  if (decision.priority === "P1") {
+  if (
+    decision.priority === "P1" ||
+    operationalMaturity < 45 ||
+    financialPressure < 45 ||
+    commercialStrength < 40
+  ) {
     return "fragile";
   }
 
-  if (decision.priority === "P2") {
+  if (
+    decision.priority === "P2" ||
+    operationalMaturity < 60 ||
+    reportingReliability < 60 ||
+    structuralRisk < 60
+  ) {
     return "degraded";
   }
 
@@ -33,53 +88,100 @@ function deriveStateLabel(
 function deriveSignals(scores: CrcpBaselineScores): CrcpSignal[] {
   const signals: CrcpSignal[] = [];
 
-  if (scores.reporting_reliability < 25) {
+  const operationalMaturity = clampScore(scores.operational_maturity);
+  const financialPressure = clampScore(scores.financial_pressure);
+  const reportingReliability = clampScore(scores.reporting_reliability);
+  const structuralRisk = clampScore(scores.structural_risk);
+  const commercialStrength = clampScore(scores.commercial_strength);
+
+  const reportingSeverity = severityFromScore(
+    reportingReliability,
+    35,
+    45,
+    60
+  );
+  if (reportingSeverity) {
     signals.push({
       code: "reporting_gap_signal",
-      severity: "CRITICAL",
-      source_metric: "reporting_reliability",
-    });
-  } else if (scores.reporting_reliability < 45) {
-    signals.push({
-      code: "reporting_gap_signal",
-      severity: "HIGH",
+      severity: reportingSeverity,
       source_metric: "reporting_reliability",
     });
   }
 
-  if (scores.operational_maturity < 40) {
+  const operationalSeverity = severityFromScore(
+    operationalMaturity,
+    35,
+    45,
+    60
+  );
+  if (operationalSeverity) {
     signals.push({
       code: "operational_instability_signal",
-      severity: "HIGH",
-      source_metric: "operational_maturity",
-    });
-  } else if (scores.operational_maturity < 55) {
-    signals.push({
-      code: "operational_instability_signal",
-      severity: "MEDIUM",
+      severity: operationalSeverity,
       source_metric: "operational_maturity",
     });
   }
 
-  if (scores.financial_pressure < 40) {
+  const financialSeverity = severityFromScore(
+    financialPressure,
+    35,
+    45,
+    60
+  );
+  if (financialSeverity) {
     signals.push({
       code: "financial_stress_signal",
-      severity: "HIGH",
-      source_metric: "financial_pressure",
-    });
-  } else if (scores.financial_pressure < 55) {
-    signals.push({
-      code: "financial_stress_signal",
-      severity: "MEDIUM",
+      severity: financialSeverity,
       source_metric: "financial_pressure",
     });
   }
 
-  if (scores.commercial_strength < 45) {
+  const structuralSeverity = severityFromScore(
+    structuralRisk,
+    35,
+    45,
+    60
+  );
+  if (structuralSeverity) {
+    signals.push({
+      code: "structural_fragility_signal",
+      severity: structuralSeverity,
+      source_metric: "structural_risk",
+    });
+  }
+
+  const commercialSeverity = severityFromScore(
+    commercialStrength,
+    30,
+    40,
+    55
+  );
+  if (commercialSeverity) {
     signals.push({
       code: "commercial_weakness_signal",
-      severity: "MEDIUM",
+      severity: commercialSeverity,
       source_metric: "commercial_strength",
+    });
+  }
+
+  if (reportingReliability < 45 && structuralRisk < 45) {
+    signals.push({
+      code: "visibility_risk_compound_signal",
+      severity:
+        reportingReliability < 35 || structuralRisk < 35 ? "CRITICAL" : "HIGH",
+      source_metric: "compound_visibility_structural",
+    });
+  }
+
+  if (
+    reportingReliability < 45 &&
+    structuralRisk < 45 &&
+    financialPressure < 45
+  ) {
+    signals.push({
+      code: "multi_domain_fragility_signal",
+      severity: "CRITICAL",
+      source_metric: "compound_multi_domain",
     });
   }
 
@@ -89,24 +191,52 @@ function deriveSignals(scores: CrcpBaselineScores): CrcpSignal[] {
 function deriveConstraints(scores: CrcpBaselineScores): CrcpConstraint[] {
   const constraints: CrcpConstraint[] = [];
 
-  if (scores.reporting_reliability < 40) {
+  const reportingReliability = clampScore(scores.reporting_reliability);
+  const structuralRisk = clampScore(scores.structural_risk);
+  const financialPressure = clampScore(scores.financial_pressure);
+  const operationalMaturity = clampScore(scores.operational_maturity);
+  const commercialStrength = clampScore(scores.commercial_strength);
+
+  if (reportingReliability < 60) {
     constraints.push({
       code: "reporting_visibility_constraint",
-      severity: scores.reporting_reliability < 25 ? "CRITICAL" : "HIGH",
+      severity: reportingReliability < 35 ? "CRITICAL" : "HIGH",
     });
   }
 
-  if (scores.structural_risk < 45) {
+  if (structuralRisk < 60) {
     constraints.push({
       code: "structural_fragility_constraint",
-      severity: scores.structural_risk < 30 ? "CRITICAL" : "HIGH",
+      severity: structuralRisk < 35 ? "CRITICAL" : "HIGH",
     });
   }
 
-  if (scores.financial_pressure < 45) {
+  if (financialPressure < 60) {
     constraints.push({
       code: "financial_control_constraint",
-      severity: scores.financial_pressure < 30 ? "CRITICAL" : "HIGH",
+      severity: financialPressure < 35 ? "CRITICAL" : "HIGH",
+    });
+  }
+
+  if (operationalMaturity < 55) {
+    constraints.push({
+      code: "execution_standardization_constraint",
+      severity: operationalMaturity < 40 ? "CRITICAL" : "HIGH",
+    });
+  }
+
+  if (commercialStrength < 50) {
+    constraints.push({
+      code: "commercial_instability_constraint",
+      severity: commercialStrength < 35 ? "CRITICAL" : "HIGH",
+    });
+  }
+
+  if (reportingReliability < 45 && structuralRisk < 45) {
+    constraints.push({
+      code: "visibility_structural_compound_constraint",
+      severity:
+        reportingReliability < 35 || structuralRisk < 35 ? "CRITICAL" : "HIGH",
     });
   }
 
@@ -116,7 +246,7 @@ function deriveConstraints(scores: CrcpBaselineScores): CrcpConstraint[] {
 function buildExecutiveSummary(
   snapshot: Pick<
     CrcpDiagnosticSnapshot,
-    "state_label" | "decision" | "active_signals" | "active_constraints"
+    "state_label" | "decision" | "active_signals" | "active_constraints" | "scores"
   >
 ): string {
   const signalCodes = snapshot.active_signals.map((signal) => signal.code);
@@ -124,14 +254,27 @@ function buildExecutiveSummary(
     (constraint) => constraint.code
   );
 
+  const weakestDimension = Object.entries(snapshot.scores).sort(
+    (a, b) => a[1] - b[1]
+  )[0];
+
+  const weakestLabel = weakestDimension
+    ? weakestDimension[0]
+    : "unknown_dimension";
+
+  const weakestScore = weakestDimension
+    ? Math.round(weakestDimension[1] * 100) / 100
+    : 0;
+
   return [
-    `The client is currently in a ${snapshot.state_label.toUpperCase()} operational state.`,
-    `Recommended decision: ${snapshot.decision.decision_label}.`,
+    `The client is currently in a ${snapshot.state_label.toUpperCase()} structural state.`,
+    `Recommended decision: ${snapshot.decision.decision_label} with priority ${snapshot.decision.priority}.`,
+    `Lowest-performing dimension: ${weakestLabel} (${weakestScore}).`,
     signalCodes.length > 0
       ? `Primary signals detected: ${signalCodes.join(", ")}.`
       : `No major structural signals detected.`,
     constraintCodes.length > 0
-      ? `Primary constraints: ${constraintCodes.join(", ")}.`
+      ? `Primary constraints active: ${constraintCodes.join(", ")}.`
       : `No active structural constraints detected.`,
   ].join(" ");
 }
@@ -141,11 +284,20 @@ export function buildCrcpDiagnosticSnapshot(
   scores: CrcpBaselineScores,
   decision: CrcpDecision
 ): CrcpDiagnosticSnapshot {
-  const stateLabel = deriveStateLabel(scores, decision);
-  const activeSignals = deriveSignals(scores);
-  const activeConstraints = deriveConstraints(scores);
+  const normalizedScores: CrcpBaselineScores = {
+    operational_maturity: clampScore(scores.operational_maturity),
+    financial_pressure: clampScore(scores.financial_pressure),
+    reporting_reliability: clampScore(scores.reporting_reliability),
+    structural_risk: clampScore(scores.structural_risk),
+    commercial_strength: clampScore(scores.commercial_strength),
+  };
+
+  const stateLabel = deriveStateLabel(normalizedScores, decision);
+  const activeSignals = deriveSignals(normalizedScores);
+  const activeConstraints = deriveConstraints(normalizedScores);
 
   const executiveSummary = buildExecutiveSummary({
+    scores: normalizedScores,
     state_label: stateLabel,
     decision,
     active_signals: activeSignals,
@@ -154,7 +306,7 @@ export function buildCrcpDiagnosticSnapshot(
 
   return {
     context: payload.context,
-    scores,
+    scores: normalizedScores,
     decision,
     state_label: stateLabel,
     active_signals: activeSignals,

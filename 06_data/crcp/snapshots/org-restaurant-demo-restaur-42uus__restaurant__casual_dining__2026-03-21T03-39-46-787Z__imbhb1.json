@@ -1,0 +1,45 @@
+{
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-42uus",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO"
+  },
+  "scores": {
+    "operational_maturity": 63.44,
+    "financial_pressure": 54.87,
+    "reporting_reliability": 57.66,
+    "structural_risk": 62.09,
+    "commercial_strength": 70.83
+  },
+  "decision": {
+    "decision_label": "standardize_operations",
+    "priority": "P2",
+    "readiness_level": "medium"
+  },
+  "state_label": "degraded",
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a DEGRADED structural state. Recommended decision: standardize_operations with priority P2. Lowest-performing dimension: financial_pressure (54.87). Primary signals detected: reporting_gap_signal, financial_stress_signal. Primary constraints active: reporting_visibility_constraint, financial_control_constraint.",
+  "created_at": "2026-03-21T03:39:46.873Z"
+}

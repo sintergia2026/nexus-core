@@ -1,0 +1,23 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-50dke::restaurant::casual_dining::2026-03-21T04-20-36-558Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-50dke",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO"
+  },
+  "baseline_state": {
+    "state_label": "degraded",
+    "scores": {
+      "operational_maturity": 61.56,
+      "financial_pressure": 62.12,
+      "reporting_reliability": 67.07,
+      "structural_risk": 63.73,
+      "commercial_strength": 70.83
+    }
+  },
+  "active_signals": [],
+  "active_constraints": [],
+  "structural_hypothesis": "The client is degraded rather than collapsed. Core business activity exists, but structural discipline, planning consistency, or cross-functional coordination likely remain below the threshold required for resilient scaling.",
+  "created_at": "2026-03-21T04:20:36.558Z"
+}

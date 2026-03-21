@@ -44,47 +44,84 @@ export interface CrcpRunErrorResult {
 
 export type CrcpRunPipelineResult = CrcpRunResult | CrcpRunErrorResult;
 
+function normalizePayloadForExecution(
+  payload: CrcpIntakePayload
+): CrcpIntakePayload {
+  const safeContext = payload?.context ?? {
+    organization_id: "",
+    sector: "",
+    subsector: "",
+    country: "",
+  };
+
+  const safeAnswers = Array.isArray(payload?.answers) ? payload.answers : [];
+
+  return {
+    ...payload,
+    context: {
+      organization_id: String(safeContext.organization_id || "").trim(),
+      sector: String(safeContext.sector || "").trim(),
+      subsector: String(safeContext.subsector || "").trim(),
+      country: String(safeContext.country || "").trim(),
+    },
+    captured_at:
+      typeof payload?.captured_at === "string" &&
+      payload.captured_at.trim().length > 0
+        ? payload.captured_at
+        : new Date().toISOString(),
+    answers: safeAnswers.map((answer) => ({
+      ...answer,
+      question_id: String(answer?.question_id || "").trim(),
+      section: String(answer?.section || "").trim(),
+      value: answer?.value,
+    })),
+  };
+}
+
 export function runCrcp(
   payload: CrcpIntakePayload,
   options?: { persist?: boolean }
 ): CrcpRunPipelineResult {
-  const validation = validateCrcpIntake(payload);
+  const intake = normalizePayloadForExecution(payload);
+  const executedAt = new Date().toISOString();
+
+  const validation = validateCrcpIntake(intake);
 
   if (!validation.ok) {
     return {
-      intake: payload,
+      intake,
       normalized: null,
       scores: null,
       decision: null,
       snapshot: null,
       twin_seed: null,
-      executed_at: new Date().toISOString(),
+      executed_at: executedAt,
       validation_issues: validation.issues,
     };
   }
 
-  const normalized = normalizeCrcpIntake(payload);
+  const normalized = normalizeCrcpIntake(intake);
   const scores = computeCrcpBaselineScores(normalized);
   const decision = computeCrcpDecision(scores);
-  const snapshot = buildCrcpDiagnosticSnapshot(payload, scores, decision);
+  const snapshot = buildCrcpDiagnosticSnapshot(intake, scores, decision);
   const twinSeed = buildCrcpTwinSeed(snapshot);
 
   const persisted = options?.persist
     ? persistCrcpArtifacts({
-        intake: payload,
+        intake,
         snapshot,
         twinSeed,
       })
     : undefined;
 
   return {
-    intake: payload,
+    intake,
     normalized,
     scores,
     decision,
     snapshot,
     twin_seed: twinSeed,
     persisted,
-    executed_at: new Date().toISOString(),
+    executed_at: executedAt,
   };
 }

@@ -27,6 +27,7 @@ type CrcpRunApiResponse = {
         sector: string;
         subsector?: string;
         country?: string;
+        city?: string;
       };
       answers: Array<{
         question_id: string;
@@ -41,6 +42,7 @@ type CrcpRunApiResponse = {
         sector: string;
         subsector?: string;
         country?: string;
+        city?: string;
       };
       metrics: Array<{
         question_id: string;
@@ -70,6 +72,7 @@ type CrcpRunApiResponse = {
         sector: string;
         subsector?: string;
         country?: string;
+        city?: string;
       };
       scores: {
         operational_maturity: number;
@@ -103,6 +106,7 @@ type CrcpRunApiResponse = {
         sector: string;
         subsector?: string;
         country?: string;
+        city?: string;
       };
       baseline_state: {
         state_label: string;
@@ -160,34 +164,63 @@ type CrcpQuestionsApiResponse = {
   error: string | null;
 };
 
-type FormState = {
-  organization_id: string;
+type MetadataState = {
   sector: string;
   subsector: string;
   country: string;
-
+  city: string;
   business_name: string;
-  has_standardized_processes: string;
-  operational_breakdowns: number;
-  delays_frequency: number;
+};
 
-  roles_defined: string;
-  dependency_on_key_people: number;
+type AnswerMap = Record<string, CrcpAnswerValue | undefined>;
 
-  data_accuracy: number;
-  single_source_of_truth: string;
+type DomainStat = {
+  domain: string;
+  total: number;
+  answered: number;
+  percent: number;
+  state: "pending" | "in_progress" | "complete";
+};
 
-  financial_stress: number;
-  knows_margins: string;
+type CaptureSummaryItem = {
+  label: string;
+  value: string;
+};
 
-  revenue_predictability: number;
-  discount_pressure: number;
+type ScoreBarItem = {
+  label: string;
+  value: number;
+};
 
-  customer_handoff_friction: number;
-  complaints_tracked: string;
+type HeaderSnapshotItem = {
+  label: string;
+  value: string;
+};
 
-  regular_planning: string;
-  reactive_changes: number;
+const COUNTRY_OPTIONS: Record<
+  string,
+  { label: string; cities: string[] }
+> = {
+  CO: {
+    label: "Colombia",
+    cities: ["Bogota", "Medellin", "Cali", "Barranquilla", "Cartagena"],
+  },
+  US: {
+    label: "United States",
+    cities: ["Denver", "Miami", "New York", "Los Angeles", "Houston"],
+  },
+  MX: {
+    label: "Mexico",
+    cities: ["CDMX", "Monterrey", "Guadalajara", "Puebla", "Tijuana"],
+  },
+  PE: {
+    label: "Peru",
+    cities: ["Lima", "Arequipa", "Cusco", "Trujillo"],
+  },
+  CL: {
+    label: "Chile",
+    cities: ["Santiago", "Valparaiso", "Concepcion", "Antofagasta"],
+  },
 };
 
 const SUBSECTOR_OPTIONS: Record<string, string[]> = {
@@ -239,34 +272,76 @@ const SUBSECTOR_OPTIONS: Record<string, string[]> = {
   ],
 };
 
-const INITIAL_FORM: FormState = {
-  organization_id: "org-sintergia-demo",
+const INITIAL_METADATA: MetadataState = {
   sector: "restaurant",
   subsector: "casual_dining",
   country: "CO",
-
+  city: "Bogota",
   business_name: "Demo Restaurant",
-  has_standardized_processes: "yes",
-  operational_breakdowns: 3,
-  delays_frequency: 4,
+};
 
-  roles_defined: "yes",
-  dependency_on_key_people: 4,
+const INITIAL_ANSWER_MAP: AnswerMap = {};
 
-  data_accuracy: 2,
-  single_source_of_truth: "no",
+const SINGLE_SELECT_OPTIONS: Record<string, string[]> = {
+  ID_06: [
+    "less_than_1_year",
+    "1_to_3_years",
+    "3_to_5_years",
+    "5_to_10_years",
+    "10_plus_years",
+  ],
+  ID_07: ["owner", "manager", "operator", "shared_responsibility", "other"],
+  ID_08: [
+    "walk_in",
+    "appointments",
+    "contracts",
+    "online",
+    "delivery",
+    "mixed",
+  ],
+};
 
-  financial_stress: 4,
-  knows_margins: "yes",
+const DOMAIN_LABELS: Record<string, string> = {
+  identity: "Identity",
+  operations: "Operations",
+  staffing: "Staffing",
+  reporting: "Reporting",
+  finance: "Finance",
+  sales: "Sales",
+  customer_flow: "Customer Flow",
+  inventory: "Inventory",
+  planning: "Planning",
+};
 
-  revenue_predictability: 3,
-  discount_pressure: 4,
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "#182235",
+  border: "1px solid #2b3955",
+  color: "#e5eefc",
+  borderRadius: 10,
+  padding: "10px 12px",
+  fontSize: 14,
+};
 
-  customer_handoff_friction: 4,
-  complaints_tracked: "yes",
+const disabledInputStyle: React.CSSProperties = {
+  ...inputStyle,
+  opacity: 0.7,
+  cursor: "not-allowed",
+};
 
-  regular_planning: "no",
-  reactive_changes: 4,
+const sectionBlockStyle: React.CSSProperties = {
+  background: "#182235",
+  border: "1px solid #2b3955",
+  borderRadius: 12,
+  padding: "14px 16px",
+};
+
+const actionButtonBaseStyle: React.CSSProperties = {
+  padding: "10px 16px",
+  borderRadius: 12,
+  border: "1px solid #334155",
+  color: "#e2e8f0",
+  fontWeight: 700,
 };
 
 function Row({
@@ -300,18 +375,32 @@ function Chips({ values }: { values: string[] }) {
   );
 }
 
-function prettyJson(value: unknown): string {
-  return JSON.stringify(value, null, 2);
-}
-
 function toneClass(value?: string): string {
   const v = String(value ?? "").toLowerCase();
 
-  if (v === "critical" || v === "p1" || v === "stabilize_now") {
+  if (
+    v === "critical" ||
+    v === "p1" ||
+    v === "stabilize_now" ||
+    v === "negative" ||
+    v === "pending" ||
+    v === "low"
+  ) {
     return `${styles.status} ${styles.statusSuperseded}`;
   }
 
-  if (v === "active" || v === "stable" || v === "high") {
+  if (
+    v === "active" ||
+    v === "stable" ||
+    v === "high" ||
+    v === "complete" ||
+    v === "ready" ||
+    v === "positive" ||
+    v === "answered" ||
+    v === "medium" ||
+    v === "valid" ||
+    v === "unlocked"
+  ) {
     return `${styles.status} ${styles.statusActive}`;
   }
 
@@ -319,130 +408,116 @@ function toneClass(value?: string): string {
 }
 
 function questionToneClass(direction?: string): string {
-  const v = String(direction ?? "").toLowerCase();
+  return toneClass(direction);
+}
 
-  if (v === "negative") {
-    return `${styles.status} ${styles.statusSuperseded}`;
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 12);
+}
+
+function buildOrganizationId(
+  businessName: string,
+  sector: string,
+  seed: string
+): string {
+  const sectorPart = slugify(sector || "org");
+  const namePart = slugify(businessName || "client");
+  return `org-${sectorPart}-${namePart || "client"}-${seed}`;
+}
+
+function isAnswered(value: CrcpAnswerValue | undefined): boolean {
+  if (typeof value === "boolean") {
+    return true;
   }
 
-  if (v === "positive") {
-    return `${styles.status} ${styles.statusActive}`;
+  if (typeof value === "number") {
+    return Number.isFinite(value);
   }
 
-  return styles.status;
+  if (typeof value === "string") {
+    return value.trim().length > 0;
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  return false;
 }
 
-function buildAnswers(form: FormState): CrcpAnswer[] {
-  return [
-    { question_id: "ID_01", section: "identity", value: form.business_name },
-    { question_id: "ID_02", section: "identity", value: [form.sector] },
-
-    {
-      question_id: "OPS_01",
-      section: "operations",
-      value: form.has_standardized_processes,
-    },
-    {
-      question_id: "OPS_02",
-      section: "operations",
-      value: Number(form.operational_breakdowns),
-    },
-    {
-      question_id: "OPS_06",
-      section: "operations",
-      value: Number(form.delays_frequency),
-    },
-
-    {
-      question_id: "STF_01",
-      section: "staffing",
-      value: form.roles_defined === "yes",
-    },
-    {
-      question_id: "STF_06",
-      section: "staffing",
-      value: Number(form.dependency_on_key_people),
-    },
-
-    {
-      question_id: "REP_02",
-      section: "reporting",
-      value: Number(form.data_accuracy),
-    },
-    {
-      question_id: "REP_06",
-      section: "reporting",
-      value: form.single_source_of_truth,
-    },
-
-    {
-      question_id: "FIN_02",
-      section: "finance",
-      value: Number(form.financial_stress),
-    },
-    {
-      question_id: "FIN_03",
-      section: "finance",
-      value: form.knows_margins,
-    },
-
-    {
-      question_id: "SAL_02",
-      section: "sales",
-      value: Number(form.revenue_predictability),
-    },
-    {
-      question_id: "SAL_07",
-      section: "sales",
-      value: Number(form.discount_pressure),
-    },
-
-    {
-      question_id: "CF_04",
-      section: "customer_flow",
-      value: Number(form.customer_handoff_friction),
-    },
-    {
-      question_id: "CF_05",
-      section: "customer_flow",
-      value: form.complaints_tracked,
-    },
-
-    {
-      question_id: "PLN_01",
-      section: "planning",
-      value: form.regular_planning,
-    },
-    {
-      question_id: "PLN_04",
-      section: "planning",
-      value: Number(form.reactive_changes),
-    },
-  ];
+function normalizeMultiSelectText(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
-function buildPreviewPayload(form: FormState) {
+function getQuestionValue(
+  question: CrcpQuestion,
+  metadata: MetadataState,
+  answers: AnswerMap
+): CrcpAnswerValue | undefined {
+  if (question.question_id === "ID_01") {
+    return metadata.business_name;
+  }
+
+  if (question.question_id === "ID_02") {
+    return [metadata.sector];
+  }
+
+  return answers[question.question_id];
+}
+
+function getQuestionPayloadValue(
+  question: CrcpQuestion,
+  metadata: MetadataState,
+  answers: AnswerMap
+): CrcpAnswerValue | undefined {
+  return getQuestionValue(question, metadata, answers);
+}
+
+function buildPayloadAnswers(
+  metadata: MetadataState,
+  questions: CrcpQuestion[],
+  answers: AnswerMap
+): CrcpAnswer[] {
+  return questions
+    .map((question) => {
+      const value = getQuestionPayloadValue(question, metadata, answers);
+
+      if (!isAnswered(value)) {
+        return null;
+      }
+
+      return {
+        question_id: question.question_id,
+        section: question.domain,
+        value,
+      };
+    })
+    .filter((item): item is CrcpAnswer => Boolean(item));
+}
+
+function buildRuntimePayload(
+  organizationId: string,
+  metadata: MetadataState,
+  questions: CrcpQuestion[],
+  answers: AnswerMap
+) {
   return {
     context: {
-      organization_id: form.organization_id,
-      sector: form.sector,
-      subsector: form.subsector,
-      country: form.country,
+      organization_id: organizationId,
+      sector: metadata.sector,
+      subsector: metadata.subsector,
+      country: metadata.country,
+      city: metadata.city,
     },
-    answers: buildAnswers(form),
-    captured_at: "__CLIENT_RUNTIME__",
-  };
-}
-
-function buildRuntimePayload(form: FormState) {
-  return {
-    context: {
-      organization_id: form.organization_id,
-      sector: form.sector,
-      subsector: form.subsector,
-      country: form.country,
-    },
-    answers: buildAnswers(form),
+    answers: buildPayloadAnswers(metadata, questions, answers),
     captured_at: new Date().toISOString(),
   };
 }
@@ -450,79 +525,224 @@ function buildRuntimePayload(form: FormState) {
 function FieldShell({
   label,
   children,
+  helper,
 }: {
   label: string;
   children: React.ReactNode;
+  helper?: string;
 }) {
   return (
     <div style={{ display: "grid", gap: 6 }}>
       <div className={styles.contextLabel}>{label}</div>
       {children}
+      {helper ? (
+        <div style={{ fontSize: 12, color: "#94a3b8" }}>{helper}</div>
+      ) : null}
     </div>
   );
 }
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  background: "#182235",
-  border: "1px solid #2b3955",
-  color: "#e5eefc",
-  borderRadius: 10,
-  padding: "10px 12px",
-  fontSize: 14,
-};
-
-function getLocalValidationIssues(form: FormState): string[] {
+function getLocalValidationIssues(metadata: MetadataState): string[] {
   const issues: string[] = [];
-  const subsectors = SUBSECTOR_OPTIONS[form.sector] ?? [];
+  const subsectors = SUBSECTOR_OPTIONS[metadata.sector] ?? [];
+  const countries = Object.keys(COUNTRY_OPTIONS);
+  const availableCities = COUNTRY_OPTIONS[metadata.country]?.cities ?? [];
 
-  if (!form.organization_id.trim()) {
-    issues.push("organization_id is required.");
-  }
-
-  if (!form.sector.trim()) {
+  if (!metadata.sector.trim()) {
     issues.push("sector is required.");
   }
 
-  if (!form.subsector.trim()) {
+  if (!metadata.subsector.trim()) {
     issues.push("subsector is required.");
-  } else if (!subsectors.includes(form.subsector)) {
+  } else if (!subsectors.includes(metadata.subsector)) {
     issues.push(
-      `subsector "${form.subsector}" is not valid for sector "${form.sector}".`
+      `subsector "${metadata.subsector}" is not valid for sector "${metadata.sector}".`
     );
   }
 
-  if (!form.country.trim()) {
+  if (!metadata.country.trim()) {
     issues.push("country is required.");
+  } else if (!countries.includes(metadata.country)) {
+    issues.push(`country "${metadata.country}" is not part of the supported set.`);
   }
 
-  if (!form.business_name.trim()) {
+  if (!metadata.city.trim()) {
+    issues.push("city is required.");
+  } else if (!availableCities.includes(metadata.city)) {
+    issues.push(
+      `city "${metadata.city}" is not valid for country "${metadata.country}".`
+    );
+  }
+
+  if (!metadata.business_name.trim()) {
     issues.push("business name is required.");
-  }
-
-  const scaleFields: Array<[string, number]> = [
-    ["operational_breakdowns", form.operational_breakdowns],
-    ["delays_frequency", form.delays_frequency],
-    ["dependency_on_key_people", form.dependency_on_key_people],
-    ["data_accuracy", form.data_accuracy],
-    ["financial_stress", form.financial_stress],
-    ["revenue_predictability", form.revenue_predictability],
-    ["discount_pressure", form.discount_pressure],
-    ["customer_handoff_friction", form.customer_handoff_friction],
-    ["reactive_changes", form.reactive_changes],
-  ];
-
-  for (const [field, value] of scaleFields) {
-    if (!Number.isInteger(value) || value < 1 || value > 5) {
-      issues.push(`${field} must be an integer between 1 and 5.`);
-    }
   }
 
   return issues;
 }
 
+function renderScaleLabel(value?: number): string {
+  if (!value) return "not_selected";
+  if (value <= 1) return "very_low";
+  if (value === 2) return "low";
+  if (value === 3) return "moderate";
+  if (value === 4) return "high";
+  return "very_high";
+}
+
+function findFirstPendingQuestionIndex(
+  questions: CrcpQuestion[],
+  metadata: MetadataState,
+  answers: AnswerMap
+): number {
+  const pendingIndex = questions.findIndex(
+    (question) => !isAnswered(getQuestionValue(question, metadata, answers))
+  );
+
+  return pendingIndex >= 0 ? pendingIndex : 0;
+}
+
+function getDomainStat(
+  protocolDomainStats: DomainStat[],
+  domain: string
+): DomainStat | undefined {
+  return protocolDomainStats.find((item) => item.domain === domain);
+}
+
+function formatResultScore(value: number | undefined): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "n/a";
+  }
+
+  return value.toFixed(2);
+}
+
+function clampPercent(value: number | undefined): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, value));
+}
+
+function prettyLabel(value: string): string {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatAnswerValue(value: CrcpAnswerValue | undefined): string {
+  if (value === undefined) {
+    return "not_answered";
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "yes" : "no";
+  }
+
+  if (typeof value === "number") {
+    return String(value);
+  }
+
+  if (typeof value === "string") {
+    return value.trim() || "not_answered";
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0 ? value.join(", ") : "not_answered";
+  }
+
+  return "not_answered";
+}
+
+function getCaptureSummary(
+  questions: CrcpQuestion[],
+  metadata: MetadataState,
+  answers: AnswerMap
+): CaptureSummaryItem[] {
+  const prioritizedIds = [
+    "ID_01",
+    "ID_02",
+    "ID_06",
+    "ID_07",
+    "ID_08",
+    "OPS_01",
+    "OPS_02",
+    "FIN_02",
+    "REP_02",
+    "PLN_04",
+  ];
+
+  return prioritizedIds
+    .map((questionId) => questions.find((question) => question.question_id === questionId))
+    .filter((question): question is CrcpQuestion => Boolean(question))
+    .map((question) => ({
+      label: question.text,
+      value: formatAnswerValue(getQuestionValue(question, metadata, answers)),
+    }));
+}
+
+function getHeaderSnapshot(metadata: MetadataState): HeaderSnapshotItem[] {
+  return [
+    {
+      label: "Organization",
+      value: metadata.business_name,
+    },
+    {
+      label: "Sector",
+      value: prettyLabel(metadata.sector),
+    },
+    {
+      label: "Subsector",
+      value: prettyLabel(metadata.subsector),
+    },
+    {
+      label: "Country",
+      value: COUNTRY_OPTIONS[metadata.country]?.label || metadata.country,
+    },
+    {
+      label: "City",
+      value: metadata.city,
+    },
+  ];
+}
+
+function getScoreBars(result: NonNullable<CrcpRunApiResponse["result"]>): ScoreBarItem[] {
+  if (!result.scores) {
+    return [];
+  }
+
+  return [
+    {
+      label: "Operational Maturity",
+      value: clampPercent(result.scores.operational_maturity),
+    },
+    {
+      label: "Financial Pressure",
+      value: clampPercent(result.scores.financial_pressure),
+    },
+    {
+      label: "Reporting Reliability",
+      value: clampPercent(result.scores.reporting_reliability),
+    },
+    {
+      label: "Structural Risk",
+      value: clampPercent(result.scores.structural_risk),
+    },
+    {
+      label: "Commercial Strength",
+      value: clampPercent(result.scores.commercial_strength),
+    },
+  ];
+}
+
 export default function CrcpLabPage() {
-  const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [mounted, setMounted] = useState(false);
+  const [orgSeed, setOrgSeed] = useState("");
+  const [metadata, setMetadata] = useState<MetadataState>(INITIAL_METADATA);
+  const [answers, setAnswers] = useState<AnswerMap>(INITIAL_ANSWER_MAP);
+  const [isHeaderLocked, setIsHeaderLocked] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<CrcpRunApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -531,16 +751,20 @@ export default function CrcpLabPage() {
     useState<CrcpQuestionsApiResponse["result"]>(null);
   const [questionsLoading, setQuestionsLoading] = useState(false);
   const [questionsError, setQuestionsError] = useState<string | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const payloadPreview = useMemo(() => buildPreviewPayload(form), [form]);
-  const localValidationIssues = useMemo(
-    () => getLocalValidationIssues(form),
-    [form]
-  );
-  const availableSubsectors = useMemo(
-    () => SUBSECTOR_OPTIONS[form.sector] ?? [],
-    [form.sector]
-  );
+  useEffect(() => {
+    setMounted(true);
+    setOrgSeed(Math.random().toString(36).slice(2, 7));
+  }, []);
+
+  const organizationId = useMemo(() => {
+    if (!orgSeed) {
+      return "";
+    }
+
+    return buildOrganizationId(metadata.business_name, metadata.sector, orgSeed);
+  }, [orgSeed, metadata.business_name, metadata.sector]);
 
   useEffect(() => {
     let cancelled = false;
@@ -551,7 +775,9 @@ export default function CrcpLabPage() {
         setQuestionsError(null);
 
         const res = await fetch(
-          `/api/internal/crcp/questions?sector=${encodeURIComponent(form.sector)}`,
+          `/api/internal/crcp/questions?sector=${encodeURIComponent(
+            metadata.sector
+          )}`,
           { cache: "no-store" }
         );
 
@@ -570,6 +796,10 @@ export default function CrcpLabPage() {
         }
 
         setQuestionCatalog(data.result);
+        setResponse(null);
+        setError(null);
+        setAnswers({});
+        setCurrentQuestionIndex(0);
       } catch (err) {
         if (!cancelled) {
           setQuestionCatalog(null);
@@ -589,10 +819,138 @@ export default function CrcpLabPage() {
     return () => {
       cancelled = true;
     };
-  }, [form.sector]);
+  }, [metadata.sector]);
 
-  function update<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((prev) => {
+  const allQuestions = useMemo(() => {
+    if (!questionCatalog) {
+      return [];
+    }
+
+    return [
+      ...questionCatalog.identityQuestions,
+      ...questionCatalog.adaptiveQuestions,
+    ];
+  }, [questionCatalog]);
+
+  useEffect(() => {
+    if (allQuestions.length === 0) {
+      setCurrentQuestionIndex(0);
+      return;
+    }
+
+    setCurrentQuestionIndex((prev) => {
+      if (prev >= allQuestions.length) {
+        return Math.max(allQuestions.length - 1, 0);
+      }
+      return prev;
+    });
+  }, [allQuestions]);
+
+  const availableSubsectors = useMemo(
+    () => SUBSECTOR_OPTIONS[metadata.sector] ?? [],
+    [metadata.sector]
+  );
+
+  const availableCities = useMemo(
+    () => COUNTRY_OPTIONS[metadata.country]?.cities ?? [],
+    [metadata.country]
+  );
+
+  const localValidationIssues = useMemo(
+    () => getLocalValidationIssues(metadata),
+    [metadata]
+  );
+
+  const answeredCount = useMemo(() => {
+    return allQuestions.filter((question) =>
+      isAnswered(getQuestionValue(question, metadata, answers))
+    ).length;
+  }, [allQuestions, metadata, answers]);
+
+  const totalQuestionCount = allQuestions.length;
+  const remainingCount = Math.max(totalQuestionCount - answeredCount, 0);
+  const progressPercent =
+    totalQuestionCount > 0
+      ? Number(((answeredCount / totalQuestionCount) * 100).toFixed(1))
+      : 0;
+
+  const currentQuestion = allQuestions[currentQuestionIndex] ?? null;
+  const currentQuestionValue = currentQuestion
+    ? getQuestionValue(currentQuestion, metadata, answers)
+    : undefined;
+
+  const protocolDomainStats = useMemo<DomainStat[]>(() => {
+    const buckets = new Map<string, { total: number; answered: number }>();
+
+    for (const question of allQuestions) {
+      const existing = buckets.get(question.domain) ?? {
+        total: 0,
+        answered: 0,
+      };
+
+      existing.total += 1;
+
+      if (isAnswered(getQuestionValue(question, metadata, answers))) {
+        existing.answered += 1;
+      }
+
+      buckets.set(question.domain, existing);
+    }
+
+    return Array.from(buckets.entries()).map(([domain, stats]) => ({
+      domain,
+      total: stats.total,
+      answered: stats.answered,
+      percent:
+        stats.total > 0
+          ? Number(((stats.answered / stats.total) * 100).toFixed(0))
+          : 0,
+      state:
+        stats.answered === 0
+          ? "pending"
+          : stats.answered === stats.total
+          ? "complete"
+          : "in_progress",
+    }));
+  }, [allQuestions, metadata, answers]);
+
+  const identityStat = getDomainStat(protocolDomainStats, "identity");
+  const operationsStat = getDomainStat(protocolDomainStats, "operations");
+  const reportingStat = getDomainStat(protocolDomainStats, "reporting");
+  const financeStat = getDomainStat(protocolDomainStats, "finance");
+
+  const captureSummary = useMemo(
+    () => getCaptureSummary(allQuestions, metadata, answers),
+    [allQuestions, metadata, answers]
+  );
+
+  const headerSnapshot = useMemo(
+    () => getHeaderSnapshot(metadata),
+    [metadata]
+  );
+
+  const result = response?.result ?? null;
+  const backendValidationIssues = result?.validation_issues ?? [];
+  const scoreBars = useMemo(() => (result ? getScoreBars(result) : []), [result]);
+
+  const isCaptureComplete =
+    totalQuestionCount > 0 && answeredCount === totalQuestionCount;
+  const isRunDisabled =
+    loading ||
+    localValidationIssues.length > 0 ||
+    !isCaptureComplete ||
+    !organizationId ||
+    !isHeaderLocked;
+
+  function updateMetadata<K extends keyof MetadataState>(
+    key: K,
+    value: MetadataState[K]
+  ) {
+    if (isHeaderLocked) {
+      return;
+    }
+
+    setMetadata((prev) => {
       const next = { ...prev, [key]: value };
 
       if (key === "sector") {
@@ -601,14 +959,120 @@ export default function CrcpLabPage() {
         next.subsector = nextSubsectors[0] ?? "";
       }
 
+      if (key === "country") {
+        const countryValue = String(value);
+        const nextCities = COUNTRY_OPTIONS[countryValue]?.cities ?? [];
+        next.city = nextCities[0] ?? "";
+      }
+
       return next;
     });
+
+    setResponse(null);
+    setError(null);
+  }
+
+  function lockHeader() {
+    if (localValidationIssues.length > 0) {
+      setError("Resolve header validation issues before locking Block 0.");
+      return;
+    }
+
+    setIsHeaderLocked(true);
+    setError(null);
+    setResponse(null);
+  }
+
+  function unlockHeader() {
+    setIsHeaderLocked(false);
+    setAnswers({});
+    setResponse(null);
+    setError(null);
+    setCurrentQuestionIndex(0);
+  }
+
+  function updateAnswer(question: CrcpQuestion, value?: CrcpAnswerValue) {
+    if (!isHeaderLocked) {
+      setError("Lock Block 0 before answering the canonical questionnaire.");
+      return;
+    }
+
+    if (question.question_id === "ID_01") {
+      return;
+    }
+
+    if (question.question_id === "ID_02") {
+      return;
+    }
+
+    setAnswers((prev) => {
+      const next = { ...prev };
+
+      if (value === undefined) {
+        delete next[question.question_id];
+      } else {
+        next[question.question_id] = value;
+      }
+
+      return next;
+    });
+
+    setResponse(null);
+    setError(null);
+  }
+
+  function goToNextQuestion() {
+    setCurrentQuestionIndex((prev) =>
+      Math.min(prev + 1, Math.max(allQuestions.length - 1, 0))
+    );
+  }
+
+  function goToPreviousQuestion() {
+    setCurrentQuestionIndex((prev) => Math.max(prev - 1, 0));
+  }
+
+  function goToNextPendingQuestion() {
+    if (allQuestions.length === 0) {
+      return;
+    }
+
+    const nextPending = allQuestions.findIndex(
+      (question, index) =>
+        index > currentQuestionIndex &&
+        !isAnswered(getQuestionValue(question, metadata, answers))
+    );
+
+    if (nextPending >= 0) {
+      setCurrentQuestionIndex(nextPending);
+      return;
+    }
+
+    const firstPending = findFirstPendingQuestionIndex(
+      allQuestions,
+      metadata,
+      answers
+    );
+    setCurrentQuestionIndex(firstPending);
   }
 
   async function handleRun(): Promise<void> {
     if (localValidationIssues.length > 0) {
       setError(
         "Local validation failed. Resolve the issues before running CRCP."
+      );
+      setResponse(null);
+      return;
+    }
+
+    if (!isHeaderLocked) {
+      setError("Lock Block 0 before executing CRCP.");
+      setResponse(null);
+      return;
+    }
+
+    if (answeredCount !== totalQuestionCount) {
+      setError(
+        `CRCP capture is incomplete. Answer all ${totalQuestionCount} questions before execution.`
       );
       setResponse(null);
       return;
@@ -623,7 +1087,9 @@ export default function CrcpLabPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(buildRuntimePayload(form)),
+        body: JSON.stringify(
+          buildRuntimePayload(organizationId, metadata, allQuestions, answers)
+        ),
       });
 
       const data = (await res.json()) as CrcpRunApiResponse;
@@ -640,14 +1106,216 @@ export default function CrcpLabPage() {
     }
   }
 
-  const result = response?.result ?? null;
-  const backendValidationIssues = result?.validation_issues ?? [];
-  const isRunDisabled = loading || localValidationIssues.length > 0;
+  function renderQuestionInput(question: CrcpQuestion) {
+    const value = getQuestionValue(question, metadata, answers);
+
+    if (question.question_id === "ID_01") {
+      return (
+        <input
+          style={disabledInputStyle}
+          value={metadata.business_name}
+          disabled
+          readOnly
+        />
+      );
+    }
+
+    if (question.question_id === "ID_02") {
+      return (
+        <div style={sectionBlockStyle}>
+          <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 10 }}>
+            This field is controlled by the protocol header.
+          </div>
+          <Chips values={[metadata.sector]} />
+        </div>
+      );
+    }
+
+    if (question.type === "yes_no") {
+      const current = typeof value === "string" ? value : "";
+
+      return (
+        <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {["yes", "no"].map((option) => {
+              const selected = current === option;
+
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updateAnswer(question, option)}
+                  style={{
+                    ...actionButtonBaseStyle,
+                    minWidth: 110,
+                    background: selected ? "#1e293b" : "#0f172a",
+                    cursor: "pointer",
+                  }}
+                >
+                  {option}
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => updateAnswer(question, undefined)}
+              style={{
+                ...actionButtonBaseStyle,
+                minWidth: 96,
+                background: "#0f172a",
+                color: "#94a3b8",
+                cursor: "pointer",
+              }}
+            >
+              clear
+            </button>
+          </div>
+
+          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+            selected: {current || "not_selected"}
+          </div>
+        </div>
+      );
+    }
+
+    if (question.type === "scale_1_5") {
+      const numericValue = typeof value === "number" ? value : undefined;
+
+      return (
+        <div style={{ display: "grid", gap: 14 }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {[1, 2, 3, 4, 5].map((step) => {
+              const selected = numericValue === step;
+
+              return (
+                <button
+                  key={step}
+                  type="button"
+                  onClick={() => updateAnswer(question, step)}
+                  style={{
+                    ...actionButtonBaseStyle,
+                    minWidth: 64,
+                    padding: "11px 14px",
+                    background: selected ? "#1e293b" : "#0f172a",
+                    cursor: "pointer",
+                  }}
+                >
+                  {step}
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => updateAnswer(question, undefined)}
+              style={{
+                ...actionButtonBaseStyle,
+                minWidth: 96,
+                background: "#0f172a",
+                color: "#94a3b8",
+                cursor: "pointer",
+              }}
+            >
+              clear
+            </button>
+          </div>
+
+          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+            selected:{" "}
+            {numericValue
+              ? `${numericValue} · ${renderScaleLabel(numericValue)}`
+              : "not_selected"}
+          </div>
+        </div>
+      );
+    }
+
+    if (question.type === "numeric") {
+      const current =
+        typeof value === "number" && Number.isFinite(value) ? String(value) : "";
+
+      return (
+        <input
+          style={inputStyle}
+          type="number"
+          value={current}
+          onChange={(e) => {
+            const next = e.target.value.trim();
+            updateAnswer(question, next === "" ? undefined : Number(next));
+          }}
+          placeholder="Enter numeric value"
+        />
+      );
+    }
+
+    if (question.type === "multi_select") {
+      const options = SINGLE_SELECT_OPTIONS[question.question_id];
+
+      if (options && options.length > 0) {
+        const current = typeof value === "string" ? value : "";
+
+        return (
+          <div style={{ display: "grid", gap: 12 }}>
+            <select
+              style={inputStyle}
+              value={current}
+              onChange={(e) =>
+                updateAnswer(
+                  question,
+                  e.target.value.trim() ? e.target.value : undefined
+                )
+              }
+            >
+              <option value="">select</option>
+              {options.map((option) => (
+                <option key={option} value={option}>
+                  {prettyLabel(option)}
+                </option>
+              ))}
+            </select>
+
+            <div style={{ fontSize: 12, color: "#94a3b8" }}>
+              selected: {current || "not_selected"}
+            </div>
+          </div>
+        );
+      }
+
+      const textValue = Array.isArray(value) ? value.join(", ") : "";
+
+      return (
+        <textarea
+          style={{ ...inputStyle, minHeight: 110, resize: "vertical" }}
+          value={textValue}
+          onChange={(e) => {
+            const parsed = normalizeMultiSelectText(e.target.value);
+            updateAnswer(question, parsed.length > 0 ? parsed : undefined);
+          }}
+          placeholder="Enter one or more values, separated by commas"
+        />
+      );
+    }
+
+    return (
+      <input
+        style={inputStyle}
+        value={typeof value === "string" ? value : ""}
+        onChange={(e) =>
+          updateAnswer(
+            question,
+            e.target.value.trim() ? e.target.value : undefined
+          )
+        }
+        placeholder="Enter response"
+      />
+    );
+  }
 
   return (
     <AppShell
       title="NEXUS™ CRCP Lab"
-      subtitle="Internal interactive surface for the canonical Client Reality Capture Protocol pipeline."
+      subtitle="Structured one-by-one capture surface for the canonical Client Reality Capture Protocol."
     >
       <section className={styles.contextBar}>
         <div className={styles.contextTitle}>CRCP Lab Control Surface</div>
@@ -655,42 +1323,86 @@ export default function CrcpLabPage() {
         <div className={styles.contextGrid}>
           <div className={styles.contextItem}>
             <div className={styles.contextLabel}>Mode</div>
-            <div>Interactive pipeline execution</div>
+            <div>Sequential protocol capture</div>
           </div>
           <div className={styles.contextItem}>
             <div className={styles.contextLabel}>Payload</div>
-            <div>Editable internal intake</div>
+            <div>System-built from canonical answers</div>
           </div>
           <div className={styles.contextItem}>
-            <div className={styles.contextLabel}>Persistence</div>
-            <div>Enabled via API route</div>
+            <div className={styles.contextLabel}>Execution</div>
+            <div>
+              {isHeaderLocked
+                ? "Ready after capture review"
+                : "Header must be locked first"}
+            </div>
           </div>
         </div>
 
-        <div style={{ marginTop: 18 }}>
+        <div
+          style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }}
+        >
+          {!isHeaderLocked ? (
+            <button
+              type="button"
+              onClick={lockHeader}
+              disabled={localValidationIssues.length > 0}
+              style={{
+                ...actionButtonBaseStyle,
+                background:
+                  localValidationIssues.length > 0 ? "#0f172a" : "#1e293b",
+                cursor:
+                  localValidationIssues.length > 0 ? "not-allowed" : "pointer",
+                opacity: localValidationIssues.length > 0 ? 0.7 : 1,
+              }}
+            >
+              Lock Header
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={unlockHeader}
+              style={{
+                ...actionButtonBaseStyle,
+                background: "#0f172a",
+                cursor: "pointer",
+              }}
+            >
+              Unlock Header
+            </button>
+          )}
+
           <button
-            onClick={handleRun}
-            disabled={isRunDisabled}
+            type="button"
+            onClick={goToNextPendingQuestion}
+            disabled={allQuestions.length === 0 || !isHeaderLocked}
             style={{
-              padding: "10px 16px",
-              borderRadius: 12,
-              border: "1px solid #334155",
-              background: isRunDisabled ? "#0f172a" : "#1e293b",
-              color: "#e2e8f0",
-              cursor: isRunDisabled ? "not-allowed" : "pointer",
-              fontWeight: 700,
-              opacity: isRunDisabled ? 0.7 : 1,
+              ...actionButtonBaseStyle,
+              background: "#0f172a",
+              cursor:
+                allQuestions.length === 0 || !isHeaderLocked
+                  ? "not-allowed"
+                  : "pointer",
+              opacity: allQuestions.length === 0 || !isHeaderLocked ? 0.7 : 1,
             }}
           >
-            {loading ? "Running CRCP..." : "Run CRCP"}
+            Next Pending
           </button>
+
+          <div style={{ fontSize: 12, color: "#94a3b8", alignSelf: "center" }}>
+            {isHeaderLocked
+              ? "Capture header locked. You can now answer the questionnaire."
+              : "Confirm country, city, sector, subsector, and business identity before continuing."}
+          </div>
         </div>
       </section>
 
       <div className={styles.grid}>
         <section className={`${styles.card} ${styles.fullWidth}`}>
-          <h2 className={styles.cardTitle}>Block 0 — Interactive Intake</h2>
-          <div className={styles.meta}>editable input surface</div>
+          <h2 className={styles.cardTitle}>Block 0 — Intake Header</h2>
+          <div className={styles.meta}>
+            protocol identity and system-assigned organization context
+          </div>
 
           <div
             style={{
@@ -700,19 +1412,19 @@ export default function CrcpLabPage() {
               marginTop: 16,
             }}
           >
-            <FieldShell label="Organization ID">
-              <input
-                style={inputStyle}
-                value={form.organization_id}
-                onChange={(e) => update("organization_id", e.target.value)}
-              />
+            <FieldShell
+              label="Organization ID"
+              helper="Assigned automatically by the system."
+            >
+              <input style={disabledInputStyle} value={organizationId} readOnly />
             </FieldShell>
 
             <FieldShell label="Sector">
               <select
-                style={inputStyle}
-                value={form.sector}
-                onChange={(e) => update("sector", e.target.value)}
+                style={isHeaderLocked ? disabledInputStyle : inputStyle}
+                value={metadata.sector}
+                onChange={(e) => updateMetadata("sector", e.target.value)}
+                disabled={isHeaderLocked}
               >
                 <option value="restaurant">restaurant</option>
                 <option value="retail">retail</option>
@@ -729,224 +1441,234 @@ export default function CrcpLabPage() {
 
             <FieldShell label="Subsector">
               <select
-                style={inputStyle}
-                value={form.subsector}
-                onChange={(e) => update("subsector", e.target.value)}
+                style={isHeaderLocked ? disabledInputStyle : inputStyle}
+                value={metadata.subsector}
+                onChange={(e) => updateMetadata("subsector", e.target.value)}
+                disabled={isHeaderLocked}
               >
                 {availableSubsectors.map((subsector) => (
                   <option key={subsector} value={subsector}>
-                    {subsector}
+                    {prettyLabel(subsector)}
                   </option>
                 ))}
               </select>
             </FieldShell>
 
             <FieldShell label="Country">
-              <input
-                style={inputStyle}
-                value={form.country}
-                onChange={(e) => update("country", e.target.value)}
-              />
+              <select
+                style={isHeaderLocked ? disabledInputStyle : inputStyle}
+                value={metadata.country}
+                onChange={(e) => updateMetadata("country", e.target.value)}
+                disabled={isHeaderLocked}
+              >
+                {Object.entries(COUNTRY_OPTIONS).map(([code, config]) => (
+                  <option key={code} value={code}>
+                    {config.label}
+                  </option>
+                ))}
+              </select>
+            </FieldShell>
+
+            <FieldShell label="City">
+              <select
+                style={isHeaderLocked ? disabledInputStyle : inputStyle}
+                value={metadata.city}
+                onChange={(e) => updateMetadata("city", e.target.value)}
+                disabled={isHeaderLocked}
+              >
+                {availableCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
             </FieldShell>
 
             <FieldShell label="Business Name">
               <input
-                style={inputStyle}
-                value={form.business_name}
-                onChange={(e) => update("business_name", e.target.value)}
-              />
-            </FieldShell>
-
-            <FieldShell label="Standardized Processes">
-              <select
-                style={inputStyle}
-                value={form.has_standardized_processes}
-                onChange={(e) =>
-                  update("has_standardized_processes", e.target.value)
-                }
-              >
-                <option value="yes">yes</option>
-                <option value="no">no</option>
-              </select>
-            </FieldShell>
-
-            <FieldShell label="Operational Breakdowns (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.operational_breakdowns}
-                onChange={(e) =>
-                  update("operational_breakdowns", Number(e.target.value))
-                }
-              />
-            </FieldShell>
-
-            <FieldShell label="Delays Frequency (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.delays_frequency}
-                onChange={(e) =>
-                  update("delays_frequency", Number(e.target.value))
-                }
-              />
-            </FieldShell>
-
-            <FieldShell label="Roles Clearly Defined">
-              <select
-                style={inputStyle}
-                value={form.roles_defined}
-                onChange={(e) => update("roles_defined", e.target.value)}
-              >
-                <option value="yes">yes</option>
-                <option value="no">no</option>
-              </select>
-            </FieldShell>
-
-            <FieldShell label="Dependency On Key People (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.dependency_on_key_people}
-                onChange={(e) =>
-                  update("dependency_on_key_people", Number(e.target.value))
-                }
-              />
-            </FieldShell>
-
-            <FieldShell label="Data Accuracy (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.data_accuracy}
-                onChange={(e) => update("data_accuracy", Number(e.target.value))}
-              />
-            </FieldShell>
-
-            <FieldShell label="Single Source Of Truth">
-              <select
-                style={inputStyle}
-                value={form.single_source_of_truth}
-                onChange={(e) =>
-                  update("single_source_of_truth", e.target.value)
-                }
-              >
-                <option value="yes">yes</option>
-                <option value="no">no</option>
-              </select>
-            </FieldShell>
-
-            <FieldShell label="Financial Stress (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.financial_stress}
-                onChange={(e) =>
-                  update("financial_stress", Number(e.target.value))
-                }
-              />
-            </FieldShell>
-
-            <FieldShell label="Knows Margins">
-              <select
-                style={inputStyle}
-                value={form.knows_margins}
-                onChange={(e) => update("knows_margins", e.target.value)}
-              >
-                <option value="yes">yes</option>
-                <option value="no">no</option>
-              </select>
-            </FieldShell>
-
-            <FieldShell label="Revenue Predictability (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.revenue_predictability}
-                onChange={(e) =>
-                  update("revenue_predictability", Number(e.target.value))
-                }
-              />
-            </FieldShell>
-
-            <FieldShell label="Discount Pressure (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.discount_pressure}
-                onChange={(e) =>
-                  update("discount_pressure", Number(e.target.value))
-                }
-              />
-            </FieldShell>
-
-            <FieldShell label="Customer Handoff Friction (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.customer_handoff_friction}
-                onChange={(e) =>
-                  update("customer_handoff_friction", Number(e.target.value))
-                }
-              />
-            </FieldShell>
-
-            <FieldShell label="Complaints Tracked">
-              <select
-                style={inputStyle}
-                value={form.complaints_tracked}
-                onChange={(e) => update("complaints_tracked", e.target.value)}
-              >
-                <option value="yes">yes</option>
-                <option value="no">no</option>
-              </select>
-            </FieldShell>
-
-            <FieldShell label="Regular Planning">
-              <select
-                style={inputStyle}
-                value={form.regular_planning}
-                onChange={(e) => update("regular_planning", e.target.value)}
-              >
-                <option value="yes">yes</option>
-                <option value="no">no</option>
-              </select>
-            </FieldShell>
-
-            <FieldShell label="Reactive Changes (1-5)">
-              <input
-                style={inputStyle}
-                type="number"
-                min={1}
-                max={5}
-                value={form.reactive_changes}
-                onChange={(e) =>
-                  update("reactive_changes", Number(e.target.value))
-                }
+                style={isHeaderLocked ? disabledInputStyle : inputStyle}
+                value={metadata.business_name}
+                onChange={(e) => updateMetadata("business_name", e.target.value)}
+                disabled={isHeaderLocked}
               />
             </FieldShell>
           </div>
         </section>
 
+        <section className={`${styles.card} ${styles.fullWidth}`}>
+          <h2 className={styles.cardTitle}>Block 0A — Protocol Progress</h2>
+          <div className={styles.meta}>live capture coverage</div>
+
+          <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Total Questions</h3>
+                <span className={toneClass("active")}>catalog</span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Count</div>
+                  <div className={styles.miniStatValue}>{totalQuestionCount}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Identity</h3>
+                <span className={toneClass("active")}>base</span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Questions</div>
+                  <div className={styles.miniStatValue}>
+                    {questionCatalog?.identityQuestions.length ?? 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Adaptive</h3>
+                <span className={toneClass("active")}>sector</span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Questions</div>
+                  <div className={styles.miniStatValue}>
+                    {questionCatalog?.adaptiveQuestions.length ?? 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Answered</h3>
+                <span
+                  className={toneClass(
+                    answeredCount > 0 ? "answered" : "pending"
+                  )}
+                >
+                  {answeredCount > 0 ? "live" : "idle"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Captured</div>
+                  <div className={styles.miniStatValue}>{answeredCount}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Remaining</h3>
+                <span
+                  className={toneClass(
+                    remainingCount === 0 ? "complete" : "pending"
+                  )}
+                >
+                  {remainingCount === 0 ? "clear" : "open"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Pending</div>
+                  <div className={styles.miniStatValue}>{remainingCount}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Progress</h3>
+                <span
+                  className={toneClass(
+                    isCaptureComplete ? "complete" : "pending"
+                  )}
+                >
+                  {isCaptureComplete ? "complete" : "in progress"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Coverage</div>
+                  <div className={styles.miniStatValue}>{progressPercent}%</div>
+                </div>
+                <div className={styles.progressTrack}>
+                  <div
+                    className={styles.progressFill}
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.miniGrid} style={{ marginTop: 18 }}>
+            {protocolDomainStats.map((domainStat) => (
+              <div key={domainStat.domain} className={styles.miniCard}>
+                <div className={styles.miniCardHeader}>
+                  <h3 className={styles.miniCardTitle}>
+                    {DOMAIN_LABELS[domainStat.domain] || domainStat.domain}
+                  </h3>
+                  <span className={toneClass(domainStat.state)}>
+                    {domainStat.state}
+                  </span>
+                </div>
+
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Coverage</div>
+                    <div className={styles.miniStatValue}>
+                      {domainStat.answered}/{domainStat.total}
+                    </div>
+                  </div>
+
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Progress</div>
+                    <div className={styles.miniStatValue}>
+                      {domainStat.percent}%
+                    </div>
+                  </div>
+
+                  <div className={styles.progressTrack}>
+                    <div
+                      className={styles.progressFill}
+                      style={{ width: `${domainStat.percent}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className={`${styles.card} ${styles.fullWidth}`}>
+          <h2 className={styles.cardTitle}>Block 0B — Context Snapshot</h2>
+          <div className={styles.meta}>
+            locked operational context summary for downstream capture consistency
+          </div>
+
+          <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+            {headerSnapshot.map((item) => (
+              <div key={item.label} className={styles.miniCard}>
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>{item.label}</div>
+                    <div className={styles.miniStatValue}>{item.value}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {localValidationIssues.length > 0 ? (
           <section className={`${styles.card} ${styles.fullWidth}`}>
-            <h2 className={styles.cardTitle}>Block 0A — Local Validation</h2>
+            <h2 className={styles.cardTitle}>Block 0C — Local Validation</h2>
             <div className={styles.meta}>client-side intake guardrails</div>
             <div className={styles.list}>
               {localValidationIssues.map((issue) => (
@@ -959,115 +1681,432 @@ export default function CrcpLabPage() {
         ) : null}
 
         <section className={`${styles.card} ${styles.fullWidth}`}>
-          <h2 className={styles.cardTitle}>Block 0B — Payload Preview</h2>
-          <div className={styles.meta}>exact payload sent to CRCP API</div>
-          <pre className={styles.mono} style={{ whiteSpace: "pre-wrap" }}>
-            {prettyJson(payloadPreview)}
-          </pre>
-        </section>
-
-        <section className={`${styles.card} ${styles.fullWidth}`}>
-          <h2 className={styles.cardTitle}>Block 1 — Question Catalog</h2>
+          <h2 className={styles.cardTitle}>Block 1 — Active Question</h2>
           <div className={styles.meta}>
-            canonical question selection resolved by sector
+            one-by-one guided intake for canonical CRCP execution
           </div>
 
-          {questionsLoading ? (
-            <div className={styles.meta} style={{ marginTop: 12 }}>
+          {!isHeaderLocked ? (
+            <div style={{ ...sectionBlockStyle, marginTop: 16 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>
+                Header unlock state detected
+              </div>
+              <div style={{ color: "#94a3b8", fontSize: 14 }}>
+                Lock Block 0 before answering the canonical questionnaire.
+              </div>
+            </div>
+          ) : questionsLoading ? (
+            <div className={styles.meta} style={{ marginTop: 14 }}>
               Loading canonical questions...
             </div>
           ) : questionsError ? (
-            <div className={styles.error} style={{ marginTop: 12 }}>
+            <div className={styles.error} style={{ marginTop: 14 }}>
               {questionsError}
             </div>
-          ) : questionCatalog ? (
+          ) : currentQuestion ? (
             <>
-              <div style={{ marginTop: 14 }}>
-                <Row label="Sector">{questionCatalog.sector}</Row>
-                <Row label="Question Count">
-                  {String(questionCatalog.questionCount)}
-                </Row>
+              <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+                <div className={styles.miniCard}>
+                  <div className={styles.miniCardHeader}>
+                    <h3 className={styles.miniCardTitle}>Question</h3>
+                    <span className={toneClass("active")}>
+                      {currentQuestionIndex + 1}/{totalQuestionCount}
+                    </span>
+                  </div>
+                  <div className={styles.miniCardBody}>
+                    <div className={styles.miniStat}>
+                      <div className={styles.miniStatLabel}>Question ID</div>
+                      <div className={styles.miniStatValue}>
+                        {currentQuestion.question_id}
+                      </div>
+                    </div>
+                    <div className={styles.miniStat}>
+                      <div className={styles.miniStatLabel}>Domain</div>
+                      <div className={styles.miniStatValue}>
+                        {DOMAIN_LABELS[currentQuestion.domain] ||
+                          currentQuestion.domain}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.miniCard}>
+                  <div className={styles.miniCardHeader}>
+                    <h3 className={styles.miniCardTitle}>Scoring Profile</h3>
+                    <span
+                      className={questionToneClass(
+                        currentQuestion.scoring_direction
+                      )}
+                    >
+                      {currentQuestion.scoring_direction || "neutral"}
+                    </span>
+                  </div>
+                  <div className={styles.miniCardBody}>
+                    <div className={styles.miniStat}>
+                      <div className={styles.miniStatLabel}>Type</div>
+                      <div className={styles.miniStatValue}>
+                        {currentQuestion.type}
+                      </div>
+                    </div>
+                    <div className={styles.miniStat}>
+                      <div className={styles.miniStatLabel}>Weight</div>
+                      <div className={styles.miniStatValue}>
+                        {String(currentQuestion.weight)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.miniCard}>
+                  <div className={styles.miniCardHeader}>
+                    <h3 className={styles.miniCardTitle}>Coverage State</h3>
+                    <span
+                      className={toneClass(
+                        isAnswered(currentQuestionValue) ? "answered" : "pending"
+                      )}
+                    >
+                      {isAnswered(currentQuestionValue)
+                        ? "answered"
+                        : "pending"}
+                    </span>
+                  </div>
+                  <div className={styles.miniCardBody}>
+                    <div className={styles.miniStat}>
+                      <div className={styles.miniStatLabel}>
+                        Protocol Progress
+                      </div>
+                      <div className={styles.miniStatValue}>
+                        {progressPercent}%
+                      </div>
+                    </div>
+                    <div className={styles.progressTrack}>
+                      <div
+                        className={styles.progressFill}
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ ...sectionBlockStyle, marginTop: 18 }}>
+                <div
+                  style={{
+                    fontSize: 22,
+                    lineHeight: 1.35,
+                    fontWeight: 800,
+                    marginBottom: 18,
+                  }}
+                >
+                  {currentQuestion.text}
+                </div>
+
+                {renderQuestionInput(currentQuestion)}
               </div>
 
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-                  gap: 16,
+                  display: "flex",
+                  gap: 10,
+                  flexWrap: "wrap",
                   marginTop: 18,
                 }}
               >
-                <section className={styles.card}>
-                  <h2 className={styles.cardTitle}>Identity Questions</h2>
-                  <div className={styles.meta}>
-                    canonical identity layer for the selected sector
-                  </div>
+                <button
+                  type="button"
+                  onClick={goToPreviousQuestion}
+                  disabled={currentQuestionIndex === 0}
+                  style={{
+                    ...actionButtonBaseStyle,
+                    background:
+                      currentQuestionIndex === 0 ? "#0f172a" : "#1e293b",
+                    cursor:
+                      currentQuestionIndex === 0 ? "not-allowed" : "pointer",
+                    opacity: currentQuestionIndex === 0 ? 0.65 : 1,
+                  }}
+                >
+                  Previous
+                </button>
 
-                  <div className={styles.list} style={{ marginTop: 14 }}>
-                    {questionCatalog.identityQuestions.map((question) => (
-                      <div key={question.question_id} className={styles.listItem}>
-                        <Row label="Question ID">{question.question_id}</Row>
-                        <Row label="Text">{question.text}</Row>
-                        <Row label="Domain">{question.domain}</Row>
-                        <Row label="Type">{question.type}</Row>
-                        <Row label="Weight">{String(question.weight)}</Row>
-                        <Row label="Direction">
-                          <span
-                            className={questionToneClass(
-                              question.scoring_direction
-                            )}
-                          >
-                            {question.scoring_direction || "neutral"}
-                          </span>
-                        </Row>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                <button
+                  type="button"
+                  onClick={goToNextQuestion}
+                  disabled={currentQuestionIndex >= totalQuestionCount - 1}
+                  style={{
+                    ...actionButtonBaseStyle,
+                    background:
+                      currentQuestionIndex >= totalQuestionCount - 1
+                        ? "#0f172a"
+                        : "#1e293b",
+                    cursor:
+                      currentQuestionIndex >= totalQuestionCount - 1
+                        ? "not-allowed"
+                        : "pointer",
+                    opacity:
+                      currentQuestionIndex >= totalQuestionCount - 1
+                        ? 0.65
+                        : 1,
+                  }}
+                >
+                  Next
+                </button>
 
-                <section className={styles.card}>
-                  <h2 className={styles.cardTitle}>Adaptive Questions</h2>
-                  <div className={styles.meta}>
-                    sector-aware and cross-sector diagnostic extensions
-                  </div>
+                <button
+                  type="button"
+                  onClick={goToNextPendingQuestion}
+                  disabled={allQuestions.length === 0}
+                  style={{
+                    ...actionButtonBaseStyle,
+                    background: "#0f172a",
+                    cursor:
+                      allQuestions.length === 0 ? "not-allowed" : "pointer",
+                    opacity: allQuestions.length === 0 ? 0.65 : 1,
+                  }}
+                >
+                  Jump to Pending
+                </button>
 
-                  <div className={styles.list} style={{ marginTop: 14 }}>
-                    {questionCatalog.adaptiveQuestions.map((question) => (
-                      <div key={question.question_id} className={styles.listItem}>
-                        <Row label="Question ID">{question.question_id}</Row>
-                        <Row label="Text">{question.text}</Row>
-                        <Row label="Domain">{question.domain}</Row>
-                        <Row label="Type">{question.type}</Row>
-                        <Row label="Weight">{String(question.weight)}</Row>
-                        <Row label="Direction">
-                          <span
-                            className={questionToneClass(
-                              question.scoring_direction
-                            )}
-                          >
-                            {question.scoring_direction || "neutral"}
-                          </span>
-                        </Row>
-                        <Row label="Applicable Sectors">
-                          <Chips
-                            values={
-                              question.applicable_sectors.length > 0
-                                ? question.applicable_sectors
-                                : ["cross_sector"]
-                            }
-                          />
-                        </Row>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                <div
+                  style={{
+                    alignSelf: "center",
+                    fontSize: 12,
+                    color: "#94a3b8",
+                  }}
+                >
+                  Answers are retained live as you move through the protocol.
+                </div>
               </div>
             </>
           ) : (
             <div className={styles.empty} style={{ marginTop: 12 }}>
-              No question catalog loaded.
+              No canonical question loaded.
             </div>
           )}
+        </section>
+
+        <section className={`${styles.card} ${styles.fullWidth}`}>
+          <h2 className={styles.cardTitle}>Block 1A — Protocol Matrix Status</h2>
+          <div className={styles.meta}>
+            institutional view of structural layers under capture
+          </div>
+
+          <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Identity Layer</h3>
+                <span className={toneClass(identityStat?.state)}>
+                  {identityStat?.state || "pending"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Purpose</div>
+                  <div className={styles.miniStatValue}>Entity resolution</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>
+                  Operational Signal Formation
+                </h3>
+                <span className={toneClass(operationsStat?.state)}>
+                  {operationsStat?.state || "pending"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Purpose</div>
+                  <div className={styles.miniStatValue}>Execution structure</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>
+                  Reporting Reliability Surface
+                </h3>
+                <span className={toneClass(reportingStat?.state)}>
+                  {reportingStat?.state || "pending"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Purpose</div>
+                  <div className={styles.miniStatValue}>Visibility integrity</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>
+                  Financial Pressure Estimation
+                </h3>
+                <span className={toneClass(financeStat?.state)}>
+                  {financeStat?.state || "pending"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Purpose</div>
+                  <div className={styles.miniStatValue}>Stress exposure</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Decision Layer</h3>
+                <span className={toneClass(result ? "ready" : "pending")}>
+                  {result ? "ready" : "pending_run"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Purpose</div>
+                  <div className={styles.miniStatValue}>
+                    CRCP execution output
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={`${styles.card} ${styles.fullWidth}`}>
+          <h2 className={styles.cardTitle}>Block 1B — Capture Summary</h2>
+          <div className={styles.meta}>
+            compact operational reading of the most relevant captured inputs
+          </div>
+
+          <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+            {captureSummary.map((item) => (
+              <div key={item.label} className={styles.miniCard}>
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>{item.label}</div>
+                    <div className={styles.miniStatValue}>
+                      {prettyLabel(item.value)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className={`${styles.card} ${styles.fullWidth}`}>
+          <h2 className={styles.cardTitle}>Block 1C — Execution Gate</h2>
+          <div className={styles.meta}>
+            controlled transition from capture to canonical CRCP execution
+          </div>
+
+          <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Capture Status</h3>
+                <span className={toneClass(isCaptureComplete ? "ready" : "pending")}>
+                  {isCaptureComplete ? "ready" : "pending"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Answered</div>
+                  <div className={styles.miniStatValue}>
+                    {answeredCount}/{totalQuestionCount}
+                  </div>
+                </div>
+                <div className={styles.progressTrack}>
+                  <div
+                    className={styles.progressFill}
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Execution Readiness</h3>
+                <span className={toneClass(localValidationIssues.length === 0 && isHeaderLocked ? "valid" : "pending")}>
+                  {localValidationIssues.length === 0 && isHeaderLocked ? "valid" : "blocked"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Organization ID</div>
+                  <div className={styles.miniStatValue}>{organizationId || "n/a"}</div>
+                </div>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>Local Validation</div>
+                  <div className={styles.miniStatValue}>
+                    {localValidationIssues.length === 0
+                      ? "No blocking issues"
+                      : `${localValidationIssues.length} issue(s) detected`}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.miniCard}>
+              <div className={styles.miniCardHeader}>
+                <h3 className={styles.miniCardTitle}>Execution Action</h3>
+                <span className={toneClass(isRunDisabled ? "pending" : "unlocked")}>
+                  {isRunDisabled ? "blocked" : "unlocked"}
+                </span>
+              </div>
+              <div className={styles.miniCardBody}>
+                <div className={styles.miniStat}>
+                  <div className={styles.miniStatLabel}>State</div>
+                  <div className={styles.miniStatValue}>
+                    {isRunDisabled
+                      ? "Resolve pending capture conditions"
+                      : "Ready to execute canonical pipeline"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ ...sectionBlockStyle, marginTop: 18 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 16,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 6 }}>
+                  {isCaptureComplete
+                    ? "Capture complete. You can now execute CRCP."
+                    : "Complete all questions before execution."}
+                </div>
+                <div style={{ fontSize: 13, color: "#94a3b8" }}>
+                  Use the execution gate only after confirming the final responses.
+                </div>
+              </div>
+
+              <button
+                onClick={handleRun}
+                disabled={isRunDisabled}
+                style={{
+                  ...actionButtonBaseStyle,
+                  minWidth: 180,
+                  background: isRunDisabled ? "#0f172a" : "#1e293b",
+                  cursor: isRunDisabled ? "not-allowed" : "pointer",
+                  opacity: isRunDisabled ? 0.7 : 1,
+                }}
+              >
+                {loading ? "Running CRCP..." : "Run CRCP"}
+              </button>
+            </div>
+          </div>
         </section>
 
         {error ? (
@@ -1080,7 +2119,7 @@ export default function CrcpLabPage() {
         {backendValidationIssues.length > 0 ? (
           <section className={`${styles.card} ${styles.fullWidth}`}>
             <h2 className={styles.cardTitle}>
-              Block 0C — Backend Validation Issues
+              Block 1D — Backend Validation Issues
             </h2>
             <div className={styles.meta}>
               canonical engine validation response
@@ -1106,6 +2145,42 @@ export default function CrcpLabPage() {
         result.snapshot &&
         result.twin_seed ? (
           <>
+            <section className={`${styles.card} ${styles.fullWidth}`}>
+              <h2 className={styles.cardTitle}>Executive Decision Banner</h2>
+              <div className={styles.meta}>
+                primary execution reading for fast operator interpretation
+              </div>
+
+              <div style={{ ...sectionBlockStyle, marginTop: 16 }}>
+                <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
+                  {prettyLabel(result.decision.decision_label)}
+                </div>
+
+                <div
+                  style={{
+                    color: "#94a3b8",
+                    fontSize: 14,
+                    lineHeight: 1.55,
+                    marginBottom: 14,
+                  }}
+                >
+                  {result.snapshot.executive_summary}
+                </div>
+
+                <div className={styles.chips}>
+                  <span className={toneClass(result.decision.priority)}>
+                    {result.decision.priority}
+                  </span>
+                  <span className={toneClass(result.snapshot.state_label)}>
+                    {result.snapshot.state_label}
+                  </span>
+                  <span className={toneClass(result.decision.readiness_level)}>
+                    {result.decision.readiness_level}
+                  </span>
+                </div>
+              </div>
+            </section>
+
             <section className={styles.card}>
               <h2 className={styles.cardTitle}>Block A — Context & Decision</h2>
               <div className={styles.meta}>executedAt: {result.executed_at}</div>
@@ -1118,6 +2193,7 @@ export default function CrcpLabPage() {
                 {result.intake.context.subsector || "n/a"}
               </Row>
               <Row label="Country">{result.intake.context.country || "n/a"}</Row>
+              <Row label="City">{result.intake.context.city || "n/a"}</Row>
               <Row label="State">
                 <span className={toneClass(result.snapshot.state_label)}>
                   {result.snapshot.state_label}
@@ -1141,19 +2217,19 @@ export default function CrcpLabPage() {
               <div className={styles.meta}>canonical score surface</div>
 
               <Row label="Operational Maturity">
-                {String(result.scores.operational_maturity)}
+                {formatResultScore(result.scores.operational_maturity)}
               </Row>
               <Row label="Financial Pressure">
-                {String(result.scores.financial_pressure)}
+                {formatResultScore(result.scores.financial_pressure)}
               </Row>
               <Row label="Reporting Reliability">
-                {String(result.scores.reporting_reliability)}
+                {formatResultScore(result.scores.reporting_reliability)}
               </Row>
               <Row label="Structural Risk">
-                {String(result.scores.structural_risk)}
+                {formatResultScore(result.scores.structural_risk)}
               </Row>
               <Row label="Commercial Strength">
-                {String(result.scores.commercial_strength)}
+                {formatResultScore(result.scores.commercial_strength)}
               </Row>
             </section>
 
@@ -1205,7 +2281,64 @@ export default function CrcpLabPage() {
             </section>
 
             <section className={`${styles.card} ${styles.fullWidth}`}>
-              <h2 className={styles.cardTitle}>Block E — Persistence</h2>
+              <h2 className={styles.cardTitle}>
+                Block E — Performance Profile
+              </h2>
+              <div className={styles.meta}>
+                visual score surface for rapid interpretation
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: 14,
+                  marginTop: 16,
+                }}
+              >
+                {scoreBars.map((item) => (
+                  <div key={item.label} style={sectionBlockStyle}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        marginBottom: 8,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: "#e2e8f0",
+                        }}
+                      >
+                        {item.label}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: "#94a3b8",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {item.value.toFixed(2)} / 100
+                      </div>
+                    </div>
+
+                    <div className={styles.progressTrack}>
+                      <div
+                        className={styles.progressFill}
+                        style={{ width: `${item.value}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className={`${styles.card} ${styles.fullWidth}`}>
+              <h2 className={styles.cardTitle}>Block F — Persistence</h2>
               <div className={styles.meta}>
                 local canonical persistence result
               </div>
@@ -1234,20 +2367,12 @@ export default function CrcpLabPage() {
                 </div>
               )}
             </section>
-
-            <section className={`${styles.card} ${styles.fullWidth}`}>
-              <h2 className={styles.cardTitle}>Block F — Raw Response Envelope</h2>
-              <div className={styles.meta}>inspection / debugging surface</div>
-              <pre className={styles.mono} style={{ whiteSpace: "pre-wrap" }}>
-                {prettyJson(response)}
-              </pre>
-            </section>
           </>
         ) : (
           <section className={`${styles.card} ${styles.fullWidth}`}>
             <h2 className={styles.cardTitle}>Lab Status</h2>
             <div className={styles.meta}>
-              Edit the intake and run CRCP to inspect the live pipeline.
+              Lock Block 0, complete the guided capture, and execute CRCP when ready.
             </div>
           </section>
         )}

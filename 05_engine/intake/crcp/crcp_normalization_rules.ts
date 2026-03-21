@@ -5,6 +5,38 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isNonEmptyStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => typeof item === "string" && item.trim().length > 0)
+  );
+}
+
+function normalizePresenceBasedValue(value: CrcpAnswerValue): number {
+  if (isNonEmptyString(value)) {
+    return 100;
+  }
+
+  if (isNonEmptyStringArray(value)) {
+    return 100;
+  }
+
+  if (typeof value === "boolean") {
+    return value ? 100 : 0;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value > 0 ? 100 : 0;
+  }
+
+  return 0;
+}
+
 export function normalizeYesNo(value: CrcpAnswerValue): number {
   if (typeof value === "boolean") {
     return value ? 100 : 0;
@@ -32,54 +64,46 @@ export function normalizeScale1To5(value: CrcpAnswerValue): number {
     return 0;
   }
 
-  const clamped = clamp(numeric, 1, 5);
+  const clamped = clamp(Math.round(numeric), 1, 5);
   return ((clamped - 1) / 4) * 100;
 }
 
 export function normalizeNumeric(value: CrcpAnswerValue): number {
   const numeric = Number(value);
 
-  if (!Number.isFinite(numeric)) {
+  if (!Number.isFinite(numeric) || numeric <= 0) {
     return 0;
   }
 
-  if (numeric <= 0) {
-    return 0;
-  }
-
-  if (numeric >= 100) {
-    return 100;
-  }
-
-  return clamp(numeric, 0, 100);
+  return 100;
 }
 
 export function normalizeMultiSelect(value: CrcpAnswerValue): number {
-  if (!Array.isArray(value)) {
-    return 0;
-  }
-
-  if (value.length === 0) {
-    return 0;
-  }
-
-  const cappedLength = clamp(value.length, 1, 5);
-  return (cappedLength / 5) * 100;
+  return normalizePresenceBasedValue(value);
 }
 
-function invertIfNeeded(value: number, direction: CrcpQuestion["scoring_direction"]): number {
+export function normalizeString(value: CrcpAnswerValue): number {
+  return normalizePresenceBasedValue(value);
+}
+
+function invertIfNeeded(
+  value: number,
+  direction: CrcpQuestion["scoring_direction"]
+): number {
+  const safeValue = clamp(value, 0, 100);
+
   if (direction === "negative") {
-    return 100 - value;
+    return 100 - safeValue;
   }
 
-  return value;
+  return safeValue;
 }
 
 export function normalizeValueByQuestionType(
   question: CrcpQuestion,
   value: CrcpAnswerValue
 ): number {
-  let normalized: number;
+  let normalized = 0;
 
   switch (question.type) {
     case "yes_no":
@@ -99,7 +123,7 @@ export function normalizeValueByQuestionType(
       break;
 
     case "string":
-      normalized = 0;
+      normalized = normalizeString(value);
       break;
 
     default:
