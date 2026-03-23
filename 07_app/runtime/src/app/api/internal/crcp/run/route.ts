@@ -23,7 +23,9 @@ function normalizeString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function isValidAnswerValue(value: unknown): boolean {
+function isValidAnswerValue(
+  value: unknown
+): value is string | number | boolean | string[] {
   if (typeof value === "string") {
     return true;
   }
@@ -91,6 +93,7 @@ export async function POST(request: NextRequest) {
     const sector = normalizeString(rawContext.sector);
     const subsector = normalizeString(rawContext.subsector);
     const country = normalizeString(rawContext.country);
+    const city = normalizeString(rawContext.city);
 
     if (!organizationId) {
       return NextResponse.json(
@@ -147,7 +150,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const normalizedAnswers = [];
+    if (!city) {
+      return NextResponse.json(
+        {
+          ok: false,
+          result: null,
+          error: 'Invalid CRCP payload: "context.city" is required.',
+        },
+        { status: 400 }
+      );
+    }
+
+    const normalizedAnswers: CrcpIntakePayload["answers"] = [];
 
     for (let index = 0; index < rawAnswers.length; index += 1) {
       const rawAnswer = rawAnswers[index];
@@ -219,6 +233,7 @@ export async function POST(request: NextRequest) {
         sector,
         subsector,
         country,
+        city,
       },
       answers: normalizedAnswers,
       captured_at: capturedAt,

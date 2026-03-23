@@ -1,0 +1,51 @@
+{
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-3tw6m",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": ""
+  },
+  "scores": {
+    "operational_maturity": 56.58,
+    "financial_pressure": 69.75,
+    "reporting_reliability": 57.39,
+    "structural_risk": 58.25,
+    "commercial_strength": 75
+  },
+  "decision": {
+    "decision_label": "standardize_operations",
+    "priority": "P2",
+    "readiness_level": "medium"
+  },
+  "state_label": "degraded",
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a DEGRADED structural state. Recommended decision: standardize_operations with priority P2. Lowest-performing dimension: operational_maturity (56.58). Primary signals detected: reporting_gap_signal, operational_instability_signal, structural_fragility_signal. Primary constraints active: reporting_visibility_constraint, structural_fragility_constraint.",
+  "created_at": "2026-03-22T21:24:48.480Z"
+}

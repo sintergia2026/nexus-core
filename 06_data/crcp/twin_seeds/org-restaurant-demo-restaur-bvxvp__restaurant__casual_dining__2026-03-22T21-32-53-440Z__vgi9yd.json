@@ -1,0 +1,76 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-bvxvp::restaurant::casual_dining::2026-03-22T21-32-53-467Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-bvxvp",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": ""
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 46.9,
+      "financial_pressure": 50.19,
+      "reporting_reliability": 30.11,
+      "structural_risk": 40.73,
+      "commercial_strength": 54.17
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "CRITICAL",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "HIGH",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    },
+    {
+      "code": "visibility_risk_compound_signal",
+      "severity": "CRITICAL",
+      "source_metric": "compound_visibility_structural"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "visibility_structural_compound_constraint",
+      "severity": "CRITICAL"
+    }
+  ],
+  "structural_hypothesis": "The client is operating under compounded visibility and structural fragility. Weak reporting reliability is likely obscuring execution instability, limiting traceability, and preventing management from identifying the true origin of operational and financial deterioration.",
+  "created_at": "2026-03-22T21:32:53.467Z"
+}

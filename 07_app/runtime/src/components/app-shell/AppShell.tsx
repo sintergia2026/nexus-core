@@ -1,7 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import {
+  usePathname,
+  useSearchParams,
+  type ReadonlyURLSearchParams,
+} from "next/navigation";
 import styles from "./AppShell.module.css";
 
 const NAV_ITEMS = [
@@ -11,23 +16,21 @@ const NAV_ITEMS = [
   { href: "/executive-report", label: "Executive Report" },
 ];
 
+type AppShellProps = {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+};
+
 function buildHrefWithCurrentQuery(
   href: string,
-  searchParams: URLSearchParams
+  searchParams: ReadonlyURLSearchParams
 ): string {
   const query = searchParams.toString();
   return query ? `${href}?${query}` : href;
 }
 
-export default function AppShell({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
+function AppShellInner({ title, subtitle, children }: AppShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -64,5 +67,13 @@ export default function AppShell({
         <section className={styles.content}>{children}</section>
       </div>
     </main>
+  );
+}
+
+export default function AppShell(props: AppShellProps) {
+  return (
+    <Suspense fallback={<div style={{ padding: 24 }}>Loading interface...</div>}>
+      <AppShellInner {...props} />
+    </Suspense>
   );
 }

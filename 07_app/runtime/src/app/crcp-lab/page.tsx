@@ -18,6 +18,163 @@ type ValidationIssue = {
   message: string;
 };
 
+type TwinSeedV2 = {
+  twin_seed_id: string;
+  twin_version: "v2";
+  lineage_id: string;
+  source_snapshot_id?: string;
+  context: {
+    organization_id: string;
+    sector: string;
+    subsector?: string;
+    country?: string;
+    city?: string;
+  };
+  baseline_state: {
+    state_label: string;
+    scores: {
+      operational_maturity: number;
+      financial_pressure: number;
+      reporting_reliability: number;
+      structural_risk: number;
+      commercial_strength: number;
+    };
+    decision: {
+      decision_label: string;
+      priority: "P1" | "P2" | "P3";
+      readiness_level: "low" | "medium" | "high";
+    };
+  };
+  active_signals: Array<{
+    code: string;
+    severity: string;
+    source_metric?: string;
+  }>;
+  active_constraints: Array<{
+    code: string;
+    severity: string;
+  }>;
+  structural_hypothesis: string;
+  structural_vector: {
+    execution: number;
+    visibility: number;
+    finance: number;
+    commercial: number;
+    coordination: number;
+  };
+  gap_vector: {
+    weakest_dimension: string;
+    weakest_score: number;
+    second_weakest_dimension?: string;
+    second_weakest_score?: number;
+    gap_severity: number;
+  };
+  twin_confidence: {
+    score: number;
+    level: "low" | "medium" | "high";
+    rationale: string;
+  };
+  activation_path: {
+    next_step: string;
+    recommended_program: string;
+    recommended_priority: "P1" | "P2" | "P3";
+    lifecycle_stage:
+      | "seeded"
+      | "stabilizing"
+      | "standardizing"
+      | "optimizing"
+      | "monitoring";
+  };
+  evidence_summary: {
+    answered_questions: number;
+    total_questions: number;
+    coverage_percent: number;
+    major_signal_count: number;
+    major_constraint_count: number;
+  };
+  created_at: string;
+};
+
+type TwinRoot = {
+  entity_id: string;
+  legal_name: string;
+  display_name: string;
+  sector: string;
+  subsector?: string;
+  country?: string;
+  city?: string;
+  lifecycle_stage: string;
+  state_label: string;
+};
+
+type TwinDomainNode = {
+  domain_id: string;
+  domain_name: string;
+  domain_label: string;
+  status: string;
+  owner_role_id?: string;
+  score?: number;
+  summary?: string;
+};
+
+type TwinRoleNode = {
+  role_id: string;
+  role_name: string;
+  role_label: string;
+  status: string;
+  domain_id?: string;
+  responsibility_summary?: string;
+};
+
+type TwinEvidenceItem = {
+  evidence_id: string;
+  evidence_type: string;
+  label: string;
+  status: string;
+  linked_domain_id?: string;
+  linked_role_id?: string;
+  source_question_id?: string;
+  value?: string | number | boolean | string[] | null;
+};
+
+type TwinDependencyEdge = {
+  edge_id: string;
+  from_node_id: string;
+  to_node_id: string;
+  relation: string;
+  status?: string;
+};
+
+type TwinActivationLayer = {
+  activation_status: string;
+  recommended_priority: string;
+  recommended_program: string;
+  next_step: string;
+  activation_summary: string;
+};
+
+type TwinSimulationLayer = {
+  simulation_status: string;
+  available_modes: string[];
+  simulation_summary: string;
+};
+
+type TwinStructure = {
+  twin_id: string;
+  twin_name: string;
+  twin_version: string;
+  lineage_id: string;
+  root: TwinRoot;
+  domains: TwinDomainNode[];
+  roles: TwinRoleNode[];
+  evidence: TwinEvidenceItem[];
+  dependencies: TwinDependencyEdge[];
+  activation: TwinActivationLayer;
+  simulation?: TwinSimulationLayer;
+  created_at: string;
+  updated_at: string;
+};
+
 type CrcpRunApiResponse = {
   ok: boolean;
   result: null | {
@@ -130,6 +287,8 @@ type CrcpRunApiResponse = {
       structural_hypothesis: string;
       created_at: string;
     } | null;
+    twin_seed_v2: TwinSeedV2 | null;
+    twin_structure: TwinStructure | null;
     persisted?: {
       intake_path: string;
       snapshot_path: string;
@@ -197,10 +356,7 @@ type HeaderSnapshotItem = {
   value: string;
 };
 
-const COUNTRY_OPTIONS: Record<
-  string,
-  { label: string; cities: string[] }
-> = {
+const COUNTRY_OPTIONS: Record<string, { label: string; cities: string[] }> = {
   CO: {
     label: "Colombia",
     cities: ["Bogota", "Medellin", "Cali", "Barranquilla", "Cartagena"],
@@ -384,7 +540,9 @@ function toneClass(value?: string): string {
     v === "stabilize_now" ||
     v === "negative" ||
     v === "pending" ||
-    v === "low"
+    v === "low" ||
+    v === "blocked" ||
+    v === "fragile"
   ) {
     return `${styles.status} ${styles.statusSuperseded}`;
   }
@@ -399,7 +557,8 @@ function toneClass(value?: string): string {
     v === "answered" ||
     v === "medium" ||
     v === "valid" ||
-    v === "unlocked"
+    v === "unlocked" ||
+    v === "planned"
   ) {
     return `${styles.status} ${styles.statusActive}`;
   }
@@ -431,22 +590,10 @@ function buildOrganizationId(
 }
 
 function isAnswered(value: CrcpAnswerValue | undefined): boolean {
-  if (typeof value === "boolean") {
-    return true;
-  }
-
-  if (typeof value === "number") {
-    return Number.isFinite(value);
-  }
-
-  if (typeof value === "string") {
-    return value.trim().length > 0;
-  }
-
-  if (Array.isArray(value)) {
-    return value.length > 0;
-  }
-
+  if (typeof value === "boolean") return true;
+  if (typeof value === "number") return Number.isFinite(value);
+  if (typeof value === "string") return value.trim().length > 0;
+  if (Array.isArray(value)) return value.length > 0;
   return false;
 }
 
@@ -563,7 +710,9 @@ function getLocalValidationIssues(metadata: MetadataState): string[] {
   if (!metadata.country.trim()) {
     issues.push("country is required.");
   } else if (!countries.includes(metadata.country)) {
-    issues.push(`country "${metadata.country}" is not part of the supported set.`);
+    issues.push(
+      `country "${metadata.country}" is not part of the supported set.`
+    );
   }
 
   if (!metadata.city.trim()) {
@@ -632,27 +781,22 @@ function prettyLabel(value: string): string {
 }
 
 function formatAnswerValue(value: CrcpAnswerValue | undefined): string {
-  if (value === undefined) {
-    return "not_answered";
-  }
-
-  if (typeof value === "boolean") {
-    return value ? "yes" : "no";
-  }
-
-  if (typeof value === "number") {
-    return String(value);
-  }
-
-  if (typeof value === "string") {
-    return value.trim() || "not_answered";
-  }
-
-  if (Array.isArray(value)) {
+  if (value === undefined) return "not_answered";
+  if (typeof value === "boolean") return value ? "yes" : "no";
+  if (typeof value === "number") return String(value);
+  if (typeof value === "string") return value.trim() || "not_answered";
+  if (Array.isArray(value))
     return value.length > 0 ? value.join(", ") : "not_answered";
-  }
-
   return "not_answered";
+}
+
+function formatUnknownValue(value: unknown): string {
+  if (value === null || value === undefined) return "n/a";
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (typeof value === "number") return String(value);
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.join(", ");
+  return JSON.stringify(value);
 }
 
 function getCaptureSummary(
@@ -674,7 +818,9 @@ function getCaptureSummary(
   ];
 
   return prioritizedIds
-    .map((questionId) => questions.find((question) => question.question_id === questionId))
+    .map((questionId) =>
+      questions.find((question) => question.question_id === questionId)
+    )
     .filter((question): question is CrcpQuestion => Boolean(question))
     .map((question) => ({
       label: question.text,
@@ -707,10 +853,10 @@ function getHeaderSnapshot(metadata: MetadataState): HeaderSnapshotItem[] {
   ];
 }
 
-function getScoreBars(result: NonNullable<CrcpRunApiResponse["result"]>): ScoreBarItem[] {
-  if (!result.scores) {
-    return [];
-  }
+function getScoreBars(
+  result: NonNullable<CrcpRunApiResponse["result"]>
+): ScoreBarItem[] {
+  if (!result.scores) return [];
 
   return [
     {
@@ -732,6 +878,31 @@ function getScoreBars(result: NonNullable<CrcpRunApiResponse["result"]>): ScoreB
     {
       label: "Commercial Strength",
       value: clampPercent(result.scores.commercial_strength),
+    },
+  ];
+}
+
+function getTwinVectorBars(twinSeedV2: TwinSeedV2): ScoreBarItem[] {
+  return [
+    {
+      label: "Execution",
+      value: clampPercent(twinSeedV2.structural_vector.execution),
+    },
+    {
+      label: "Visibility",
+      value: clampPercent(twinSeedV2.structural_vector.visibility),
+    },
+    {
+      label: "Finance",
+      value: clampPercent(twinSeedV2.structural_vector.finance),
+    },
+    {
+      label: "Commercial",
+      value: clampPercent(twinSeedV2.structural_vector.commercial),
+    },
+    {
+      label: "Coordination",
+      value: clampPercent(twinSeedV2.structural_vector.coordination),
     },
   ];
 }
@@ -763,7 +934,11 @@ export default function CrcpLabPage() {
       return "";
     }
 
-    return buildOrganizationId(metadata.business_name, metadata.sector, orgSeed);
+    return buildOrganizationId(
+      metadata.business_name,
+      metadata.sector,
+      orgSeed
+    );
   }, [orgSeed, metadata.business_name, metadata.sector]);
 
   useEffect(() => {
@@ -924,14 +1099,17 @@ export default function CrcpLabPage() {
     [allQuestions, metadata, answers]
   );
 
-  const headerSnapshot = useMemo(
-    () => getHeaderSnapshot(metadata),
-    [metadata]
-  );
+  const headerSnapshot = useMemo(() => getHeaderSnapshot(metadata), [metadata]);
 
   const result = response?.result ?? null;
   const backendValidationIssues = result?.validation_issues ?? [];
   const scoreBars = useMemo(() => (result ? getScoreBars(result) : []), [result]);
+  const twinSeedV2 = result?.twin_seed_v2 ?? null;
+  const twinStructure = result?.twin_structure ?? null;
+  const twinVectorBars = useMemo(
+    () => (twinSeedV2 ? getTwinVectorBars(twinSeedV2) : []),
+    [twinSeedV2]
+  );
 
   const isCaptureComplete =
     totalQuestionCount > 0 && answeredCount === totalQuestionCount;
@@ -1352,7 +1530,9 @@ export default function CrcpLabPage() {
                 background:
                   localValidationIssues.length > 0 ? "#0f172a" : "#1e293b",
                 cursor:
-                  localValidationIssues.length > 0 ? "not-allowed" : "pointer",
+                  localValidationIssues.length > 0
+                    ? "not-allowed"
+                    : "pointer",
                 opacity: localValidationIssues.length > 0 ? 0.7 : 1,
               }}
             >
@@ -1762,7 +1942,9 @@ export default function CrcpLabPage() {
                     <h3 className={styles.miniCardTitle}>Coverage State</h3>
                     <span
                       className={toneClass(
-                        isAnswered(currentQuestionValue) ? "answered" : "pending"
+                        isAnswered(currentQuestionValue)
+                          ? "answered"
+                          : "pending"
                       )}
                     >
                       {isAnswered(currentQuestionValue)
@@ -2008,7 +2190,11 @@ export default function CrcpLabPage() {
             <div className={styles.miniCard}>
               <div className={styles.miniCardHeader}>
                 <h3 className={styles.miniCardTitle}>Capture Status</h3>
-                <span className={toneClass(isCaptureComplete ? "ready" : "pending")}>
+                <span
+                  className={toneClass(
+                    isCaptureComplete ? "ready" : "pending"
+                  )}
+                >
                   {isCaptureComplete ? "ready" : "pending"}
                 </span>
               </div>
@@ -2031,14 +2217,24 @@ export default function CrcpLabPage() {
             <div className={styles.miniCard}>
               <div className={styles.miniCardHeader}>
                 <h3 className={styles.miniCardTitle}>Execution Readiness</h3>
-                <span className={toneClass(localValidationIssues.length === 0 && isHeaderLocked ? "valid" : "pending")}>
-                  {localValidationIssues.length === 0 && isHeaderLocked ? "valid" : "blocked"}
+                <span
+                  className={toneClass(
+                    localValidationIssues.length === 0 && isHeaderLocked
+                      ? "valid"
+                      : "pending"
+                  )}
+                >
+                  {localValidationIssues.length === 0 && isHeaderLocked
+                    ? "valid"
+                    : "blocked"}
                 </span>
               </div>
               <div className={styles.miniCardBody}>
                 <div className={styles.miniStat}>
                   <div className={styles.miniStatLabel}>Organization ID</div>
-                  <div className={styles.miniStatValue}>{organizationId || "n/a"}</div>
+                  <div className={styles.miniStatValue}>
+                    {organizationId || "n/a"}
+                  </div>
                 </div>
                 <div className={styles.miniStat}>
                   <div className={styles.miniStatLabel}>Local Validation</div>
@@ -2054,7 +2250,9 @@ export default function CrcpLabPage() {
             <div className={styles.miniCard}>
               <div className={styles.miniCardHeader}>
                 <h3 className={styles.miniCardTitle}>Execution Action</h3>
-                <span className={toneClass(isRunDisabled ? "pending" : "unlocked")}>
+                <span
+                  className={toneClass(isRunDisabled ? "pending" : "unlocked")}
+                >
                   {isRunDisabled ? "blocked" : "unlocked"}
                 </span>
               </div>
@@ -2088,7 +2286,8 @@ export default function CrcpLabPage() {
                     : "Complete all questions before execution."}
                 </div>
                 <div style={{ fontSize: 13, color: "#94a3b8" }}>
-                  Use the execution gate only after confirming the final responses.
+                  Use the execution gate only after confirming the final
+                  responses.
                 </div>
               </div>
 
@@ -2280,10 +2479,651 @@ export default function CrcpLabPage() {
               </Row>
             </section>
 
+            {twinSeedV2 ? (
+              <>
+                <section className={`${styles.card} ${styles.fullWidth}`}>
+                  <h2 className={styles.cardTitle}>
+                    Block D2 — Twin Seed V2 Intelligence Surface
+                  </h2>
+                  <div className={styles.meta}>
+                    advanced twin intelligence, confidence, gap analysis, and activation path
+                  </div>
+
+                  <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Twin Version</h3>
+                        <span className={toneClass("active")}>
+                          {twinSeedV2.twin_version}
+                        </span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Twin Seed ID</div>
+                          <div
+                            className={styles.miniStatValue}
+                            style={{ wordBreak: "break-word" }}
+                          >
+                            {twinSeedV2.twin_seed_id}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Lineage</h3>
+                        <span className={toneClass("active")}>traceable</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Lineage ID</div>
+                          <div
+                            className={styles.miniStatValue}
+                            style={{ wordBreak: "break-word" }}
+                          >
+                            {twinSeedV2.lineage_id}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Confidence</h3>
+                        <span className={toneClass(twinSeedV2.twin_confidence.level)}>
+                          {twinSeedV2.twin_confidence.level}
+                        </span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Score</div>
+                          <div className={styles.miniStatValue}>
+                            {twinSeedV2.twin_confidence.score.toFixed(2)} / 100
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Lifecycle Stage</h3>
+                        <span className={toneClass("active")}>
+                          {prettyLabel(twinSeedV2.activation_path.lifecycle_stage)}
+                        </span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Priority</div>
+                          <div className={styles.miniStatValue}>
+                            {twinSeedV2.activation_path.recommended_priority}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>Block D3 — Gap Vector</h2>
+                  <div className={styles.meta}>
+                    weakest dimensions and structural severity concentration
+                  </div>
+
+                  <Row label="Weakest Dimension">
+                    {prettyLabel(twinSeedV2.gap_vector.weakest_dimension)}
+                  </Row>
+                  <Row label="Weakest Score">
+                    {twinSeedV2.gap_vector.weakest_score.toFixed(2)}
+                  </Row>
+                  <Row label="Second Weakest">
+                    {twinSeedV2.gap_vector.second_weakest_dimension
+                      ? prettyLabel(twinSeedV2.gap_vector.second_weakest_dimension)
+                      : "n/a"}
+                  </Row>
+                  <Row label="Second Weakest Score">
+                    {typeof twinSeedV2.gap_vector.second_weakest_score === "number"
+                      ? twinSeedV2.gap_vector.second_weakest_score.toFixed(2)
+                      : "n/a"}
+                  </Row>
+                  <Row label="Gap Severity">
+                    {twinSeedV2.gap_vector.gap_severity.toFixed(2)}
+                  </Row>
+                </section>
+
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>Block D4 — Activation Path</h2>
+                  <div className={styles.meta}>
+                    recommended transition logic for post-diagnostic execution
+                  </div>
+
+                  <Row label="Next Step">
+                    {prettyLabel(twinSeedV2.activation_path.next_step)}
+                  </Row>
+                  <Row label="Recommended Program">
+                    {prettyLabel(twinSeedV2.activation_path.recommended_program)}
+                  </Row>
+                  <Row label="Recommended Priority">
+                    <span
+                      className={toneClass(
+                        twinSeedV2.activation_path.recommended_priority
+                      )}
+                    >
+                      {twinSeedV2.activation_path.recommended_priority}
+                    </span>
+                  </Row>
+                  <Row label="Lifecycle Stage">
+                    {prettyLabel(twinSeedV2.activation_path.lifecycle_stage)}
+                  </Row>
+                </section>
+
+                <section className={`${styles.card} ${styles.fullWidth}`}>
+                  <h2 className={styles.cardTitle}>
+                    Block D5 — Structural Vector Surface
+                  </h2>
+                  <div className={styles.meta}>
+                    composite twin operating surface across core structural dimensions
+                  </div>
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gap: 14,
+                      marginTop: 16,
+                    }}
+                  >
+                    {twinVectorBars.map((item) => (
+                      <div key={item.label} style={sectionBlockStyle}>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            gap: 12,
+                            marginBottom: 8,
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: "#e2e8f0",
+                            }}
+                          >
+                            {item.label}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 13,
+                              color: "#94a3b8",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {item.value.toFixed(2)} / 100
+                          </div>
+                        </div>
+
+                        <div className={styles.progressTrack}>
+                          <div
+                            className={styles.progressFill}
+                            style={{ width: `${item.value}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className={`${styles.card} ${styles.fullWidth}`}>
+                  <h2 className={styles.cardTitle}>Block D6 — Twin Evidence</h2>
+                  <div className={styles.meta}>
+                    evidence quality and interpretive confidence support
+                  </div>
+
+                  <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Answered Questions</h3>
+                        <span className={toneClass("active")}>evidence</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Count</div>
+                          <div className={styles.miniStatValue}>
+                            {twinSeedV2.evidence_summary.answered_questions}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Total Questions</h3>
+                        <span className={toneClass("active")}>catalog</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Count</div>
+                          <div className={styles.miniStatValue}>
+                            {twinSeedV2.evidence_summary.total_questions}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Coverage Percent</h3>
+                        <span className={toneClass("active")}>coverage</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Percent</div>
+                          <div className={styles.miniStatValue}>
+                            {twinSeedV2.evidence_summary.coverage_percent.toFixed(2)}%
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Major Signals</h3>
+                        <span className={toneClass("active")}>signal load</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Count</div>
+                          <div className={styles.miniStatValue}>
+                            {twinSeedV2.evidence_summary.major_signal_count}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Major Constraints</h3>
+                        <span className={toneClass("active")}>constraint load</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Count</div>
+                          <div className={styles.miniStatValue}>
+                            {twinSeedV2.evidence_summary.major_constraint_count}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ ...sectionBlockStyle, marginTop: 18 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
+                      Twin Confidence Rationale
+                    </div>
+                    <div style={{ color: "#94a3b8", fontSize: 14, lineHeight: 1.6 }}>
+                      {twinSeedV2.twin_confidence.rationale}
+                    </div>
+                  </div>
+                </section>
+              </>
+            ) : null}
+
+            {twinStructure ? (
+              <>
+                <section className={`${styles.card} ${styles.fullWidth}`}>
+                  <h2 className={styles.cardTitle}>
+                    Block D7 — True Digital Twin Structure
+                  </h2>
+                  <div className={styles.meta}>
+                    repository-grade structural representation of the organization
+                  </div>
+
+                  <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Twin ID</h3>
+                        <span className={toneClass("active")}>
+                          {twinStructure.twin_version}
+                        </span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Identifier</div>
+                          <div
+                            className={styles.miniStatValue}
+                            style={{ wordBreak: "break-word" }}
+                          >
+                            {twinStructure.twin_id}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Twin Name</h3>
+                        <span className={toneClass("active")}>structural</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Name</div>
+                          <div className={styles.miniStatValue}>
+                            {twinStructure.twin_name}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Lineage</h3>
+                        <span className={toneClass("active")}>traceable</span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Lineage ID</div>
+                          <div
+                            className={styles.miniStatValue}
+                            style={{ wordBreak: "break-word" }}
+                          >
+                            {twinStructure.lineage_id}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.miniCard}>
+                      <div className={styles.miniCardHeader}>
+                        <h3 className={styles.miniCardTitle}>Root State</h3>
+                        <span className={toneClass(twinStructure.root.state_label)}>
+                          {twinStructure.root.state_label}
+                        </span>
+                      </div>
+                      <div className={styles.miniCardBody}>
+                        <div className={styles.miniStat}>
+                          <div className={styles.miniStatLabel}>Lifecycle</div>
+                          <div className={styles.miniStatValue}>
+                            {prettyLabel(twinStructure.root.lifecycle_stage)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>Block D8 — Entity Root</h2>
+                  <div className={styles.meta}>
+                    canonical company root identity
+                  </div>
+
+                  <Row label="Entity ID">{twinStructure.root.entity_id}</Row>
+                  <Row label="Legal Name">{twinStructure.root.legal_name}</Row>
+                  <Row label="Display Name">{twinStructure.root.display_name}</Row>
+                  <Row label="Sector">{twinStructure.root.sector}</Row>
+                  <Row label="Subsector">
+                    {twinStructure.root.subsector || "n/a"}
+                  </Row>
+                  <Row label="Country">{twinStructure.root.country || "n/a"}</Row>
+                  <Row label="City">{twinStructure.root.city || "n/a"}</Row>
+                  <Row label="Lifecycle">
+                    {prettyLabel(twinStructure.root.lifecycle_stage)}
+                  </Row>
+                  <Row label="State">
+                    <span className={toneClass(twinStructure.root.state_label)}>
+                      {twinStructure.root.state_label}
+                    </span>
+                  </Row>
+                </section>
+
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>Block D9 — Domains</h2>
+                  <div className={styles.meta}>
+                    navigable business domains
+                  </div>
+
+                  {twinStructure.domains.length > 0 ? (
+                    <div className={styles.list}>
+                      {twinStructure.domains.map((domain) => (
+                        <div key={domain.domain_id} className={styles.listItem}>
+                          <Row label="Domain ID">{domain.domain_id}</Row>
+                          <Row label="Name">{domain.domain_name}</Row>
+                          <Row label="Label">{domain.domain_label}</Row>
+                          <Row label="Status">
+                            <span className={toneClass(domain.status)}>
+                              {domain.status}
+                            </span>
+                          </Row>
+                          <Row label="Owner Role">{domain.owner_role_id || "n/a"}</Row>
+                          <Row label="Score">
+                            {typeof domain.score === "number"
+                              ? domain.score.toFixed(2)
+                              : "n/a"}
+                          </Row>
+                          <Row label="Summary">{domain.summary || "n/a"}</Row>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={styles.empty}>No domain nodes returned.</div>
+                  )}
+                </section>
+
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>Block D10 — Roles</h2>
+                  <div className={styles.meta}>
+                    organizational role system
+                  </div>
+
+                  {twinStructure.roles.length > 0 ? (
+                    <div className={styles.list}>
+                      {twinStructure.roles.map((role) => (
+                        <div key={role.role_id} className={styles.listItem}>
+                          <Row label="Role ID">{role.role_id}</Row>
+                          <Row label="Name">{role.role_name}</Row>
+                          <Row label="Label">{role.role_label}</Row>
+                          <Row label="Status">
+                            <span className={toneClass(role.status)}>
+                              {role.status}
+                            </span>
+                          </Row>
+                          <Row label="Domain">{role.domain_id || "n/a"}</Row>
+                          <Row label="Responsibility">
+                            {role.responsibility_summary || "n/a"}
+                          </Row>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={styles.empty}>No role nodes returned.</div>
+                  )}
+                </section>
+
+                <section className={`${styles.card} ${styles.fullWidth}`}>
+                  <h2 className={styles.cardTitle}>Block D11 — Evidence Layer</h2>
+                  <div className={styles.meta}>
+                    supporting structural evidence
+                  </div>
+
+                  {twinStructure.evidence.length > 0 ? (
+                    <div className={styles.list}>
+                      {twinStructure.evidence.map((item) => (
+                        <div key={item.evidence_id} className={styles.listItem}>
+                          <Row label="Evidence ID">{item.evidence_id}</Row>
+                          <Row label="Type">{item.evidence_type}</Row>
+                          <Row label="Label">{item.label}</Row>
+                          <Row label="Status">
+                            <span className={toneClass(item.status)}>
+                              {item.status}
+                            </span>
+                          </Row>
+                          <Row label="Linked Domain">
+                            {item.linked_domain_id || "n/a"}
+                          </Row>
+                          <Row label="Linked Role">
+                            {item.linked_role_id || "n/a"}
+                          </Row>
+                          <Row label="Source Question">
+                            {item.source_question_id || "n/a"}
+                          </Row>
+                          <Row label="Value">
+                            {formatUnknownValue(item.value)}
+                          </Row>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={styles.empty}>No evidence items returned.</div>
+                  )}
+                </section>
+
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>Block D12 — Activation Layer</h2>
+                  <div className={styles.meta}>
+                    post-diagnostic activation logic
+                  </div>
+
+                  <Row label="Activation Status">
+                    <span className={toneClass(twinStructure.activation.activation_status)}>
+                      {twinStructure.activation.activation_status}
+                    </span>
+                  </Row>
+                  <Row label="Recommended Priority">
+                    <span className={toneClass(twinStructure.activation.recommended_priority)}>
+                      {twinStructure.activation.recommended_priority}
+                    </span>
+                  </Row>
+                  <Row label="Recommended Program">
+                    {twinStructure.activation.recommended_program}
+                  </Row>
+                  <Row label="Next Step">{twinStructure.activation.next_step}</Row>
+                  <Row label="Summary">
+                    {twinStructure.activation.activation_summary}
+                  </Row>
+                </section>
+
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>Block D13 — Simulation Layer</h2>
+                  <div className={styles.meta}>
+                    future scenario architecture
+                  </div>
+
+                  {twinStructure.simulation ? (
+                    <>
+                      <Row label="Simulation Status">
+                        <span className={toneClass(twinStructure.simulation.simulation_status)}>
+                          {twinStructure.simulation.simulation_status}
+                        </span>
+                      </Row>
+                      <Row label="Available Modes">
+                        <Chips values={twinStructure.simulation.available_modes} />
+                      </Row>
+                      <Row label="Simulation Summary">
+                        {twinStructure.simulation.simulation_summary}
+                      </Row>
+                    </>
+                  ) : (
+                    <div className={styles.empty}>
+                      No simulation layer returned.
+                    </div>
+                  )}
+                </section>
+
+                <section className={`${styles.card} ${styles.fullWidth}`}>
+                  <h2 className={styles.cardTitle}>Block D14 — Dependency Graph</h2>
+                  <div className={styles.meta}>
+                    structural relationships between twin nodes
+                  </div>
+
+                  {twinStructure.dependencies.length > 0 ? (
+                    <div className={styles.list}>
+                      {twinStructure.dependencies.map((edge) => (
+                        <div key={edge.edge_id} className={styles.listItem}>
+                          <Row label="Edge ID">{edge.edge_id}</Row>
+                          <Row label="From">{edge.from_node_id}</Row>
+                          <Row label="To">{edge.to_node_id}</Row>
+                          <Row label="Relation">{edge.relation}</Row>
+                          <Row label="Status">
+                            {edge.status ? (
+                              <span className={toneClass(edge.status)}>
+                                {edge.status}
+                              </span>
+                            ) : (
+                              "n/a"
+                            )}
+                          </Row>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={styles.empty}>
+                      No dependency edges returned.
+                    </div>
+                  )}
+                </section>
+
+                <section className={`${styles.card} ${styles.fullWidth}`}>
+                  <h2 className={styles.cardTitle}>
+                    Block D15 — Repository View
+                  </h2>
+                  <div className={styles.meta}>
+                    business rendered as structural repository
+                  </div>
+
+                  <div
+                    style={{
+                      ...sectionBlockStyle,
+                      marginTop: 16,
+                      overflowX: "auto",
+                    }}
+                  >
+                    <div
+                      style={{
+                        minWidth: 980,
+                        display: "grid",
+                        gap: 8,
+                        fontFamily:
+                          'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                        fontSize: 13,
+                        color: "#cbd5e1",
+                      }}
+                    >
+                      <div>/{slugify(twinStructure.root.display_name || "company")}</div>
+                      <div>├── root/</div>
+                      <div>│   ├── entity_id.ts</div>
+                      <div>│   ├── identity.ts</div>
+                      <div>│   └── lifecycle.ts</div>
+                      <div>├── domains/</div>
+                      {twinStructure.domains.map((domain, index) => (
+                        <div key={domain.domain_id}>
+                          {index === twinStructure.domains.length - 1
+                            ? `│   └── ${domain.domain_name}.node.ts`
+                            : `│   ├── ${domain.domain_name}.node.ts`}
+                        </div>
+                      ))}
+                      <div>├── roles/</div>
+                      {twinStructure.roles.map((role, index) => (
+                        <div key={role.role_id}>
+                          {index === twinStructure.roles.length - 1
+                            ? `│   └── ${role.role_name}.role.ts`
+                            : `│   ├── ${role.role_name}.role.ts`}
+                        </div>
+                      ))}
+                      <div>├── evidence/</div>
+                      <div>│   └── evidence.index.ts</div>
+                      <div>├── activation/</div>
+                      <div>│   └── activation.layer.ts</div>
+                      <div>└── simulation/</div>
+                      <div>    └── simulation.layer.ts</div>
+                    </div>
+                  </div>
+                </section>
+              </>
+            ) : null}
+
             <section className={`${styles.card} ${styles.fullWidth}`}>
-              <h2 className={styles.cardTitle}>
-                Block E — Performance Profile
-              </h2>
+              <h2 className={styles.cardTitle}>Block E — Performance Profile</h2>
               <div className={styles.meta}>
                 visual score surface for rapid interpretation
               </div>
@@ -2372,7 +3212,8 @@ export default function CrcpLabPage() {
           <section className={`${styles.card} ${styles.fullWidth}`}>
             <h2 className={styles.cardTitle}>Lab Status</h2>
             <div className={styles.meta}>
-              Lock Block 0, complete the guided capture, and execute CRCP when ready.
+              Lock Block 0, complete the guided capture, and execute CRCP when
+              ready.
             </div>
           </section>
         )}

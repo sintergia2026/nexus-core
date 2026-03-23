@@ -1,0 +1,35 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-yvqqu::restaurant::casual_dining::2026-03-22T02-29-07-954Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-yvqqu",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": ""
+  },
+  "baseline_state": {
+    "state_label": "degraded",
+    "scores": {
+      "operational_maturity": 63.35,
+      "financial_pressure": 62.5,
+      "reporting_reliability": 59.41,
+      "structural_risk": 62.7,
+      "commercial_strength": 75
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-22T02:29:07.954Z"
+}

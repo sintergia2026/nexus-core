@@ -19,6 +19,7 @@ function normalizeContext(payload: CrcpIntakePayload) {
     sector: String(payload.context?.sector || "").trim(),
     subsector: String(payload.context?.subsector || "").trim(),
     country: String(payload.context?.country || "").trim(),
+    city: String(payload.context?.city || "").trim(),
   };
 }
 

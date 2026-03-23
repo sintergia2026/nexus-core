@@ -14,8 +14,9 @@ export interface CrcpAnswer {
 export interface CrcpContext {
   organization_id: string;
   sector: string;
-  subsector?: string;
-  country?: string;
+  subsector: string;
+  country: string;
+  city: string;
 }
 
 export interface CrcpIntakePayload {

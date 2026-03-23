@@ -1,0 +1,53 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-jg31i::restaurant::casual_dining::2026-03-22T01-31-20-397Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-jg31i",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "PE",
+    "city": ""
+  },
+  "baseline_state": {
+    "state_label": "degraded",
+    "scores": {
+      "operational_maturity": 51.41,
+      "financial_pressure": 51.34,
+      "reporting_reliability": 62.1,
+      "structural_risk": 56.3,
+      "commercial_strength": 70.83
+    }
+  },
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client shows operational instability driven by inconsistent execution, process friction, or dependence on non-standardized work. The system likely lacks enough procedural stability to support scalable performance.",
+  "created_at": "2026-03-22T01:31:20.397Z"
+}

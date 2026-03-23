@@ -157,22 +157,28 @@ export function validateCrcpIntake(
     });
   }
 
-  if (!isValidStringValue(context.subsector)) {
+    if (!isValidStringValue(context.subsector)) {
     issues.push({
       code: "MISSING_SUBSECTOR",
       field: "context.subsector",
       message: "subsector is required.",
     });
-  } else if (
-    isValidStringValue(context.sector) &&
-    subsectorProfilesTyped[context.sector] &&
-    !subsectorProfilesTyped[context.sector].includes(context.subsector)
-  ) {
-    issues.push({
-      code: "INVALID_SUBSECTOR",
-      field: "context.subsector",
-      message: `subsector "${context.subsector}" is not valid for sector "${context.sector}".`,
-    });
+  } else {
+    const sectorKey = String(context.sector || "");
+    const subsectorValue = String(context.subsector || "");
+    const allowedSubsectors = subsectorProfilesTyped[sectorKey];
+
+    if (
+      isValidStringValue(context.sector) &&
+      Array.isArray(allowedSubsectors) &&
+      !allowedSubsectors.includes(subsectorValue)
+    ) {
+      issues.push({
+        code: "INVALID_SUBSECTOR",
+        field: "context.subsector",
+        message: `subsector "${context.subsector}" is not valid for sector "${context.sector}".`,
+      });
+    }
   }
 
   if (!isValidStringValue(context.country)) {

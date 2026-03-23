@@ -1,0 +1,55 @@
+{
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-jg31i",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "PE",
+    "city": ""
+  },
+  "scores": {
+    "operational_maturity": 51.41,
+    "financial_pressure": 51.34,
+    "reporting_reliability": 62.1,
+    "structural_risk": 56.3,
+    "commercial_strength": 70.83
+  },
+  "decision": {
+    "decision_label": "standardize_operations",
+    "priority": "P2",
+    "readiness_level": "medium"
+  },
+  "state_label": "degraded",
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a DEGRADED structural state. Recommended decision: standardize_operations with priority P2. Lowest-performing dimension: financial_pressure (51.34). Primary signals detected: operational_instability_signal, financial_stress_signal, structural_fragility_signal. Primary constraints active: structural_fragility_constraint, financial_control_constraint, execution_standardization_constraint.",
+  "created_at": "2026-03-22T01:37:44.685Z"
+}
