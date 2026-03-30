@@ -1,0 +1,37 @@
+{
+  "context": {
+    "organization_id": "org-health-spa-new-york-62c61",
+    "sector": "health",
+    "subsector": "therapy",
+    "country": "US",
+    "city": "New York"
+  },
+  "scores": {
+    "operational_maturity": 61.72,
+    "financial_pressure": 43.35,
+    "reporting_reliability": 64.38,
+    "structural_risk": 60.39,
+    "commercial_strength": 59.34
+  },
+  "decision": {
+    "decision_label": "contain_risk",
+    "priority": "P1",
+    "readiness_level": "medium"
+  },
+  "state_label": "fragile",
+  "active_signals": [
+    {
+      "code": "financial_stress_signal",
+      "severity": "HIGH",
+      "source_metric": "financial_pressure"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a FRAGILE structural state. Recommended decision: contain_risk with priority P1. Lowest-performing dimension: financial_pressure (43.35). Primary signals detected: financial_stress_signal. Primary constraints active: financial_control_constraint.",
+  "created_at": "2026-03-26T02:00:58.879Z"
+}

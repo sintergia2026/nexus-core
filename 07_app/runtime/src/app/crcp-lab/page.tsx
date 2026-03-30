@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import AppShell from "@/components/app-shell/AppShell";
 import styles from "../internal-records-view/page.module.css";
 
@@ -175,9 +175,31 @@ type TwinStructure = {
   updated_at: string;
 };
 
+type CrcpProgram = {
+  program_id: string;
+  program_label: string;
+  status: string;
+  recommended_priority: "P1" | "P2" | "P3";
+  current_phase: "containment" | "stabilization" | "control";
+  target_state: string;
+  target_domains: string[];
+  actions: Array<{
+    action_id: string;
+    domain: string;
+    title: string;
+    description: string;
+    owner_role: string;
+    expected_outcome: string;
+    phase: string;
+  }>;
+  rationale: string;
+  generated_at: string;
+};
+
 type CrcpRunApiResponse = {
   ok: boolean;
   result: null | {
+  crcp_program?: CrcpProgram;
     intake: {
       context: {
         organization_id: string;
@@ -351,9 +373,73 @@ type ScoreBarItem = {
   value: number;
 };
 
+type ExecutionActionStatus =
+  | "pending"
+  | "ready"
+  | "in_progress"
+  | "completed";
+
+type ExecutionTrackerItem = {
+  action_id: string;
+  title: string;
+  domain: string;
+  owner_role: string;
+  phase: string;
+  expected_outcome: string;
+  status: ExecutionActionStatus;
+};
+
 type HeaderSnapshotItem = {
   label: string;
   value: string;
+};
+
+type SimulationProfile =
+  | "critical"
+  | "fragile"
+  | "average"
+  | "strong"
+  | "elite";
+
+  type RepoNodeType =
+  | "root"
+  | "domain"
+  | "role"
+  | "evidence"
+  | "execution"
+  | "automation"
+  | "commercial"
+  | "activation"
+  | "simulation"
+  | "lineage"
+  | "governance";
+
+type SelectedRepoNode = {
+  node_type: RepoNodeType;
+  node_id: string;
+  node_label: string;
+};
+
+type RepoTreeNode = {
+  id: string;
+  label: string;
+  node_type:
+    | "folder"
+    | "file"
+    | "root"
+    | "domain"
+    | "role"
+    | "evidence"
+    | "execution"
+    | "automation"
+    | "commercial"
+    | "activation"
+    | "simulation"
+    | "lineage"
+    | "governance";
+  status?: string;
+  children?: RepoTreeNode[];
+  selectable?: boolean;
 };
 
 const COUNTRY_OPTIONS: Record<string, { label: string; cities: string[] }> = {
@@ -469,7 +555,15 @@ const DOMAIN_LABELS: Record<string, string> = {
   planning: "Planning",
 };
 
-const inputStyle: React.CSSProperties = {
+const SIMULATION_PROFILE_OPTIONS: SimulationProfile[] = [
+  "critical",
+  "fragile",
+  "average",
+  "strong",
+  "elite",
+];
+
+const inputStyle: CSSProperties = {
   width: "100%",
   background: "#182235",
   border: "1px solid #2b3955",
@@ -479,20 +573,20 @@ const inputStyle: React.CSSProperties = {
   fontSize: 14,
 };
 
-const disabledInputStyle: React.CSSProperties = {
+const disabledInputStyle: CSSProperties = {
   ...inputStyle,
   opacity: 0.7,
   cursor: "not-allowed",
 };
 
-const sectionBlockStyle: React.CSSProperties = {
+const sectionBlockStyle: CSSProperties = {
   background: "#182235",
   border: "1px solid #2b3955",
   borderRadius: 12,
   padding: "14px 16px",
 };
 
-const actionButtonBaseStyle: React.CSSProperties = {
+const actionButtonBaseStyle: CSSProperties = {
   padding: "10px 16px",
   borderRadius: 12,
   border: "1px solid #334155",
@@ -505,7 +599,7 @@ function Row({
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className={styles.row}>
@@ -552,22 +646,23 @@ function toneClass(value?: string): string {
     v === "stable" ||
     v === "high" ||
     v === "complete" ||
+    v === "completed" ||
     v === "ready" ||
     v === "positive" ||
     v === "answered" ||
     v === "medium" ||
     v === "valid" ||
     v === "unlocked" ||
-    v === "planned"
+    v === "planned" ||
+    v === "in_progress" ||
+    v === "containment" ||
+    v === "stabilization" ||
+    v === "control"
   ) {
     return `${styles.status} ${styles.statusActive}`;
   }
 
   return styles.status;
-}
-
-function questionToneClass(direction?: string): string {
-  return toneClass(direction);
 }
 
 function slugify(value: string): string {
@@ -577,6 +672,16 @@ function slugify(value: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 12);
+}
+
+function getRandomItem<T>(items: T[]): T {     
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function getRandomInteger(min: number, max: number): number { 
+  const safeMin = Math.ceil(min);
+  const safeMax = Math.floor(max);
+  return Math.floor(Math.random() * (safeMax - safeMin + 1)) + safeMin;
 }
 
 function buildOrganizationId(
@@ -602,6 +707,63 @@ function normalizeMultiSelectText(value: string): string[] {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function buildRandomAnswerValue(
+  question: CrcpQuestion,
+  metadata: MetadataState
+): CrcpAnswerValue | undefined {
+  if (question.question_id === "ID_01") {
+    return metadata.business_name;
+  }
+
+  if (question.question_id === "ID_02") {
+    return [metadata.sector];
+  }
+
+  if (question.type === "yes_no") {
+    return getRandomItem(["yes", "no"]);
+  }
+
+  if (question.type === "scale_1_5") {
+    return getRandomInteger(1, 5);      
+  }
+
+  if (question.type === "numeric") {
+    return getRandomInteger(1, 100);  
+  }
+
+  if (question.type === "multi_select") {
+    const options = SINGLE_SELECT_OPTIONS[question.question_id];
+
+    if (options && options.length > 0) {
+      return getRandomItem(options);      
+    }
+
+    return ["demo_value_1", "demo_value_2"];
+  }
+
+  return `demo_${slugify(question.question_id)}`;
+}
+
+function buildRandomAnswerMap(
+  questions: CrcpQuestion[],
+  metadata: MetadataState
+): AnswerMap {
+  const nextAnswers: AnswerMap = {};
+
+  for (const question of questions) {
+    if (question.question_id === "ID_01" || question.question_id === "ID_02") {
+      continue;
+    }
+
+    nextAnswers[question.question_id] = buildRandomAnswerValue(
+      question,
+      metadata
+    );
+  }
+
+  return nextAnswers;
 }
 
 function getQuestionValue(
@@ -669,13 +831,117 @@ function buildRuntimePayload(
   };
 }
 
+function buildSimulatedAnswerValue(
+  question: CrcpQuestion,
+  metadata: MetadataState,
+  profile: SimulationProfile
+): CrcpAnswerValue | undefined {
+  if (question.question_id === "ID_01") {
+    return metadata.business_name;
+  }
+
+  if (question.question_id === "ID_02") {
+    return [metadata.sector];
+  }
+
+  if (question.type === "yes_no") {
+    if (profile === "critical") return "no";
+    if (profile === "fragile") return getRandomItem(["no", "no", "yes"]);
+    if (profile === "average") return getRandomItem(["yes", "no"]);
+    if (profile === "strong") return getRandomItem(["yes", "yes", "no"]);
+    if (profile === "elite") return "yes";
+  }
+
+  if (question.type === "scale_1_5") {
+    if (profile === "critical") return getRandomInteger(1, 2);
+    if (profile === "fragile") return getRandomInteger(2, 3);
+    if (profile === "average") return getRandomInteger(3, 4);
+    if (profile === "strong") return getRandomInteger(4, 5);
+    if (profile === "elite") return 5;
+  }
+
+  if (question.type === "numeric") {
+    if (profile === "critical") return getRandomInteger(1, 25);
+    if (profile === "fragile") return getRandomInteger(20, 45);
+    if (profile === "average") return getRandomInteger(40, 70);
+    if (profile === "strong") return getRandomInteger(65, 90);
+    if (profile === "elite") return getRandomInteger(85, 100);
+  }
+
+  if (question.type === "multi_select") {
+    const options = SINGLE_SELECT_OPTIONS[question.question_id];
+
+    if (options && options.length > 0) {
+      return getRandomItem(options);
+    }
+
+    if (profile === "critical") {
+      return ["manual", "unstable"];
+    }
+
+    if (profile === "fragile") {
+      return ["partial_control", "reactive"];
+    }
+
+    if (profile === "average") {
+      return ["baseline_process", "mixed_visibility"];
+    }
+
+    if (profile === "strong") {
+      return ["structured", "measured"];
+    }
+
+    return ["structured", "measured", "optimized"];
+  }
+
+  if (profile === "critical") {
+    return `critical_${slugify(question.question_id)}`;
+  }
+
+  if (profile === "fragile") {
+    return `fragile_${slugify(question.question_id)}`;
+  }
+
+  if (profile === "average") {
+    return `average_${slugify(question.question_id)}`;
+  }
+
+  if (profile === "strong") {
+    return `strong_${slugify(question.question_id)}`;
+  }
+
+  return `elite_${slugify(question.question_id)}`;
+}
+
+function buildSimulatedAnswerMap(
+  questions: CrcpQuestion[],
+  metadata: MetadataState,
+  profile: SimulationProfile
+): AnswerMap {
+  const nextAnswers: AnswerMap = {};
+
+  for (const question of questions) {
+    if (question.question_id === "ID_01" || question.question_id === "ID_02") {
+      continue;
+    }
+
+    nextAnswers[question.question_id] = buildSimulatedAnswerValue(
+      question,
+      metadata,
+      profile
+    );
+  }
+
+  return nextAnswers;
+}
+
 function FieldShell({
   label,
   children,
   helper,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
   helper?: string;
 }) {
   return (
@@ -687,6 +953,79 @@ function FieldShell({
       ) : null}
     </div>
   );
+}
+
+function getExecutionProgressPercent(
+  items: ExecutionTrackerItem[]
+): number {
+  if (!items.length) return 0;
+
+  const score = items.reduce((sum, item) => {
+    if (item.status === "completed") return sum + 1;
+    if (item.status === "in_progress") return sum + 0.5;
+    if (item.status === "ready") return sum + 0.25;
+    return sum;
+  }, 0);
+
+  return Math.round((score / items.length) * 100);
+}
+
+function getProgramExecutionState(
+  items: ExecutionTrackerItem[]
+): "idle" | "active" | "at_risk" | "completed" {
+  if (!items.length) return "idle";
+
+  const completedCount = items.filter(
+    (item) => item.status === "completed"
+  ).length;
+
+  const inProgressCount = items.filter(
+    (item) => item.status === "in_progress"
+  ).length;
+
+  const readyCount = items.filter(
+    (item) => item.status === "ready"
+  ).length;
+
+  if (completedCount === items.length) {
+    return "completed";
+  }
+
+  if (inProgressCount > 0 || readyCount > 0) {
+    return "active";
+  }
+
+  return "idle";
+}
+
+function inferInitialExecutionStatus(
+  index: number,
+  total: number,
+  phase: string
+): ExecutionActionStatus {
+  const normalizedPhase = phase.toLowerCase();
+
+  if (total === 0) {
+    return "pending";
+  }
+
+  if (normalizedPhase === "containment") {
+    if (index === 0) return "in_progress";
+    if (index === 1) return "ready";
+    return "pending";
+  }
+
+  if (normalizedPhase === "stabilization") {
+    if (index === 0) return "ready";
+    return "pending";
+  }
+
+  if (normalizedPhase === "control") {
+    if (index === 0) return "ready";
+    return "pending";
+  }
+
+  return "pending";
 }
 
 function getLocalValidationIssues(metadata: MetadataState): string[] {
@@ -907,16 +1246,73 @@ function getTwinVectorBars(twinSeedV2: TwinSeedV2): ScoreBarItem[] {
   ];
 }
 
+function buildExecutionTrackerItems(
+  crcpProgram:
+    | NonNullable<
+        NonNullable<CrcpRunApiResponse["result"]>["crcp_program"]
+      >
+    | null
+): ExecutionTrackerItem[] {
+  if (!crcpProgram || !Array.isArray(crcpProgram.actions)) {
+    return [];
+  }
+
+  return crcpProgram.actions.map((action, index, arr) => ({
+    action_id: action.action_id,
+    title: action.title,
+    domain: action.domain,
+    owner_role: action.owner_role,
+    phase: action.phase,
+    expected_outcome: action.expected_outcome,
+    status: inferInitialExecutionStatus(
+      index,
+      arr.length,
+      crcpProgram.current_phase
+    ),
+  }));
+}
+
+function getNextExecutionStatus(
+  current: ExecutionActionStatus
+): ExecutionActionStatus {
+  if (current === "pending") return "ready";
+  if (current === "ready") return "in_progress";
+  if (current === "in_progress") return "completed";
+  return "pending";
+}
+
 export default function CrcpLabPage() {
-  const [mounted, setMounted] = useState(false);
   const [orgSeed, setOrgSeed] = useState("");
   const [metadata, setMetadata] = useState<MetadataState>(INITIAL_METADATA);
   const [answers, setAnswers] = useState<AnswerMap>(INITIAL_ANSWER_MAP);
   const [isHeaderLocked, setIsHeaderLocked] = useState(false);
+  const [simulationProfile, setSimulationProfile] =
+    useState<SimulationProfile>("average");
 
-  const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState<CrcpRunApiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+const [loading, setLoading] = useState(false);
+const [response, setResponse] = useState<CrcpRunApiResponse | null>(null);
+const [error, setError] = useState<string | null>(null);
+const [selectedRepoNode, setSelectedRepoNode] =
+  useState<SelectedRepoNode | null>(null);
+const [executionTrackerState, setExecutionTrackerState] = useState<
+  ExecutionTrackerItem[]
+>([]);
+
+const [expandedRepoNodes, setExpandedRepoNodes] = useState<Record<string, boolean>>({
+  repo_root: true,
+  root_folder: true,
+  domains_folder: true,
+  roles_folder: true,
+  evidence_folder: false,
+  execution_folder: true,
+  automation_folder: false,
+  finance_folder: false,
+  commercial_folder: false,
+  activation_folder: false,
+  simulation_folder: false,
+  lineage_folder: false,
+  governance_folder: false,
+});
 
   const [questionCatalog, setQuestionCatalog] =
     useState<CrcpQuestionsApiResponse["result"]>(null);
@@ -925,9 +1321,8 @@ export default function CrcpLabPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   useEffect(() => {
-    setMounted(true);
-    setOrgSeed(Math.random().toString(36).slice(2, 7));
-  }, []);
+  setOrgSeed(Math.random().toString(36).slice(2, 7));
+}, []);
 
   const organizationId = useMemo(() => {
     if (!orgSeed) {
@@ -1090,35 +1485,907 @@ export default function CrcpLabPage() {
   }, [allQuestions, metadata, answers]);
 
   const identityStat = getDomainStat(protocolDomainStats, "identity");
-  const operationsStat = getDomainStat(protocolDomainStats, "operations");
-  const reportingStat = getDomainStat(protocolDomainStats, "reporting");
-  const financeStat = getDomainStat(protocolDomainStats, "finance");
+const operationsStat = getDomainStat(protocolDomainStats, "operations");
+const reportingStat = getDomainStat(protocolDomainStats, "reporting");
+const financeStat = getDomainStat(protocolDomainStats, "finance");
 
-  const captureSummary = useMemo(
-    () => getCaptureSummary(allQuestions, metadata, answers),
-    [allQuestions, metadata, answers]
+const captureSummary = useMemo(
+  () => getCaptureSummary(allQuestions, metadata, answers),
+  [allQuestions, metadata, answers]
+);
+
+const headerSnapshot = useMemo(() => getHeaderSnapshot(metadata), [metadata]);
+
+// ===============================
+// CORE RESULT
+// ===============================
+const result = response?.result ?? null;
+
+// ===============================
+// CRCP PROGRAM (BLOCK H BASE)
+// ===============================
+const crcpProgram = result?.crcp_program ?? null;
+
+useEffect(() => {
+  setExecutionTrackerState(buildExecutionTrackerItems(crcpProgram));
+}, [crcpProgram]);
+
+const executionTrackerItems = executionTrackerState;
+
+const executionProgressPercent = useMemo(
+  () => getExecutionProgressPercent(executionTrackerItems),
+  [executionTrackerItems]
+);
+
+const programExecutionState = useMemo(
+  () => getProgramExecutionState(executionTrackerItems), 
+  [executionTrackerItems]
+);
+
+// ===============================
+// VALIDATION + SCORES
+// ===============================
+const backendValidationIssues = result?.validation_issues ?? [];
+
+const scoreBars = useMemo(
+  () => (result ? getScoreBars(result) : []),
+  [result]
+);
+
+// ===============================
+// TWIN
+// ===============================
+const twinSeedV2 = result?.twin_seed_v2 ?? null;
+const twinStructure = result?.twin_structure ?? null;
+
+const twinVectorBars = useMemo(
+  () => (twinSeedV2 ? getTwinVectorBars(twinSeedV2) : []),
+  [twinSeedV2]
+);
+
+const selectedDomainNode = useMemo(() => {
+  if (!twinStructure || !selectedRepoNode || selectedRepoNode.node_type !== "domain") {
+    return null;
+  }
+
+  return (
+    twinStructure.domains.find(
+      (domain) => domain.domain_id === selectedRepoNode.node_id
+    ) || null
+  );
+}, [twinStructure, selectedRepoNode]);
+
+const selectedRoleNode = useMemo(() => {
+  if (!twinStructure || !selectedRepoNode || selectedRepoNode.node_type !== "role") {
+    return null;
+  }
+
+  return (
+    twinStructure.roles.find((role) => role.role_id === selectedRepoNode.node_id) ||
+    null
+  );
+}, [twinStructure, selectedRepoNode]);
+
+const selectedRepoNodeStatus = useMemo(() => {
+  if (!selectedRepoNode || !twinStructure) {
+    return "n/a";
+  }
+
+  if (selectedRepoNode.node_type === "root") {
+    return twinStructure.root.state_label;
+  }
+
+  if (selectedRepoNode.node_type === "domain" && selectedDomainNode) {
+    return selectedDomainNode.status;
+  }
+
+  if (selectedRepoNode.node_type === "role" && selectedRoleNode) {
+    return selectedRoleNode.status;
+  }
+
+  if (selectedRepoNode.node_type === "evidence") {
+    return twinStructure.evidence.length > 0 ? "active" : "pending";
+  }
+
+  if (selectedRepoNode.node_type === "execution") {
+    return programExecutionState;
+  }
+
+  if (selectedRepoNode.node_type === "automation") {
+    return "planned";
+  }
+
+  if (selectedRepoNode.node_type === "commercial") {
+    const commercialDomain = twinStructure.domains.find(
+      (domain) => domain.domain_name === "commercial"
+    );
+    return commercialDomain?.status || "planned";
+  }
+
+  if (selectedRepoNode.node_type === "activation") {
+    return twinStructure.activation.activation_status;
+  }
+
+  if (selectedRepoNode.node_type === "simulation") {
+    return twinStructure.simulation?.simulation_status || "planned";
+  }
+
+  if (selectedRepoNode.node_type === "lineage") {
+    return "traceable";
+  }
+
+  if (selectedRepoNode.node_type === "governance") {
+    const governanceDomain = twinStructure.domains.find(
+      (domain) => domain.domain_name === "governance"
+    );
+    return governanceDomain?.status || "planned";
+  }
+
+  return "n/a";
+}, [
+  selectedRepoNode,
+  twinStructure,
+  selectedDomainNode,
+  selectedRoleNode,
+  programExecutionState,
+]);
+
+const selectedRepoNodeScore = useMemo(() => {
+  if (!selectedRepoNode || !twinStructure) {
+    return "n/a";
+  }
+
+  if (selectedRepoNode.node_type === "root") {
+    return result?.scores
+      ? `${formatResultScore(result.scores.operational_maturity)} / 100`
+      : "n/a";
+  }
+
+  if (selectedRepoNode.node_type === "domain" && selectedDomainNode) {
+    return typeof selectedDomainNode.score === "number"
+      ? `${selectedDomainNode.score.toFixed(2)} / 100`
+      : "n/a";
+  }
+
+  if (selectedRepoNode.node_type === "role") {
+    return "role-based";
+  }
+
+  if (selectedRepoNode.node_type === "execution") {
+    return `${executionProgressPercent}%`;
+  }
+
+  return "n/a";
+}, [
+  selectedRepoNode,
+  twinStructure,
+  selectedDomainNode,
+  result,
+  executionProgressPercent,
+]);
+
+const selectedRepoNodeEvidenceCount = useMemo(() => {
+  if (!selectedRepoNode || !twinStructure) {
+    return 0;
+  }
+
+  if (selectedRepoNode.node_type === "root") {
+    return twinStructure.evidence.length;
+  }
+
+  if (selectedRepoNode.node_type === "domain") {
+    return twinStructure.evidence.filter(
+      (item) => item.linked_domain_id === selectedRepoNode.node_id
+    ).length;
+  }
+
+  if (selectedRepoNode.node_type === "role") {
+    return twinStructure.evidence.filter(
+      (item) => item.linked_role_id === selectedRepoNode.node_id
+    ).length;
+  }
+
+  if (selectedRepoNode.node_type === "evidence") {
+    return twinStructure.evidence.length;
+  }
+
+  return 0;
+}, [selectedRepoNode, twinStructure]);
+
+const financeDomainNode = useMemo(() => {
+  if (!twinStructure) return null;
+
+  return (
+    twinStructure.domains.find((domain) => domain.domain_name === "finance") || null
+  );
+}, [twinStructure]);
+
+const financeRoleNode = useMemo(() => {
+  if (!twinStructure) return null;
+
+  return (
+    twinStructure.roles.find((role) =>
+      role.role_name.toLowerCase().includes("finance")
+    ) || null
+  );
+}, [twinStructure]);
+
+const financeEvidenceCount = useMemo(() => {
+  if (!twinStructure || !financeDomainNode) return 0;
+
+  return twinStructure.evidence.filter(
+    (item) => item.linked_domain_id === financeDomainNode.domain_id
+  ).length;
+}, [twinStructure, financeDomainNode]);
+
+const criticalFocusDomain = useMemo(() => {
+  if (!twinStructure || twinStructure.domains.length === 0) {
+    return null;
+  }
+
+  const scoredDomains = twinStructure.domains.filter(
+    (domain) => typeof domain.score === "number"
   );
 
-  const headerSnapshot = useMemo(() => getHeaderSnapshot(metadata), [metadata]);
+  if (scoredDomains.length === 0) {
+    return null;
+  }
 
-  const result = response?.result ?? null;
-  const backendValidationIssues = result?.validation_issues ?? [];
-  const scoreBars = useMemo(() => (result ? getScoreBars(result) : []), [result]);
-  const twinSeedV2 = result?.twin_seed_v2 ?? null;
-  const twinStructure = result?.twin_structure ?? null;
-  const twinVectorBars = useMemo(
-    () => (twinSeedV2 ? getTwinVectorBars(twinSeedV2) : []),
-    [twinSeedV2]
+  return scoredDomains.reduce((lowest, current) => {
+    const lowestScore = typeof lowest.score === "number" ? lowest.score : Infinity;
+    const currentScore = typeof current.score === "number" ? current.score : Infinity;
+    return currentScore < lowestScore ? current : lowest;
+  });
+}, [twinStructure]);
+
+useEffect(() => {
+  if (!twinStructure) {
+    return;
+  }
+
+  setSelectedRepoNode((prev) => {
+    if (prev) {
+      return prev;
+    }
+
+    if (criticalFocusDomain) {
+      return {
+        node_type: "domain",
+        node_id: criticalFocusDomain.domain_id,
+        node_label: criticalFocusDomain.domain_label,
+      };
+    }
+
+    return {
+      node_type: "root",
+      node_id: twinStructure.root.entity_id,
+      node_label: twinStructure.root.display_name,
+    };
+  });
+}, [twinStructure, criticalFocusDomain]);
+
+const selectedNodeDependencies = useMemo(() => {
+  if (!selectedRepoNode || !twinStructure) {
+    return [];
+  }
+
+  return twinStructure.dependencies.filter(
+    (edge) =>
+      edge.from_node_id === selectedRepoNode.node_id ||
+      edge.to_node_id === selectedRepoNode.node_id
   );
+}, [selectedRepoNode, twinStructure]);
 
-  const isCaptureComplete =
-    totalQuestionCount > 0 && answeredCount === totalQuestionCount;
-  const isRunDisabled =
-    loading ||
-    localValidationIssues.length > 0 ||
-    !isCaptureComplete ||
-    !organizationId ||
-    !isHeaderLocked;
+const selectedNodeEvidencePreview = useMemo(() => {
+  if (!selectedRepoNode || !twinStructure) {
+    return [];
+  }
+
+  if (selectedRepoNode.node_type === "root") {
+    return twinStructure.evidence.slice(0, 5);
+  }
+
+  if (selectedRepoNode.node_type === "domain") {
+    return twinStructure.evidence
+      .filter((item) => item.linked_domain_id === selectedRepoNode.node_id)
+      .slice(0, 5);
+  }
+
+  if (selectedRepoNode.node_type === "role") {
+    return twinStructure.evidence
+      .filter((item) => item.linked_role_id === selectedRepoNode.node_id)
+      .slice(0, 5);
+  }
+
+  if (selectedRepoNode.node_type === "evidence") {
+    return twinStructure.evidence.slice(0, 5);
+  }
+
+  return [];
+}, [selectedRepoNode, twinStructure]);
+
+const selectedNodeExecutionActions = useMemo(() => {
+  if (!selectedRepoNode || !crcpProgram) {
+    return [];
+  }
+
+  if (selectedRepoNode.node_type === "domain") {
+    const domainName =
+      twinStructure?.domains.find(
+        (domain) => domain.domain_id === selectedRepoNode.node_id
+      )?.domain_name || "";
+
+    return crcpProgram.actions.filter((action) => action.domain === domainName);
+  }
+
+  if (selectedRepoNode.node_type === "role") {
+    const roleName =
+      twinStructure?.roles.find((role) => role.role_id === selectedRepoNode.node_id)
+        ?.role_name || "";
+
+    return crcpProgram.actions.filter((action) => action.owner_role === roleName);
+  }
+
+  if (selectedRepoNode.node_type === "execution") {
+    return crcpProgram.actions;
+  }
+
+  return [];
+}, [selectedRepoNode, crcpProgram, twinStructure]);
+
+const selectedNodeExecutionLinked = useMemo(() => {
+  if (!selectedRepoNode || !crcpProgram) {
+    return false;
+  }
+
+  if (selectedRepoNode.node_type === "execution") {
+    return true;
+  }
+
+  if (selectedRepoNode.node_type === "domain") {
+    const domainName =
+      twinStructure?.domains.find(
+        (domain) => domain.domain_id === selectedRepoNode.node_id
+      )?.domain_name || "";
+
+    return (
+      crcpProgram.target_domains.includes(domainName) ||
+      crcpProgram.actions.some((action) => action.domain === domainName)
+    );
+  }
+
+  if (selectedRepoNode.node_type === "role") {
+    const roleName =
+      twinStructure?.roles.find(
+        (role) => role.role_id === selectedRepoNode.node_id
+      )?.role_name || "";
+
+    return crcpProgram.actions.some((action) => action.owner_role === roleName);
+  }
+
+  return false;
+}, [selectedRepoNode, crcpProgram, twinStructure]);
+
+const selectedNodeInterpretation = useMemo(() => {
+  return getSelectedNodeInterpretation({
+    selectedRepoNode,
+    selectedDomainNode,
+    selectedRoleNode,
+    selectedNodeExecutionLinked,
+    selectedNodeExecutionActions,
+  });
+}, [
+  selectedRepoNode,
+  selectedDomainNode,
+  selectedRoleNode,
+  selectedNodeExecutionLinked,
+  selectedNodeExecutionActions,
+]);
+
+const selectedNodeRiskBand = useMemo(() => {
+  return getSelectedNodeRiskBand({
+    selectedRepoNodeStatus,
+    selectedRepoNodeExecutionLinked: selectedNodeExecutionLinked,
+  });
+}, [selectedRepoNodeStatus, selectedNodeExecutionLinked]);
+
+const selectedNodeSystemType = useMemo(() => {
+  return getSelectedNodeSystemType(selectedRepoNode);
+}, [selectedRepoNode]);
+
+function getRepoNodeStatus(node: RepoTreeNode): string {
+  if (node.node_type === "root") {
+    return twinStructure?.root.state_label || "planned";
+  }
+
+  if (node.node_type === "domain") {
+    const domain = twinStructure?.domains.find((d) => d.domain_id === node.id);
+    return domain?.status || "planned";
+  }
+
+  if (node.node_type === "role") {
+    const role = twinStructure?.roles.find((r) => r.role_id === node.id);
+    return role?.status || "planned";
+  }
+
+  if (node.node_type === "execution") {
+    return programExecutionState;
+  }
+
+  if (node.node_type === "evidence") {
+    return twinStructure?.evidence.length ? "active" : "pending";
+  }
+
+  if (node.node_type === "activation") {
+    return twinStructure?.activation.activation_status || "planned";
+  }
+
+  if (node.node_type === "simulation") {
+    return twinStructure?.simulation?.simulation_status || "planned";
+  }
+
+  if (node.node_type === "commercial") {
+    const commercialDomain = twinStructure?.domains.find(
+      (domain) => domain.domain_name === "commercial"
+    );
+    return commercialDomain?.status || "planned";
+  }
+
+  if (node.node_type === "governance") {
+    const governanceDomain = twinStructure?.domains.find(
+      (domain) => domain.domain_name === "governance"
+    );
+    return governanceDomain?.status || "planned";
+  }
+
+  return node.status || "planned";
+}
+
+function getRepoNodeTone(status?: string): CSSProperties {
+  const value = String(status || "").toLowerCase();
+
+  if (
+    value === "critical" ||
+    value === "fragile" ||
+    value === "degraded"
+  ) {
+    return {
+      color: "#fca5a5",
+      borderLeft: "2px solid #ef4444",
+      paddingLeft: 6,
+    };
+  }
+
+  if (
+    value === "pending" ||
+    value === "planned" ||
+    value === "medium" ||
+    value === "elevated"
+  ) {
+    return {
+      color: "#fcd34d",
+      borderLeft: "2px solid #f59e0b",
+      paddingLeft: 6,
+    };
+  }
+
+  return {
+    color: "#86efac",
+    borderLeft: "2px solid #22c55e",
+    paddingLeft: 6,
+  };
+}
+
+function toggleRepoNode(nodeId: string) {
+  setExpandedRepoNodes((prev) => ({
+    ...prev,
+    [nodeId]: !prev[nodeId],
+  }));
+}
+
+const repoTree = useMemo<RepoTreeNode | null>(() => {
+  if (!twinStructure) return null;
+
+  return {
+    id: "repo_root",
+    label: `/${slugify(twinStructure.root.display_name || "company")}__${slugify(
+      twinStructure.root.sector || "general"
+    )}__runtime`,
+    node_type: "folder",
+    selectable: false,
+    children: [
+      {
+        id: "root_folder",
+        label: "root/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          {
+            id: twinStructure.root.entity_id,
+            label: "entity_id.ts",
+            node_type: "root",
+            selectable: true,
+          },
+          { id: "legal_identity_file", label: "legal_identity.ts", node_type: "file", selectable: false },
+          { id: "business_identity_file", label: "business_identity.ts", node_type: "file", selectable: false },
+          { id: "sector_profile_file", label: "sector_profile.ts", node_type: "file", selectable: false },
+          { id: "subsector_profile_file", label: "subsector_profile.ts", node_type: "file", selectable: false },
+          { id: "operational_identity_file", label: "operational_identity.ts", node_type: "file", selectable: false },
+          { id: "lifecycle_file", label: "lifecycle.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "domains_folder",
+        label: "domains/",
+        node_type: "folder",
+        selectable: false,
+        children: twinStructure.domains.map((domain) => ({
+          id: domain.domain_id,
+          label: `${slugify(domain.domain_name)}.domain.ts`,
+          node_type: "domain",
+          selectable: true,
+        })),
+      },
+      {
+        id: "roles_folder",
+        label: "roles/",
+        node_type: "folder",
+        selectable: false,
+        children: twinStructure.roles.map((role) => ({
+          id: role.role_id,
+          label: `${slugify(role.role_name)}.role.ts`,
+          node_type: "role",
+          selectable: true,
+        })),
+      },
+      {
+        id: "evidence_folder",
+        label: "evidence/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "evidence_layer", label: "evidence.index.ts", node_type: "evidence", selectable: true },
+          { id: "signal_registry_file", label: "signal_registry.ts", node_type: "file", selectable: false },
+          { id: "constraint_registry_file", label: "constraint_registry.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "execution_folder",
+        label: "execution/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "execution_layer", label: "crcp_program.ts", node_type: "execution", selectable: true },
+          { id: "execution_tracker_file", label: "execution_tracker.ts", node_type: "file", selectable: false },
+          { id: "execution_state_file", label: "execution_state.ts", node_type: "file", selectable: false },
+          { id: "dependency_map_file", label: "dependency_map.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "automation_folder",
+        label: "automation/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "automation_layer", label: "phase_01_stabilization.ts", node_type: "automation", selectable: true },
+          { id: "phase_02_control_file", label: "phase_02_control.ts", node_type: "file", selectable: false },
+          { id: "phase_03_optimization_file", label: "phase_03_optimization.ts", node_type: "file", selectable: false },
+          { id: "automation_policy_file", label: "automation_policy.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "finance_folder",
+        label: "finance/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          {
+            id: financeDomainNode?.domain_id || "finance_domain_virtual",
+            label: "finance.domain.ts",
+            node_type: "domain",
+            selectable: Boolean(financeDomainNode),
+          },
+          { id: "cashflow_control_file", label: "cashflow_control.ts", node_type: "file", selectable: false },
+          { id: "margin_visibility_file", label: "margin_visibility.ts", node_type: "file", selectable: false },
+          { id: "expense_pressure_file", label: "expense_pressure.ts", node_type: "file", selectable: false },
+          { id: "financial_risk_flags_file", label: "financial_risk_flags.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "commercial_folder",
+        label: "commercial/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "commercial_layer", label: "channel_architecture.ts", node_type: "commercial", selectable: true },
+          { id: "social_media_system_file", label: "social_media_system.ts", node_type: "file", selectable: false },
+          { id: "campaign_logic_file", label: "campaign_logic.ts", node_type: "file", selectable: false },
+          { id: "demand_generation_file", label: "demand_generation.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "activation_folder",
+        label: "activation/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "activation_layer", label: "activation.layer.ts", node_type: "activation", selectable: true },
+          { id: "activation_path_file", label: "activation_path.ts", node_type: "file", selectable: false },
+          { id: "readiness_gate_file", label: "readiness_gate.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "simulation_folder",
+        label: "simulation/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "simulation_layer", label: "simulation.layer.ts", node_type: "simulation", selectable: true },
+          { id: "scenario_registry_file", label: "scenario_registry.ts", node_type: "file", selectable: false },
+          { id: "scenario_execution_file", label: "scenario_execution.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "lineage_folder",
+        label: "lineage/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "lineage_layer", label: "lineage_id.ts", node_type: "lineage", selectable: true },
+          { id: "twin_history_file", label: "twin_history.ts", node_type: "file", selectable: false },
+          { id: "structural_transitions_file", label: "structural_transitions.ts", node_type: "file", selectable: false },
+        ],
+      },
+      {
+        id: "governance_folder",
+        label: "governance/",
+        node_type: "folder",
+        selectable: false,
+        children: [
+          { id: "governance_layer", label: "governance_state.ts", node_type: "governance", selectable: true },
+          { id: "operating_rules_file", label: "operating_rules.ts", node_type: "file", selectable: false },
+          { id: "control_surface_file", label: "control_surface.ts", node_type: "file", selectable: false },
+        ],
+      },
+    ],
+  };
+}, [twinStructure, financeDomainNode]);
+
+function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
+  const isFolder = node.node_type === "folder";
+  const isExpanded = expandedRepoNodes[node.id] ?? false;
+  const isSelected = selectedRepoNode?.node_id === node.id;
+  const nodeStatus = getRepoNodeStatus(node);
+  const toneStyle = getRepoNodeTone(nodeStatus);
+
+  const indent = `${depth * 18}px`;
+
+  return (
+    <div key={node.id} style={{ display: "grid", gap: 4 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginLeft: indent,
+          ...toneStyle,
+        }}
+      >
+        {isFolder ? (
+          <button
+            type="button"
+            onClick={() => toggleRepoNode(node.id)}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#94a3b8",
+              cursor: "pointer",
+              fontSize: 12,
+              width: 18,
+            }}
+          >
+            {isExpanded ? "▾" : "▸"}
+          </button>
+        ) : (
+          <div style={{ width: 18 }} />
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            if (!node.selectable) return;
+            if (node.node_type === "file" || node.node_type === "folder") return;
+
+            setSelectedRepoNode({
+              node_type: node.node_type as RepoNodeType,
+              node_id: node.id,
+              node_label: node.label,
+            });
+          }}
+          style={{
+            background: isSelected ? "#1e293b" : "transparent",
+            border: isSelected ? "1px solid #3b82f6" : "1px solid transparent",
+            color: toneStyle.color || "#cbd5e1",
+            textAlign: "left",
+            padding: "3px 8px",
+            cursor: node.selectable ? "pointer" : "default",
+            fontFamily:
+              'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+            fontSize: 13,
+            borderRadius: 6,
+            width: "100%",
+            opacity: node.selectable ? 1 : 0.82,
+          }}
+        >
+          {node.label}
+        </button>
+      </div>
+
+      {isFolder && isExpanded && node.children?.length
+        ? node.children.map((child) => renderRepoTreeNode(child, depth + 1))
+        : null}
+    </div>
+  );
+}
+
+function getRepoNodeButtonStyle(isActive: boolean): CSSProperties {
+  return {
+    background: isActive ? "#1e293b" : "transparent",
+    border: isActive ? "1px solid #3b82f6" : "1px solid transparent",
+    color: isActive ? "#f8fafc" : "#cbd5e1",
+    textAlign: "left",
+    padding: "2px 6px",
+    cursor: "pointer",
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+    fontSize: 13,
+    borderRadius: 6,
+  };
+}
+
+function getSelectedNodeInterpretation(input: {
+  selectedRepoNode: SelectedRepoNode | null;
+  selectedDomainNode: TwinDomainNode | null;
+  selectedRoleNode: TwinRoleNode | null;
+  selectedNodeExecutionLinked: boolean;
+  selectedNodeExecutionActions: Array<{
+    action_id: string;
+    domain: string;
+    title: string;
+    description: string;
+    owner_role: string;
+    expected_outcome: string;
+    phase: string;
+  }>;
+}): {
+  summary: string;
+  actionability: "high" | "medium" | "low";
+  recommended_reading: string;
+} {
+  const {
+    selectedRepoNode,
+    selectedDomainNode,
+    selectedRoleNode,
+    selectedNodeExecutionLinked,
+    selectedNodeExecutionActions,
+  } = input;
+
+  if (!selectedRepoNode) {
+    return {
+      summary: "No node selected.",
+      actionability: "low",
+      recommended_reading: "Select a repository node to inspect its structural meaning.",
+    };
+  }
+
+  if (selectedRepoNode.node_type === "root") {
+    return {
+      summary:
+        "This is the primary business root. It defines the entity that anchors all domains, roles, evidence, execution, and governance logic.",
+      actionability: "medium",
+      recommended_reading:
+        "Use root inspection to confirm entity integrity, state quality, and total system cohesion.",
+    };
+  }
+
+  if (selectedRepoNode.node_type === "domain" && selectedDomainNode) {
+    return {
+      summary:
+        selectedDomainNode.summary ||
+        "This domain concentrates structural logic, evidence, and role ownership for a critical business layer.",
+      actionability:
+        selectedNodeExecutionLinked || (selectedDomainNode.score ?? 100) < 60
+          ? "high"
+          : "medium",
+      recommended_reading:
+        selectedNodeExecutionLinked
+          ? "This domain is program-linked. Review active actions and evidence before intervention."
+          : "Review score, owner role, and structural evidence before defining action.",
+    };
+  }
+
+  if (selectedRepoNode.node_type === "role" && selectedRoleNode) {
+    return {
+      summary:
+        selectedRoleNode.responsibility_summary ||
+        "This role acts as an operational responsibility anchor inside the twin.",
+      actionability: selectedNodeExecutionLinked ? "high" : "medium",
+      recommended_reading:
+        selectedNodeExecutionLinked
+          ? "This role is directly exposed to execution pressure."
+          : "Use this role to understand ownership and accountability distribution.",
+    };
+  }
+
+  if (selectedRepoNode.node_type === "execution") {
+    return {
+      summary:
+        "This node represents the active operational program generated from the CRCP decision layer.",
+      actionability: "high",
+      recommended_reading:
+        selectedNodeExecutionActions.length > 0
+          ? "Execution is live. Review units, owners, and intended outcomes."
+          : "No linked actions detected yet.",
+    };
+  }
+
+  return {
+    summary:
+      "This node belongs to a structural support layer of the twin repository.",
+    actionability: selectedNodeExecutionLinked ? "high" : "low",
+    recommended_reading:
+      selectedNodeExecutionLinked
+        ? "This node is linked to current program execution."
+        : "Use this node as a structural reading surface.",
+  };
+}
+
+function getSelectedNodeRiskBand(input: {
+  selectedRepoNodeStatus: string;
+  selectedRepoNodeExecutionLinked: boolean;
+}): "critical" | "elevated" | "stable" {
+  const status = String(input.selectedRepoNodeStatus || "").toLowerCase();
+
+  if (
+    status === "critical" ||
+    status === "fragile" ||
+    status === "degraded"
+  ) {
+    return "critical";
+  }
+
+  if (input.selectedRepoNodeExecutionLinked) {
+    return "elevated";
+  }
+
+  return "stable";
+}
+
+function getSelectedNodeSystemType(
+  selectedRepoNode: SelectedRepoNode | null
+): string {
+  if (!selectedRepoNode) return "unassigned";
+
+  if (selectedRepoNode.node_type === "root") return "entity_root";
+  if (selectedRepoNode.node_type === "domain") return "domain_node";
+  if (selectedRepoNode.node_type === "role") return "role_node";
+  if (selectedRepoNode.node_type === "execution") return "execution_node";
+  if (selectedRepoNode.node_type === "evidence") return "evidence_node";
+
+  return `${selectedRepoNode.node_type}_node`;
+}
+
+// ===============================
+// EXECUTION STATE
+// ===============================
+const isCaptureComplete =
+  totalQuestionCount > 0 && answeredCount === totalQuestionCount;
+
+const isRunDisabled =
+  loading ||
+  localValidationIssues.length > 0 ||
+  !isCaptureComplete ||
+  !organizationId ||
+  !isHeaderLocked;
 
   function updateMetadata<K extends keyof MetadataState>(
     key: K,
@@ -1168,6 +2435,25 @@ export default function CrcpLabPage() {
     setError(null);
     setCurrentQuestionIndex(0);
   }
+
+  function autofillRandomAnswers() {
+  if (!isHeaderLocked) {
+    setError("Lock Block 0 before using Autofill Random.");
+    return;
+  }
+
+  if (allQuestions.length === 0) {
+    setError("No canonical questions loaded yet.");
+    return;
+  }
+
+  const nextAnswers = buildRandomAnswerMap(allQuestions, metadata);
+
+  setAnswers(nextAnswers);
+  setResponse(null);
+  setError(null);
+  setCurrentQuestionIndex(0);
+}
 
   function updateAnswer(question: CrcpQuestion, value?: CrcpAnswerValue) {
     if (!isHeaderLocked) {
@@ -1283,6 +2569,39 @@ export default function CrcpLabPage() {
       setLoading(false);
     }
   }
+
+  function cycleExecutionStatus(actionId: string) {
+  setExecutionTrackerState((prev) =>
+    prev.map((item) =>
+      item.action_id === actionId
+        ? { ...item, status: getNextExecutionStatus(item.status) }
+        : item
+    )
+  );
+}
+
+function autofillSimulation() {
+  if (!isHeaderLocked) {
+    setError("Lock Block 0 before running simulation autofill.");
+    return;
+  }
+
+  if (allQuestions.length === 0) {
+    setError("No canonical questions loaded yet.");
+    return;
+  }
+
+  const nextAnswers = buildSimulatedAnswerMap(
+    allQuestions,
+    metadata,
+    simulationProfile
+  );
+
+  setAnswers(nextAnswers);
+  setResponse(null);
+  setError(null);
+  setCurrentQuestionIndex(0);
+}
 
   function renderQuestionInput(question: CrcpQuestion) {
     const value = getQuestionValue(question, metadata, answers);
@@ -1569,11 +2888,65 @@ export default function CrcpLabPage() {
             Next Pending
           </button>
 
+          <select
+  value={simulationProfile}
+  onChange={(e) =>
+    setSimulationProfile(e.target.value as SimulationProfile)
+  }
+  style={{
+    ...inputStyle,
+    width: 180,
+    padding: "10px 12px",
+  }}
+>
+  {SIMULATION_PROFILE_OPTIONS.map((profile) => (
+    <option key={profile} value={profile}>
+      {prettyLabel(profile)}
+    </option>
+  ))}
+</select>
+
+<button
+  type="button"
+  onClick={autofillSimulation}
+  disabled={!isHeaderLocked || allQuestions.length === 0}
+  style={{
+    ...actionButtonBaseStyle,
+    background: "#0f172a",
+    cursor:
+      !isHeaderLocked || allQuestions.length === 0
+        ? "not-allowed"
+        : "pointer",
+    opacity: !isHeaderLocked || allQuestions.length === 0 ? 0.7 : 1,
+  }}
+>
+  Autofill Simulated
+</button>
+
+          <button
+  type="button"
+  onClick={autofillRandomAnswers}
+  disabled={allQuestions.length === 0 || !isHeaderLocked}
+  style={{
+    ...actionButtonBaseStyle,
+    background: "#0f172a",
+    cursor:
+      allQuestions.length === 0 || !isHeaderLocked
+        ? "not-allowed"
+        : "pointer",
+    opacity: allQuestions.length === 0 || !isHeaderLocked ? 0.7 : 1,
+  }}
+>
+  Autofill Random
+</button>
+
           <div style={{ fontSize: 12, color: "#94a3b8", alignSelf: "center" }}>
-            {isHeaderLocked
-              ? "Capture header locked. You can now answer the questionnaire."
-              : "Confirm country, city, sector, subsector, and business identity before continuing."}
-          </div>
+  {isHeaderLocked
+    ? `Capture header locked. Simulation profile: ${prettyLabel(
+        simulationProfile
+      )}.`
+    : "Confirm country, city, sector, subsector, and business identity before continuing."}
+</div>
         </div>
       </section>
 
@@ -1914,9 +3287,7 @@ export default function CrcpLabPage() {
                   <div className={styles.miniCardHeader}>
                     <h3 className={styles.miniCardTitle}>Scoring Profile</h3>
                     <span
-                      className={questionToneClass(
-                        currentQuestion.scoring_direction
-                      )}
+                      className={toneClass(currentQuestion.scoring_direction)}
                     >
                       {currentQuestion.scoring_direction || "neutral"}
                     </span>
@@ -3063,64 +4434,732 @@ export default function CrcpLabPage() {
                   )}
                 </section>
 
-                <section className={`${styles.card} ${styles.fullWidth}`}>
-                  <h2 className={styles.cardTitle}>
-                    Block D15 — Repository View
-                  </h2>
-                  <div className={styles.meta}>
-                    business rendered as structural repository
-                  </div>
+               <section className={`${styles.card} ${styles.fullWidth}`}>
+  <h2 className={styles.cardTitle}>Block D15 — Repository Runtime</h2>
+  <div className={styles.meta}>
+    primary navigable structural interface for the true digital twin
+  </div>
 
+  {twinStructure ? (
+    <>
+      <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+        <div className={styles.miniCard}>
+          <div className={styles.miniCardHeader}>
+            <h3 className={styles.miniCardTitle}>Business Identity</h3>
+            <span className={toneClass(twinStructure.root.state_label)}>
+              {prettyLabel(twinStructure.root.state_label)}
+            </span>
+          </div>
+          <div className={styles.miniCardBody}>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Business Name</div>
+              <div className={styles.miniStatValue}>
+                {twinStructure.root.display_name}
+              </div>
+            </div>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Sector</div>
+              <div className={styles.miniStatValue}>
+                {prettyLabel(twinStructure.root.sector)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.miniCard}>
+          <div className={styles.miniCardHeader}>
+            <h3 className={styles.miniCardTitle}>Location</h3>
+            <span className={toneClass("active")}>Live</span>
+          </div>
+          <div className={styles.miniCardBody}>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Country</div>
+              <div className={styles.miniStatValue}>
+                {twinStructure.root.country || "n/a"}
+              </div>
+            </div>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>City</div>
+              <div className={styles.miniStatValue}>
+                {twinStructure.root.city || "n/a"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.miniCard}>
+          <div className={styles.miniCardHeader}>
+            <h3 className={styles.miniCardTitle}>Lifecycle</h3>
+            <span className={toneClass("active")}>
+              {prettyLabel(twinStructure.root.lifecycle_stage)}
+            </span>
+          </div>
+          <div className={styles.miniCardBody}>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Twin Name</div>
+              <div className={styles.miniStatValue}>{twinStructure.twin_name}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.miniCard}>
+          <div className={styles.miniCardHeader}>
+            <h3 className={styles.miniCardTitle}>Execution Program</h3>
+            <span
+              className={toneClass(
+                crcpProgram?.recommended_priority || "planned"
+              )}
+            >
+              {crcpProgram?.recommended_priority || "n/a"}
+            </span>
+          </div>
+          <div className={styles.miniCardBody}>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Program</div>
+              <div className={styles.miniStatValue}>
+                {crcpProgram?.program_label || "n/a"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.miniCard}>
+          <div className={styles.miniCardHeader}>
+            <h3 className={styles.miniCardTitle}>Financial Layer</h3>
+            <span className={toneClass(financeDomainNode?.status || "pending")}>
+              {prettyLabel(financeDomainNode?.status || "pending")}
+            </span>
+          </div>
+          <div className={styles.miniCardBody}>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Finance Score</div>
+              <div className={styles.miniStatValue}>
+                {typeof financeDomainNode?.score === "number"
+                  ? `${financeDomainNode.score.toFixed(2)} / 100`
+                  : "n/a"}
+              </div>
+            </div>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Evidence</div>
+              <div className={styles.miniStatValue}>{financeEvidenceCount}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.miniCard}>
+          <div className={styles.miniCardHeader}>
+            <h3 className={styles.miniCardTitle}>Critical Focus</h3>
+            <span className={toneClass(criticalFocusDomain?.status || "pending")}>
+              {prettyLabel(criticalFocusDomain?.status || "pending")}
+            </span>
+          </div>
+          <div className={styles.miniCardBody}>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Domain</div>
+              <div className={styles.miniStatValue}>
+                {criticalFocusDomain?.domain_label || "n/a"}
+              </div>
+            </div>
+            <div className={styles.miniStat}>
+              <div className={styles.miniStatLabel}>Score</div>
+              <div className={styles.miniStatValue}>
+                {typeof criticalFocusDomain?.score === "number"
+                  ? `${criticalFocusDomain.score.toFixed(2)} / 100`
+                  : "n/a"}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "minmax(260px, 0.8fr) minmax(420px, 1.25fr) minmax(340px, 0.75fr)",
+    gap: 18,
+    marginTop: 18,
+  }}
+>
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Runtime Repository
+    </div>
+
+    {repoTree ? (
+      <div
+        style={{
+          display: "grid",
+          gap: 6,
+          maxHeight: 720,
+          overflowY: "auto",
+          paddingRight: 4,
+        }}
+      >
+        {renderRepoTreeNode(repoTree)}
+      </div>
+    ) : (
+      <div className={styles.empty}>Repository runtime unavailable.</div>
+    )}
+  </div>
+
+  <div
+    style={{
+      ...sectionBlockStyle,
+      overflowX: "auto",
+    }}
+  >
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Selected Node
+            </div>
+
+            {selectedRepoNode ? (
+              <>
+                <Row label="Node">{selectedRepoNode.node_label}</Row>
+                <Row label="Type">{prettyLabel(selectedRepoNode.node_type)}</Row>
+                <Row label="Status">
+                  <span className={toneClass(selectedRepoNodeStatus)}>
+                    {prettyLabel(selectedRepoNodeStatus)}
+                  </span>
+                </Row>
+                <Row label="Node ID">{selectedRepoNode.node_id}</Row>
+                <Row label="Score">{selectedRepoNodeScore}</Row>
+                <Row label="Evidence Count">
+                  {String(selectedRepoNodeEvidenceCount)}
+                </Row>
+                <Row label="Dependencies">
+                  {String(selectedNodeDependencies.length)}
+                </Row>
+                <Row label="Execution Linked">
+                  <span
+                    className={toneClass(
+                      selectedNodeExecutionLinked ? "active" : "pending"
+                    )}
+                  >
+                    {selectedNodeExecutionLinked ? "Yes" : "No"}
+                  </span>
+                </Row>
+                <Row label="Program Actions">
+                  {String(selectedNodeExecutionActions.length)}
+                </Row>
+
+                {selectedDomainNode ? (
+                  <>
+                    <Row label="Owner Role">
+                      {selectedDomainNode.owner_role_id || "n/a"}
+                    </Row>
+                    <Row label="Summary">
+                      {selectedDomainNode.summary || "n/a"}
+                    </Row>
+                  </>
+                ) : null}
+
+                {selectedRoleNode ? (
+                  <>
+                    <Row label="Domain">
+                      {selectedRoleNode.domain_id || "n/a"}
+                    </Row>
+                    <Row label="Responsibility">
+                      {selectedRoleNode.responsibility_summary || "n/a"}
+                    </Row>
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <div className={styles.empty}>No node selected.</div>
+            )}
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Node Evidence Preview
+            </div>
+
+            {selectedNodeEvidencePreview.length > 0 ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                {selectedNodeEvidencePreview.map((item) => (
                   <div
+                    key={item.evidence_id}
                     style={{
-                      ...sectionBlockStyle,
-                      marginTop: 16,
-                      overflowX: "auto",
+                      borderBottom: "1px solid #24324a",
+                      paddingBottom: 8,
                     }}
                   >
                     <div
                       style={{
-                        minWidth: 980,
-                        display: "grid",
-                        gap: 8,
-                        fontFamily:
-                          'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
                         fontSize: 13,
-                        color: "#cbd5e1",
+                        fontWeight: 700,
+                        color: "#e2e8f0",
                       }}
                     >
-                      <div>/{slugify(twinStructure.root.display_name || "company")}</div>
-                      <div>├── root/</div>
-                      <div>│   ├── entity_id.ts</div>
-                      <div>│   ├── identity.ts</div>
-                      <div>│   └── lifecycle.ts</div>
-                      <div>├── domains/</div>
-                      {twinStructure.domains.map((domain, index) => (
-                        <div key={domain.domain_id}>
-                          {index === twinStructure.domains.length - 1
-                            ? `│   └── ${domain.domain_name}.node.ts`
-                            : `│   ├── ${domain.domain_name}.node.ts`}
-                        </div>
-                      ))}
-                      <div>├── roles/</div>
-                      {twinStructure.roles.map((role, index) => (
-                        <div key={role.role_id}>
-                          {index === twinStructure.roles.length - 1
-                            ? `│   └── ${role.role_name}.role.ts`
-                            : `│   ├── ${role.role_name}.role.ts`}
-                        </div>
-                      ))}
-                      <div>├── evidence/</div>
-                      <div>│   └── evidence.index.ts</div>
-                      <div>├── activation/</div>
-                      <div>│   └── activation.layer.ts</div>
-                      <div>└── simulation/</div>
-                      <div>    └── simulation.layer.ts</div>
+                      {item.label}
+                    </div>
+                    <div
+                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+                    >
+                      {item.evidence_type} ·{" "}
+                      {item.source_question_id || "no_question_ref"}
+                    </div>
+                    <div style={{ marginTop: 6 }}>
+                      <span className={toneClass(item.status)}>
+                        {prettyLabel(item.status)}
+                      </span>
                     </div>
                   </div>
-                </section>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.empty}>No evidence preview available.</div>
+            )}
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Node Dependencies
+            </div>
+
+            {selectedNodeDependencies.length > 0 ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                {selectedNodeDependencies.slice(0, 6).map((edge) => (
+                  <div
+                    key={edge.edge_id}
+                    style={{
+                      borderBottom: "1px solid #24324a",
+                      paddingBottom: 8,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#e2e8f0",
+                      }}
+                    >
+                      {edge.relation}
+                    </div>
+                    <div
+                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+                    >
+                      from: {edge.from_node_id}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                      to: {edge.to_node_id}
+                    </div>
+                    <div style={{ marginTop: 6 }}>
+                      <span className={toneClass(edge.status || "planned")}>
+                        {prettyLabel(edge.status || "planned")}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.empty}>No dependency relations found.</div>
+            )}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 18 }}>
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              System Reading
+            </div>
+            <Row label="Root State">
+              <span className={toneClass(twinStructure.root.state_label)}>
+                {prettyLabel(twinStructure.root.state_label)}
+              </span>
+            </Row>
+            <Row label="Domains">{String(twinStructure.domains.length)}</Row>
+            <Row label="Roles">{String(twinStructure.roles.length)}</Row>
+            <Row label="Evidence">{String(twinStructure.evidence.length)}</Row>
+            <Row label="Dependencies">
+              {String(twinStructure.dependencies.length)}
+            </Row>
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Financial Surface
+            </div>
+            <Row label="Finance Status">
+              <span className={toneClass(financeDomainNode?.status || "pending")}>
+                {prettyLabel(financeDomainNode?.status || "pending")}
+              </span>
+            </Row>
+            <Row label="Finance Score">
+              {typeof financeDomainNode?.score === "number"
+                ? `${financeDomainNode.score.toFixed(2)} / 100`
+                : "n/a"}
+            </Row>
+            <Row label="Finance Role">
+              {financeRoleNode?.role_label || "n/a"}
+            </Row>
+            <Row label="Evidence">{String(financeEvidenceCount)}</Row>
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Execution Relevance
+            </div>
+            <Row label="Linked to Program">
+              <span
+                className={toneClass(
+                  selectedNodeExecutionLinked ? "active" : "pending"
+                )}
+              >
+                {selectedNodeExecutionLinked ? "Yes" : "No"}
+              </span>
+            </Row>
+            <Row label="Action Count">
+              {String(selectedNodeExecutionActions.length)}
+            </Row>
+            <Row label="Priority">
+              <span
+                className={toneClass(
+                  crcpProgram?.recommended_priority || "planned"
+                )}
+              >
+                {crcpProgram?.recommended_priority || "n/a"}
+              </span>
+            </Row>
+            <Row label="Execution Status">
+              <span
+                className={toneClass(
+                  selectedNodeExecutionLinked ? "active" : "pending"
+                )}
+              >
+                {selectedNodeExecutionLinked
+                  ? "program_linked"
+                  : "not_linked"}
+              </span>
+            </Row>
+
+            {selectedNodeExecutionActions.length > 0 ? (
+              <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+                {selectedNodeExecutionActions.slice(0, 4).map((action) => (
+                  <div
+                    key={action.action_id}
+                    style={{
+                      borderBottom: "1px solid #24324a",
+                      paddingBottom: 8,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#e2e8f0",
+                      }}
+                    >
+                      {action.title}
+                    </div>
+                    <div
+                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+                    >
+                      {prettyLabel(action.phase)} · {prettyLabel(action.domain)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.empty} style={{ marginTop: 10 }}>
+                No linked program actions.
+              </div>
+            )}
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Execution Surface
+            </div>
+            <Row label="Program">
+              {crcpProgram?.program_label || "n/a"}
+            </Row>
+            <Row label="Priority">
+              <span
+                className={toneClass(
+                  crcpProgram?.recommended_priority || "planned"
+                )}
+              >
+                {crcpProgram?.recommended_priority || "n/a"}
+              </span>
+            </Row>
+            <Row label="Operational Meaning">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeExecutionLinked
+                  ? "This node is structurally relevant to the currently active CRCP program."
+                  : "This node is currently outside the direct execution path."}
+              </div>
+            </Row>
+            <Row label="Phase">
+              <span className={toneClass(crcpProgram?.current_phase || "planned")}>
+                {prettyLabel(crcpProgram?.current_phase || "planned")}
+              </span>
+            </Row>
+            <Row label="Progress">{executionProgressPercent}%</Row>
+          </div>
+        </div>
+      </div>
+    </>
+  ) : (
+    <div className={styles.empty} style={{ marginTop: 14 }}>
+      No repository runtime available.
+    </div>
+  )}
+</section>
               </>
             ) : null}
+            {crcpProgram ? (
+  <section className={`${styles.card} ${styles.fullWidth}`}>
+    <h2 className={styles.cardTitle}>
+      Block G — CRCP Executable Program
+    </h2>
+    <div className={styles.meta}>
+      system-generated structural intervention program derived from twin state
+    </div>
+
+    <div style={{ ...sectionBlockStyle, marginTop: 16 }}>
+      <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
+        {crcpProgram.program_label}
+      </div>
+
+      <div className={styles.chips} style={{ marginBottom: 12 }}>
+        <span className={toneClass(crcpProgram.status)}>
+          {crcpProgram.status}
+        </span>
+        <span className={toneClass(crcpProgram.recommended_priority)}>
+          {crcpProgram.recommended_priority}
+        </span>
+        <span className={toneClass(crcpProgram.current_phase)}>
+          {crcpProgram.current_phase}
+        </span>
+      </div>
+
+      <Row label="Target State">
+        {prettyLabel(crcpProgram.target_state)}
+      </Row>
+
+      <Row label="Target Domains">
+       <Chips values={crcpProgram.target_domains.map(prettyLabel)} />
+      </Row>
+
+      <Row label="Rationale">
+        <div style={{ color: "#94a3b8" }}>
+          {crcpProgram.rationale}
+        </div>
+      </Row>
+    </div>
+
+    <Row label="Generated At">
+  <div className={styles.mutedMono}>{crcpProgram.generated_at}</div>
+</Row>
+
+    <div style={{ marginTop: 18 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+        Program Actions
+      </h3>
+
+      {crcpProgram.actions.length > 0 ? (
+        <div className={styles.list}>
+          {crcpProgram.actions.map((action) => (
+            <div key={action.action_id} className={styles.listItem}>
+              <Row label="Title">{action.title}</Row>
+
+              <Row label="Domain">
+                {prettyLabel(action.domain)}
+              </Row>
+
+              <Row label="Phase">
+                <span className={toneClass(action.phase)}>
+                  {action.phase}
+                </span>
+              </Row>
+
+              <Row label="Owner Role">
+                {prettyLabel(action.owner_role)}
+              </Row>
+
+              <Row label="Description">
+                {action.description}
+              </Row>
+
+              <Row label="Expected Outcome">
+                <div style={{ color: "#94a3b8" }}>
+                  {action.expected_outcome}
+                </div>
+              </Row>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.empty}>
+          No actions generated.
+        </div>
+      )}
+    </div>
+  </section>
+) : null}
+
+{crcpProgram ? (
+  <section className={`${styles.card} ${styles.fullWidth}`}>
+    <h2 className={styles.cardTitle}>
+      Block H — CRCP Execution Tracker
+    </h2>
+    <div className={styles.meta}>
+      operational execution surface for the currently activated CRCP program
+    </div>
+
+    <div className={styles.miniGrid} style={{ marginTop: 16 }}>
+      <div className={styles.miniCard}>
+        <div className={styles.miniCardHeader}>
+          <h3 className={styles.miniCardTitle}>Program Status</h3>
+          <span className={toneClass(programExecutionState)}> 
+            {prettyLabel(programExecutionState)} 
+          </span>
+        </div>
+        <div className={styles.miniCardBody}>
+          <div className={styles.miniStat}>
+            <div className={styles.miniStatLabel}>Current Phase</div>
+            <div className={styles.miniStatValue}>
+              {prettyLabel(crcpProgram.current_phase)}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.miniCard}>
+        <div className={styles.miniCardHeader}>
+          <h3 className={styles.miniCardTitle}>Tracked Actions</h3>
+          <span className={toneClass("active")}>Tracked</span>
+        </div>
+        <div className={styles.miniCardBody}>
+          <div className={styles.miniStat}>
+            <div className={styles.miniStatLabel}>Program Units</div>
+            <div className={styles.miniStatValue}>
+              {executionTrackerItems.length}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.miniCard}>
+        <div className={styles.miniCardHeader}>
+          <h3 className={styles.miniCardTitle}>Execution Progress</h3>
+          <span
+            className={toneClass(
+              executionProgressPercent >= 100
+                ? "complete"
+                : executionProgressPercent > 0
+                ? "in_progress"
+                : "pending"
+            )}
+          >
+            {executionProgressPercent >= 100
+              ? "Complete"
+              : executionProgressPercent > 0
+              ? "In Progress"
+              : "Pending"}
+          </span>
+        </div>
+        <div className={styles.miniCardBody}>
+          <div className={styles.miniStat}>
+            <div className={styles.miniStatLabel}>Progress</div>
+            <div className={styles.miniStatValue}>
+              {executionProgressPercent}%
+            </div>
+          </div>
+          <div className={styles.progressTrack}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${executionProgressPercent}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.miniCard}>
+        <div className={styles.miniCardHeader}>
+          <h3 className={styles.miniCardTitle}>Target Domains</h3>
+          <span className={toneClass("active")}>Scope</span>
+        </div>
+        <div className={styles.miniCardBody}>
+          <Chips values={crcpProgram.target_domains.map(prettyLabel)} />
+        </div>
+      </div>
+    </div>
+
+    <div style={{ marginTop: 18 }}>
+      {executionTrackerItems.length > 0 ? (
+        <div className={styles.list}>
+          {executionTrackerItems.map((item, index) => (
+            <div key={item.action_id} className={styles.listItem}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 12,
+                  flexWrap: "wrap",
+                  marginBottom: 12,
+                }}
+              >
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#e2e8f0" }}>
+                  Unit {String(index + 1).padStart(2, "0")} — {item.title}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => cycleExecutionStatus(item.action_id)}
+                  style={{
+                    ...actionButtonBaseStyle,
+                    padding: "6px 12px",
+                    fontSize: 12,
+                    background: "#0f172a",
+                    cursor: "pointer",
+                  }}
+                >
+                  <span className={toneClass(item.status)}>
+                    {prettyLabel(item.status)}
+                  </span>
+                </button>
+              </div>
+
+              <Row label="Action ID">{item.action_id}</Row>
+
+              <Row label="Domain">{prettyLabel(item.domain)}</Row>
+
+              <Row label="Phase">
+                <span className={toneClass(item.phase)}>
+                  {prettyLabel(item.phase)}
+                </span>
+              </Row>
+
+              <Row label="Owner Role">{prettyLabel(item.owner_role)}</Row>
+
+              <Row label="Expected Outcome">
+                <div style={{ color: "#94a3b8" }}>
+                  {item.expected_outcome}
+                </div>
+              </Row>
+
+              <Row label="Execution Intent">
+                <div style={{ color: "#94a3b8" }}>
+                  {`Advance ${prettyLabel(item.domain)} through ${prettyLabel(
+                    item.phase
+                  )} control actions.`}
+                </div>
+              </Row>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.empty}>No execution actions available.</div>
+      )}
+    </div>
+  </section>
+) : null}
+
+
 
             <section className={`${styles.card} ${styles.fullWidth}`}>
               <h2 className={styles.cardTitle}>Block E — Performance Profile</h2>

@@ -37,17 +37,49 @@ function buildTwinId(twinSeedV2: TwinSeedV2): string {
   ].join("::");
 }
 
-function buildTwinName(twinSeedV2: TwinSeedV2): string {
-  const org = twinSeedV2.context.organization_id || "unknown_org";
-  const sector = twinSeedV2.context.sector || "general";
-  return `${org} / ${sector} / structural twin`;
+function resolveBusinessName(
+  twinSeedV2: TwinSeedV2,
+  intake?: CrcpIntakePayload
+): string {
+  const answerFromIntake = intake?.answers?.find(
+    (answer) => answer.question_id === "ID_01"
+  );
+
+  const rawValue = answerFromIntake?.value;
+
+  if (typeof rawValue === "string" && rawValue.trim().length > 0) {
+    return rawValue.trim();
+  }
+
+  if (Array.isArray(rawValue) && rawValue.length > 0) {
+    const firstValue = rawValue[0];
+    if (typeof firstValue === "string" && firstValue.trim().length > 0) {
+      return firstValue.trim();
+    }
+  }
+
+  return twinSeedV2.context.organization_id || "unknown_org";
 }
 
-function buildRoot(twinSeedV2: TwinSeedV2): TwinRoot {
+function buildTwinName(
+  twinSeedV2: TwinSeedV2,
+  intake?: CrcpIntakePayload
+): string {
+  const businessName = resolveBusinessName(twinSeedV2, intake);
+  const sector = twinSeedV2.context.sector || "general";
+  return `${businessName} / ${sector} / structural twin`;
+}
+
+function buildRoot(
+  twinSeedV2: TwinSeedV2,
+  intake?: CrcpIntakePayload
+): TwinRoot {
+  const businessName = resolveBusinessName(twinSeedV2, intake);
+
   return {
     entity_id: twinSeedV2.context.organization_id,
-    legal_name: twinSeedV2.context.organization_id,
-    display_name: twinSeedV2.context.organization_id,
+    legal_name: businessName,
+    display_name: businessName,
     sector: twinSeedV2.context.sector,
     subsector: twinSeedV2.context.subsector,
     country: twinSeedV2.context.country,
@@ -276,7 +308,7 @@ export function buildTwinStructure({
   intake,
   normalized,
 }: BuildTwinStructureInput): TwinStructure {
-  const root = buildRoot(twin_seed_v2);
+  const root = buildRoot(twin_seed_v2, intake);
   const baseDomains = buildDomainNodes(twin_seed_v2);
   const roles = buildSectorRoleNodes(twin_seed_v2, baseDomains);
   const domains = attachDomainOwners(baseDomains, roles);
@@ -294,7 +326,7 @@ export function buildTwinStructure({
 
   return {
     twin_id: buildTwinId(twin_seed_v2),
-    twin_name: buildTwinName(twin_seed_v2),
+    twin_name: buildTwinName(twin_seed_v2, intake),
     twin_version: twin_seed_v2.twin_version,
     lineage_id: twin_seed_v2.lineage_id,
     root,

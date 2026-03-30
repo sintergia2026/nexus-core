@@ -121,4 +121,4 @@ export function computeCrcpBaselineScores(
     structural_risk: structuralRisk,
     commercial_strength: commercialStrength,
   };
-}
+}                         

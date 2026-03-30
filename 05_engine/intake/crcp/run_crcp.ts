@@ -14,6 +14,8 @@ import { buildCrcpDiagnosticSnapshot } from "./crcp_snapshot_builder";
 import { buildCrcpTwinSeed } from "./crcp_twin_seed_builder";
 import { buildTwinSeedV2 } from "../../twin/builders/buildTwinSeedV2";
 import { buildTwinStructure } from "../../twin/builders/buildTwinStructure";
+import { buildCrcpProgram } from "../../programs/crcp/crcp.program";
+import { CrcpProgram } from "../../programs/crcp/crcp.types";
 import {
   CrcpPersistenceResult,
   persistCrcpArtifacts,
@@ -32,6 +34,7 @@ export interface CrcpRunResult {
   twin_seed: CrcpTwinSeed;
   twin_seed_v2: TwinSeedV2;
   twin_structure: TwinStructure;
+  crcp_program: CrcpProgram;
   persisted?: CrcpPersistenceResult;
   executed_at: string;
 }
@@ -45,6 +48,7 @@ export interface CrcpRunErrorResult {
   twin_seed: null;
   twin_seed_v2: null;
   twin_structure: null;
+  crcp_program: null;
   persisted?: undefined;
   executed_at: string;
   validation_issues: CrcpValidationIssue[];
@@ -108,6 +112,7 @@ export function runCrcp(
       twin_seed: null,
       twin_seed_v2: null,
       twin_structure: null,
+      crcp_program: null,
       executed_at: executedAt,
       validation_issues: validation.issues,
     };
@@ -159,6 +164,8 @@ export function runCrcp(
     normalized,
   });
 
+  const crcpProgram = buildCrcpProgram(twinStructure);
+
   const persisted = options?.persist
     ? persistCrcpArtifacts({
         intake,
@@ -176,6 +183,7 @@ export function runCrcp(
     twin_seed: twinSeed,
     twin_seed_v2: twinSeedV2,
     twin_structure: twinStructure,
+    crcp_program: crcpProgram,
     persisted,
     executed_at: executedAt,
   };

@@ -1,0 +1,58 @@
+{
+  "twin_seed_id": "twin_seed::org-logistics-legal-logic-igsud::logistics::dispatch::2026-03-26T05-29-08-921Z",
+  "context": {
+    "organization_id": "org-logistics-legal-logic-igsud",
+    "sector": "logistics",
+    "subsector": "dispatch",
+    "country": "US",
+    "city": "New York"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 63.66,
+      "financial_pressure": 38.52,
+      "reporting_reliability": 45.41,
+      "structural_risk": 55.16,
+      "commercial_strength": 50
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "HIGH",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-26T05:29:08.921Z"
+}

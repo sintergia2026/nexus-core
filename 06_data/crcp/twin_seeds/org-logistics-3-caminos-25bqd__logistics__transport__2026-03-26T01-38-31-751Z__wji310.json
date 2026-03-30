@@ -1,0 +1,49 @@
+{
+  "twin_seed_id": "twin_seed::org-logistics-3-caminos-25bqd::logistics::transport::2026-03-26T01-38-31-822Z",
+  "context": {
+    "organization_id": "org-logistics-3-caminos-25bqd",
+    "sector": "logistics",
+    "subsector": "transport",
+    "country": "MX",
+    "city": "CDMX"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 59.55,
+      "financial_pressure": 50.31,
+      "reporting_reliability": 70,
+      "structural_risk": 60.49,
+      "commercial_strength": 37.5
+    }
+  },
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "HIGH",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client shows financial fragility driven by weak cash control, poor visibility into margins, or unstable cost behavior. Financial stress appears structural rather than incidental.",
+  "created_at": "2026-03-26T01:38:31.822Z"
+}

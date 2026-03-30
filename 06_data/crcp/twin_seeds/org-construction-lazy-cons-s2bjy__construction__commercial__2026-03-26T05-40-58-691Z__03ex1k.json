@@ -1,0 +1,67 @@
+{
+  "twin_seed_id": "twin_seed::org-construction-lazy-cons-s2bjy::construction::commercial::2026-03-26T05-40-58-759Z",
+  "context": {
+    "organization_id": "org-construction-lazy-cons-s2bjy",
+    "sector": "construction",
+    "subsector": "commercial",
+    "country": "PE",
+    "city": "Trujillo"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 56.56,
+      "financial_pressure": 58.41,
+      "reporting_reliability": 36.39,
+      "structural_risk": 50.72,
+      "commercial_strength": 0
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "HIGH",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "CRITICAL",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "CRITICAL"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-26T05:40:58.759Z"
+}

@@ -1,0 +1,264 @@
+{
+  "context": {
+    "organization_id": "org-general-general-clea-t9evc",
+    "sector": "general",
+    "subsector": "other",
+    "country": "PE",
+    "city": "Cusco"
+  },
+  "answers": [
+    {
+      "question_id": "ID_01",
+      "section": "identity",
+      "value": "GENERAL CLEAN "
+    },
+    {
+      "question_id": "ID_02",
+      "section": "identity",
+      "value": [
+        "general"
+      ]
+    },
+    {
+      "question_id": "ID_03",
+      "section": "identity",
+      "value": 86
+    },
+    {
+      "question_id": "ID_04",
+      "section": "identity",
+      "value": 65
+    },
+    {
+      "question_id": "ID_05",
+      "section": "identity",
+      "value": 20
+    },
+    {
+      "question_id": "ID_06",
+      "section": "identity",
+      "value": "10_plus_years"
+    },
+    {
+      "question_id": "ID_07",
+      "section": "identity",
+      "value": "manager"
+    },
+    {
+      "question_id": "ID_08",
+      "section": "identity",
+      "value": "delivery"
+    },
+    {
+      "question_id": "OPS_GEN_01",
+      "section": "operations",
+      "value": 5
+    },
+    {
+      "question_id": "STF_GEN_01",
+      "section": "staffing",
+      "value": 5
+    },
+    {
+      "question_id": "REP_GEN_01",
+      "section": "reporting",
+      "value": 1
+    },
+    {
+      "question_id": "FIN_GEN_01",
+      "section": "finance",
+      "value": 1
+    },
+    {
+      "question_id": "SAL_GEN_01",
+      "section": "sales",
+      "value": 5
+    },
+    {
+      "question_id": "PLN_GEN_01",
+      "section": "planning",
+      "value": 4
+    },
+    {
+      "question_id": "OPS_03",
+      "section": "operations",
+      "value": 1
+    },
+    {
+      "question_id": "OPS_02",
+      "section": "operations",
+      "value": 2
+    },
+    {
+      "question_id": "OPS_08",
+      "section": "operations",
+      "value": 4
+    },
+    {
+      "question_id": "STF_06",
+      "section": "staffing",
+      "value": 2
+    },
+    {
+      "question_id": "REP_02",
+      "section": "reporting",
+      "value": 2
+    },
+    {
+      "question_id": "REP_06",
+      "section": "reporting",
+      "value": "yes"
+    },
+    {
+      "question_id": "FIN_02",
+      "section": "finance",
+      "value": 4
+    },
+    {
+      "question_id": "FIN_03",
+      "section": "finance",
+      "value": "no"
+    },
+    {
+      "question_id": "SAL_02",
+      "section": "sales",
+      "value": 3
+    },
+    {
+      "question_id": "SAL_07",
+      "section": "sales",
+      "value": 5
+    },
+    {
+      "question_id": "CF_04",
+      "section": "customer_flow",
+      "value": 3
+    },
+    {
+      "question_id": "CF_05",
+      "section": "customer_flow",
+      "value": "yes"
+    },
+    {
+      "question_id": "PLN_01",
+      "section": "planning",
+      "value": "no"
+    },
+    {
+      "question_id": "PLN_04",
+      "section": "planning",
+      "value": 1
+    },
+    {
+      "question_id": "FIN_01",
+      "section": "finance",
+      "value": "no"
+    },
+    {
+      "question_id": "FIN_08",
+      "section": "finance",
+      "value": 4
+    },
+    {
+      "question_id": "STF_09",
+      "section": "staffing",
+      "value": 1
+    },
+    {
+      "question_id": "REP_09",
+      "section": "reporting",
+      "value": 2
+    },
+    {
+      "question_id": "REP_11",
+      "section": "reporting",
+      "value": 5
+    },
+    {
+      "question_id": "REP_12",
+      "section": "reporting",
+      "value": 4
+    },
+    {
+      "question_id": "FIN_11",
+      "section": "finance",
+      "value": 5
+    },
+    {
+      "question_id": "FIN_12",
+      "section": "finance",
+      "value": 3
+    },
+    {
+      "question_id": "REP_01",
+      "section": "reporting",
+      "value": "yes"
+    },
+    {
+      "question_id": "REP_05",
+      "section": "reporting",
+      "value": 1
+    },
+    {
+      "question_id": "REP_07",
+      "section": "reporting",
+      "value": 2
+    },
+    {
+      "question_id": "FIN_05",
+      "section": "finance",
+      "value": 5
+    },
+    {
+      "question_id": "FIN_06",
+      "section": "finance",
+      "value": 4
+    },
+    {
+      "question_id": "FIN_07",
+      "section": "finance",
+      "value": "no"
+    },
+    {
+      "question_id": "SAL_08",
+      "section": "sales",
+      "value": 3
+    },
+    {
+      "question_id": "CF_06",
+      "section": "customer_flow",
+      "value": 1
+    },
+    {
+      "question_id": "OPS_13",
+      "section": "operations",
+      "value": 4
+    },
+    {
+      "question_id": "OPS_14",
+      "section": "operations",
+      "value": 1
+    },
+    {
+      "question_id": "OPS_15",
+      "section": "operations",
+      "value": 1
+    },
+    {
+      "question_id": "OPS_16",
+      "section": "operations",
+      "value": "yes"
+    },
+    {
+      "question_id": "STF_10",
+      "section": "staffing",
+      "value": 2
+    },
+    {
+      "question_id": "STF_11",
+      "section": "staffing",
+      "value": 1
+    }
+  ],
+  "captured_at": "2026-03-26T18:43:21.716Z"
+}

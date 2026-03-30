@@ -1,0 +1,67 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-6x02g::restaurant::casual_dining::2026-03-25T09-04-51-786Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-6x02g",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": "Bogota"
+  },
+  "baseline_state": {
+    "state_label": "degraded",
+    "scores": {
+      "operational_maturity": 53.01,
+      "financial_pressure": 53.24,
+      "reporting_reliability": 42.2,
+      "structural_risk": 50.51,
+      "commercial_strength": 54.17
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "HIGH",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-25T09:04:51.786Z"
+}

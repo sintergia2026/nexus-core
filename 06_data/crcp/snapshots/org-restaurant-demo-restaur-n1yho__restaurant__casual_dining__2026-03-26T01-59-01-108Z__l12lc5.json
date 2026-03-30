@@ -1,0 +1,64 @@
+{
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-n1yho",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": "Bogota"
+  },
+  "scores": {
+    "operational_maturity": 44.92,
+    "financial_pressure": 55.63,
+    "reporting_reliability": 67.2,
+    "structural_risk": 51.02,
+    "commercial_strength": 41.67
+  },
+  "decision": {
+    "decision_label": "contain_risk",
+    "priority": "P1",
+    "readiness_level": "medium"
+  },
+  "state_label": "fragile",
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "HIGH",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a FRAGILE structural state. Recommended decision: contain_risk with priority P1. Lowest-performing dimension: commercial_strength (41.67). Primary signals detected: operational_instability_signal, financial_stress_signal, structural_fragility_signal, commercial_weakness_signal. Primary constraints active: structural_fragility_constraint, financial_control_constraint, execution_standardization_constraint, commercial_instability_constraint.",
+  "created_at": "2026-03-26T01:59:01.126Z"
+}

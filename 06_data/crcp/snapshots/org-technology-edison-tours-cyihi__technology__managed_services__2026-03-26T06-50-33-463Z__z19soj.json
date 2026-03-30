@@ -1,0 +1,55 @@
+{
+  "context": {
+    "organization_id": "org-technology-edison-tours-cyihi",
+    "sector": "technology",
+    "subsector": "managed_services",
+    "country": "CL",
+    "city": "Valparaiso"
+  },
+  "scores": {
+    "operational_maturity": 63.04,
+    "financial_pressure": 58.18,
+    "reporting_reliability": 35,
+    "structural_risk": 55.31,
+    "commercial_strength": 80.56
+  },
+  "decision": {
+    "decision_label": "standardize_operations",
+    "priority": "P2",
+    "readiness_level": "medium"
+  },
+  "state_label": "degraded",
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "HIGH",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a DEGRADED structural state. Recommended decision: standardize_operations with priority P2. Lowest-performing dimension: reporting_reliability (35). Primary signals detected: reporting_gap_signal, financial_stress_signal, structural_fragility_signal. Primary constraints active: reporting_visibility_constraint, structural_fragility_constraint, financial_control_constraint.",
+  "created_at": "2026-03-26T06:50:33.480Z"
+}

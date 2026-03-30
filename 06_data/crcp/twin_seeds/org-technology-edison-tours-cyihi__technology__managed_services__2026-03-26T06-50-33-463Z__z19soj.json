@@ -1,0 +1,53 @@
+{
+  "twin_seed_id": "twin_seed::org-technology-edison-tours-cyihi::technology::managed_services::2026-03-26T06-50-33-480Z",
+  "context": {
+    "organization_id": "org-technology-edison-tours-cyihi",
+    "sector": "technology",
+    "subsector": "managed_services",
+    "country": "CL",
+    "city": "Valparaiso"
+  },
+  "baseline_state": {
+    "state_label": "degraded",
+    "scores": {
+      "operational_maturity": 63.04,
+      "financial_pressure": 58.18,
+      "reporting_reliability": 35,
+      "structural_risk": 55.31,
+      "commercial_strength": 80.56
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "HIGH",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-26T06:50:33.480Z"
+}

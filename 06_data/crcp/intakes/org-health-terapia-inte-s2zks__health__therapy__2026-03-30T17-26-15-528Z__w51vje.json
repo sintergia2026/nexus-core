@@ -1,0 +1,264 @@
+{
+  "context": {
+    "organization_id": "org-health-terapia-inte-s2zks",
+    "sector": "health",
+    "subsector": "therapy",
+    "country": "PE",
+    "city": "Lima"
+  },
+  "answers": [
+    {
+      "question_id": "ID_01",
+      "section": "identity",
+      "value": "TERAPIA INTENSIVA"
+    },
+    {
+      "question_id": "ID_02",
+      "section": "identity",
+      "value": [
+        "health"
+      ]
+    },
+    {
+      "question_id": "ID_03",
+      "section": "identity",
+      "value": 20
+    },
+    {
+      "question_id": "ID_04",
+      "section": "identity",
+      "value": 24
+    },
+    {
+      "question_id": "ID_05",
+      "section": "identity",
+      "value": 41
+    },
+    {
+      "question_id": "ID_06",
+      "section": "identity",
+      "value": "10_plus_years"
+    },
+    {
+      "question_id": "ID_07",
+      "section": "identity",
+      "value": "owner"
+    },
+    {
+      "question_id": "ID_08",
+      "section": "identity",
+      "value": "appointments"
+    },
+    {
+      "question_id": "OPS_H_01",
+      "section": "operations",
+      "value": 2
+    },
+    {
+      "question_id": "STF_H_01",
+      "section": "staffing",
+      "value": 3
+    },
+    {
+      "question_id": "REP_H_01",
+      "section": "reporting",
+      "value": 2
+    },
+    {
+      "question_id": "CF_H_01",
+      "section": "customer_flow",
+      "value": 3
+    },
+    {
+      "question_id": "PLN_H_01",
+      "section": "planning",
+      "value": 2
+    },
+    {
+      "question_id": "OPS_03",
+      "section": "operations",
+      "value": 2
+    },
+    {
+      "question_id": "STF_06",
+      "section": "staffing",
+      "value": 3
+    },
+    {
+      "question_id": "REP_02",
+      "section": "reporting",
+      "value": 3
+    },
+    {
+      "question_id": "REP_06",
+      "section": "reporting",
+      "value": "no"
+    },
+    {
+      "question_id": "REP_07",
+      "section": "reporting",
+      "value": 3
+    },
+    {
+      "question_id": "FIN_02",
+      "section": "finance",
+      "value": 3
+    },
+    {
+      "question_id": "CF_04",
+      "section": "customer_flow",
+      "value": 3
+    },
+    {
+      "question_id": "PLN_04",
+      "section": "planning",
+      "value": 3
+    },
+    {
+      "question_id": "FIN_01",
+      "section": "finance",
+      "value": "no"
+    },
+    {
+      "question_id": "FIN_03",
+      "section": "finance",
+      "value": "yes"
+    },
+    {
+      "question_id": "FIN_08",
+      "section": "finance",
+      "value": 2
+    },
+    {
+      "question_id": "STF_09",
+      "section": "staffing",
+      "value": 2
+    },
+    {
+      "question_id": "REP_09",
+      "section": "reporting",
+      "value": 2
+    },
+    {
+      "question_id": "REP_11",
+      "section": "reporting",
+      "value": 2
+    },
+    {
+      "question_id": "REP_12",
+      "section": "reporting",
+      "value": 3
+    },
+    {
+      "question_id": "FIN_11",
+      "section": "finance",
+      "value": 3
+    },
+    {
+      "question_id": "FIN_12",
+      "section": "finance",
+      "value": 2
+    },
+    {
+      "question_id": "REP_01",
+      "section": "reporting",
+      "value": "yes"
+    },
+    {
+      "question_id": "REP_05",
+      "section": "reporting",
+      "value": 3
+    },
+    {
+      "question_id": "FIN_05",
+      "section": "finance",
+      "value": 3
+    },
+    {
+      "question_id": "FIN_06",
+      "section": "finance",
+      "value": 3
+    },
+    {
+      "question_id": "FIN_07",
+      "section": "finance",
+      "value": "yes"
+    },
+    {
+      "question_id": "CF_06",
+      "section": "customer_flow",
+      "value": 3
+    },
+    {
+      "question_id": "OPS_13",
+      "section": "operations",
+      "value": 2
+    },
+    {
+      "question_id": "OPS_14",
+      "section": "operations",
+      "value": 3
+    },
+    {
+      "question_id": "OPS_15",
+      "section": "operations",
+      "value": 2
+    },
+    {
+      "question_id": "OPS_16",
+      "section": "operations",
+      "value": "no"
+    },
+    {
+      "question_id": "STF_10",
+      "section": "staffing",
+      "value": 2
+    },
+    {
+      "question_id": "STF_11",
+      "section": "staffing",
+      "value": 2
+    },
+    {
+      "question_id": "STF_12",
+      "section": "staffing",
+      "value": 3
+    },
+    {
+      "question_id": "REP_10",
+      "section": "reporting",
+      "value": "no"
+    },
+    {
+      "question_id": "FIN_10",
+      "section": "finance",
+      "value": 2
+    },
+    {
+      "question_id": "CF_07",
+      "section": "customer_flow",
+      "value": 3
+    },
+    {
+      "question_id": "CF_08",
+      "section": "customer_flow",
+      "value": 3
+    },
+    {
+      "question_id": "PLN_07",
+      "section": "planning",
+      "value": 3
+    },
+    {
+      "question_id": "PLN_08",
+      "section": "planning",
+      "value": 2
+    },
+    {
+      "question_id": "STF_04",
+      "section": "staffing",
+      "value": 3
+    }
+  ],
+  "captured_at": "2026-03-30T17:26:15.528Z"
+}

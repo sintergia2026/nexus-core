@@ -1,0 +1,82 @@
+{
+  "context": {
+    "organization_id": "org-health-spa-o72i5",
+    "sector": "health",
+    "subsector": "outpatient",
+    "country": "CO",
+    "city": "Cali"
+  },
+  "scores": {
+    "operational_maturity": 44.18,
+    "financial_pressure": 50.4,
+    "reporting_reliability": 42.61,
+    "structural_risk": 42.01,
+    "commercial_strength": 44.78
+  },
+  "decision": {
+    "decision_label": "contain_risk",
+    "priority": "P1",
+    "readiness_level": "medium"
+  },
+  "state_label": "fragile",
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "HIGH",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "HIGH",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "HIGH",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    },
+    {
+      "code": "visibility_risk_compound_signal",
+      "severity": "HIGH",
+      "source_metric": "compound_visibility_structural"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "visibility_structural_compound_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a FRAGILE structural state. Recommended decision: contain_risk with priority P1. Lowest-performing dimension: structural_risk (42.01). Primary signals detected: reporting_gap_signal, operational_instability_signal, financial_stress_signal, structural_fragility_signal, commercial_weakness_signal, visibility_risk_compound_signal. Primary constraints active: reporting_visibility_constraint, structural_fragility_constraint, financial_control_constraint, execution_standardization_constraint, commercial_instability_constraint, visibility_structural_compound_constraint.",
+  "created_at": "2026-03-26T02:20:38.179Z"
+}

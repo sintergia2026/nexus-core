@@ -1,0 +1,58 @@
+{
+  "twin_seed_id": "twin_seed::org-health-terapia-inte-s2zks::health::therapy::2026-03-30T17-26-15-584Z",
+  "context": {
+    "organization_id": "org-health-terapia-inte-s2zks",
+    "sector": "health",
+    "subsector": "therapy",
+    "country": "PE",
+    "city": "Lima"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 51.31,
+      "financial_pressure": 61.97,
+      "reporting_reliability": 47.45,
+      "structural_risk": 49.85,
+      "commercial_strength": 50
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-30T17:26:15.584Z"
+}

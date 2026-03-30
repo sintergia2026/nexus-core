@@ -1,0 +1,62 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-t9br6::restaurant::casual_dining::2026-03-25T21-23-27-157Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-t9br6",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": "Bogota"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 51.6,
+      "financial_pressure": 46.66,
+      "reporting_reliability": 72.31,
+      "structural_risk": 57.53,
+      "commercial_strength": 37.5
+    }
+  },
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "HIGH",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client shows operational instability driven by inconsistent execution, process friction, or dependence on non-standardized work. The system likely lacks enough procedural stability to support scalable performance.",
+  "created_at": "2026-03-25T21:23:27.157Z"
+}

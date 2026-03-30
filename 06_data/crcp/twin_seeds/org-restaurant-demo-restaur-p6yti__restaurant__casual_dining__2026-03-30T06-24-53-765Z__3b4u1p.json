@@ -1,0 +1,80 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-p6yti::restaurant::casual_dining::2026-03-30T06-24-53-826Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-p6yti",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": "Bogota"
+  },
+  "baseline_state": {
+    "state_label": "critical",
+    "scores": {
+      "operational_maturity": 36.84,
+      "financial_pressure": 48.38,
+      "reporting_reliability": 35.48,
+      "structural_risk": 37.3,
+      "commercial_strength": 45.83
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "HIGH",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "HIGH",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "HIGH",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    },
+    {
+      "code": "visibility_risk_compound_signal",
+      "severity": "HIGH",
+      "source_metric": "compound_visibility_structural"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "visibility_structural_compound_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating under compounded visibility and structural fragility. Weak reporting reliability is likely obscuring execution instability, limiting traceability, and preventing management from identifying the true origin of operational and financial deterioration.",
+  "created_at": "2026-03-30T06:24:53.826Z"
+}

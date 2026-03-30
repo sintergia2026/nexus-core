@@ -1,0 +1,901 @@
+[
+  {
+    "evidence_id": "evidence::coverage::demo-restaurant-001",
+    "evidence_type": "coverage",
+    "label": "Questionnaire Coverage",
+    "status": "high",
+    "value": 100,
+    "rationale": "Coverage reflects answered canonical intake questions.",
+    "metadata": {
+      "answered_questions": 50,
+      "total_questions": 50
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::confidence::demo-restaurant-001",
+    "evidence_type": "confidence",
+    "label": "Twin Confidence",
+    "status": "high",
+    "value": 75,
+    "rationale": "Twin confidence is high due to strong capture coverage and acceptable structural visibility.",
+    "metadata": {
+      "level": "high"
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::gap::demo-restaurant-001",
+    "evidence_type": "gap",
+    "label": "Primary Structural Gap",
+    "status": "high",
+    "value": 49.9,
+    "source_metric": "financial_pressure",
+    "rationale": "Gap severity is derived from the weakest structural dimension.",
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_1_id_01::demo-restaurant-001",
+    "evidence_type": "identity",
+    "label": "Business Identity",
+    "status": "active",
+    "source_question_id": "ID_01",
+    "linked_domain_id": "domain::demo-restaurant-001::governance",
+    "source_metric": "basic",
+    "rationale": "Evidence generated from canonical intake answer ID_01.",
+    "value": "Restaurante Demo",
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_2_id_02::demo-restaurant-001",
+    "evidence_type": "identity",
+    "label": "Sector Identity",
+    "status": "active",
+    "source_question_id": "ID_02",
+    "linked_domain_id": "domain::demo-restaurant-001::governance",
+    "source_metric": "sector",
+    "rationale": "Evidence generated from canonical intake answer ID_02.",
+    "value": "restaurant",
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_3_id_03::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — ID_03",
+    "status": "active",
+    "source_question_id": "ID_03",
+    "source_metric": "size",
+    "rationale": "Evidence generated from canonical intake answer ID_03.",
+    "value": 3,
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_4_id_04::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — ID_04",
+    "status": "active",
+    "source_question_id": "ID_04",
+    "source_metric": "scale",
+    "rationale": "Evidence generated from canonical intake answer ID_04.",
+    "value": 4,
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_5_id_05::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — ID_05",
+    "status": "active",
+    "source_question_id": "ID_05",
+    "source_metric": "revenue",
+    "rationale": "Evidence generated from canonical intake answer ID_05.",
+    "value": 5,
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_6_id_06::demo-restaurant-001",
+    "evidence_type": "trajectory",
+    "label": "Operating History",
+    "status": "active",
+    "source_question_id": "ID_06",
+    "linked_domain_id": "domain::demo-restaurant-001::operations",
+    "source_metric": "age",
+    "rationale": "Evidence generated from canonical intake answer ID_06.",
+    "value": "3_to_5_years",
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_7_id_07::demo-restaurant-001",
+    "evidence_type": "role_definition",
+    "label": "Operations Responsibility",
+    "status": "active",
+    "source_question_id": "ID_07",
+    "linked_domain_id": "domain::demo-restaurant-001::governance",
+    "source_metric": "ownership",
+    "rationale": "Evidence generated from canonical intake answer ID_07.",
+    "value": "owner",
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_8_id_08::demo-restaurant-001",
+    "evidence_type": "revenue_channel",
+    "label": "Revenue Channel Structure",
+    "status": "active",
+    "source_question_id": "ID_08",
+    "linked_domain_id": "domain::demo-restaurant-001::commercial",
+    "source_metric": "channel",
+    "rationale": "Evidence generated from canonical intake answer ID_08.",
+    "value": "mixed",
+    "metadata": {
+      "section": "identity",
+      "normalized_value": 100,
+      "weight": 1
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_9_ops_r_01::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — OPS_R_01",
+    "status": "active",
+    "source_question_id": "OPS_R_01",
+    "source_metric": "bottleneck",
+    "rationale": "Evidence generated from canonical intake answer OPS_R_01.",
+    "value": 4,
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 25,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_10_stf_r_01::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — STF_R_01",
+    "status": "active",
+    "source_question_id": "STF_R_01",
+    "source_metric": "shortage",
+    "rationale": "Evidence generated from canonical intake answer STF_R_01.",
+    "value": 3,
+    "metadata": {
+      "section": "staffing",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_11_inv_r_01::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — INV_R_01",
+    "status": "active",
+    "source_question_id": "INV_R_01",
+    "source_metric": "prep_waste",
+    "rationale": "Evidence generated from canonical intake answer INV_R_01.",
+    "value": 3,
+    "metadata": {
+      "section": "inventory",
+      "normalized_value": 50,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_12_cf_r_01::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — CF_R_01",
+    "status": "active",
+    "source_question_id": "CF_R_01",
+    "source_metric": "turnover",
+    "rationale": "Evidence generated from canonical intake answer CF_R_01.",
+    "value": 4,
+    "metadata": {
+      "section": "customer_flow",
+      "normalized_value": 25,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_13_rep_r_01::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_R_01",
+    "status": "active",
+    "source_question_id": "REP_R_01",
+    "source_metric": "shift_reporting",
+    "rationale": "Evidence generated from canonical intake answer REP_R_01.",
+    "value": 2,
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 25,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_14_fin_r_01::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_R_01",
+    "status": "active",
+    "source_question_id": "FIN_R_01",
+    "source_metric": "cost_variance",
+    "rationale": "Evidence generated from canonical intake answer FIN_R_01.",
+    "value": 2,
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 25,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_15_sal_r_01::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — SAL_R_01",
+    "status": "active",
+    "source_question_id": "SAL_R_01",
+    "source_metric": "channel_mix",
+    "rationale": "Evidence generated from canonical intake answer SAL_R_01.",
+    "value": 3,
+    "metadata": {
+      "section": "sales",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_16_ops_02::demo-restaurant-001",
+    "evidence_type": "operations_signal",
+    "label": "Execution Stability",
+    "status": "active",
+    "source_question_id": "OPS_02",
+    "linked_domain_id": "domain::demo-restaurant-001::operations",
+    "source_metric": "friction",
+    "rationale": "Evidence generated from canonical intake answer OPS_02.",
+    "value": 3,
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 50,
+      "weight": 1.6
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_17_ops_03::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — OPS_03",
+    "status": "active",
+    "source_question_id": "OPS_03",
+    "source_metric": "dependency",
+    "rationale": "Evidence generated from canonical intake answer OPS_03.",
+    "value": 4,
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 25,
+      "weight": 1.7
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_18_ops_08::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — OPS_08",
+    "status": "active",
+    "source_question_id": "OPS_08",
+    "source_metric": "predictability",
+    "rationale": "Evidence generated from canonical intake answer OPS_08.",
+    "value": 2,
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 25,
+      "weight": 1.6
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_19_ops_13::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — OPS_13",
+    "status": "active",
+    "source_question_id": "OPS_13",
+    "source_metric": "exception_handling",
+    "rationale": "Evidence generated from canonical intake answer OPS_13.",
+    "value": 3,
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_20_ops_14::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — OPS_14",
+    "status": "active",
+    "source_question_id": "OPS_14",
+    "source_metric": "recovery_capability",
+    "rationale": "Evidence generated from canonical intake answer OPS_14.",
+    "value": 4,
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 75,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_21_ops_15::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — OPS_15",
+    "status": "active",
+    "source_question_id": "OPS_15",
+    "source_metric": "rework_burden",
+    "rationale": "Evidence generated from canonical intake answer OPS_15.",
+    "value": 3,
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_22_ops_16::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — OPS_16",
+    "status": "active",
+    "source_question_id": "OPS_16",
+    "source_metric": "standard_enforcement",
+    "rationale": "Evidence generated from canonical intake answer OPS_16.",
+    "value": "yes",
+    "metadata": {
+      "section": "operations",
+      "normalized_value": 100,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_23_stf_06::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — STF_06",
+    "status": "active",
+    "source_question_id": "STF_06",
+    "source_metric": "dependency",
+    "rationale": "Evidence generated from canonical intake answer STF_06.",
+    "value": 3,
+    "metadata": {
+      "section": "staffing",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_24_stf_09::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — STF_09",
+    "status": "active",
+    "source_question_id": "STF_09",
+    "source_metric": "resilience_to_absence",
+    "rationale": "Evidence generated from canonical intake answer STF_09.",
+    "value": 2,
+    "metadata": {
+      "section": "staffing",
+      "normalized_value": 25,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_25_stf_10::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — STF_10",
+    "status": "active",
+    "source_question_id": "STF_10",
+    "source_metric": "ownership_confusion",
+    "rationale": "Evidence generated from canonical intake answer STF_10.",
+    "value": 3,
+    "metadata": {
+      "section": "staffing",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_26_stf_11::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — STF_11",
+    "status": "active",
+    "source_question_id": "STF_11",
+    "source_metric": "managerial_capacity",
+    "rationale": "Evidence generated from canonical intake answer STF_11.",
+    "value": 4,
+    "metadata": {
+      "section": "staffing",
+      "normalized_value": 75,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_27_stf_12::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — STF_12",
+    "status": "active",
+    "source_question_id": "STF_12",
+    "source_metric": "staffing_lag",
+    "rationale": "Evidence generated from canonical intake answer STF_12.",
+    "value": 3,
+    "metadata": {
+      "section": "staffing",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_28_cf_04::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — CF_04",
+    "status": "active",
+    "source_question_id": "CF_04",
+    "source_metric": "handoff_friction",
+    "rationale": "Evidence generated from canonical intake answer CF_04.",
+    "value": 3,
+    "metadata": {
+      "section": "customer_flow",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_29_cf_06::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — CF_06",
+    "status": "active",
+    "source_question_id": "CF_06",
+    "source_metric": "capacity_mismatch",
+    "rationale": "Evidence generated from canonical intake answer CF_06.",
+    "value": 2,
+    "metadata": {
+      "section": "customer_flow",
+      "normalized_value": 75,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_30_rep_01::demo-restaurant-001",
+    "evidence_type": "reporting_signal",
+    "label": "Reporting Discipline",
+    "status": "active",
+    "source_question_id": "REP_01",
+    "linked_domain_id": "domain::demo-restaurant-001::reporting",
+    "source_metric": "metrics",
+    "rationale": "Evidence generated from canonical intake answer REP_01.",
+    "value": "yes",
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 100,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_31_rep_02::demo-restaurant-001",
+    "evidence_type": "reporting_signal",
+    "label": "Reporting Accuracy",
+    "status": "active",
+    "source_question_id": "REP_02",
+    "linked_domain_id": "domain::demo-restaurant-001::reporting",
+    "source_metric": "accuracy",
+    "rationale": "Evidence generated from canonical intake answer REP_02.",
+    "value": 2,
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 25,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_32_rep_05::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_05",
+    "status": "active",
+    "source_question_id": "REP_05",
+    "source_metric": "completeness",
+    "rationale": "Evidence generated from canonical intake answer REP_05.",
+    "value": 3,
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_33_rep_06::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_06",
+    "status": "active",
+    "source_question_id": "REP_06",
+    "source_metric": "source_of_truth",
+    "rationale": "Evidence generated from canonical intake answer REP_06.",
+    "value": "no",
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 0,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_34_rep_07::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_07",
+    "status": "active",
+    "source_question_id": "REP_07",
+    "source_metric": "delay_impact",
+    "rationale": "Evidence generated from canonical intake answer REP_07.",
+    "value": 3,
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_35_rep_09::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_09",
+    "status": "active",
+    "source_question_id": "REP_09",
+    "source_metric": "version_conflict",
+    "rationale": "Evidence generated from canonical intake answer REP_09.",
+    "value": 2,
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 75,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_36_rep_10::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_10",
+    "status": "active",
+    "source_question_id": "REP_10",
+    "source_metric": "traceability",
+    "rationale": "Evidence generated from canonical intake answer REP_10.",
+    "value": "yes",
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 100,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_37_rep_11::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_11",
+    "status": "active",
+    "source_question_id": "REP_11",
+    "source_metric": "late_visibility",
+    "rationale": "Evidence generated from canonical intake answer REP_11.",
+    "value": 2,
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 75,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_38_rep_12::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — REP_12",
+    "status": "active",
+    "source_question_id": "REP_12",
+    "source_metric": "operational_financial_linkage",
+    "rationale": "Evidence generated from canonical intake answer REP_12.",
+    "value": 3,
+    "metadata": {
+      "section": "reporting",
+      "normalized_value": 50,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_39_fin_01::demo-restaurant-001",
+    "evidence_type": "financial_signal",
+    "label": "Financial Pressure",
+    "status": "active",
+    "source_question_id": "FIN_01",
+    "linked_domain_id": "domain::demo-restaurant-001::finance",
+    "source_metric": "cash_flow",
+    "rationale": "Evidence generated from canonical intake answer FIN_01.",
+    "value": "no",
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 0,
+      "weight": 2
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_40_fin_02::demo-restaurant-001",
+    "evidence_type": "financial_signal",
+    "label": "Financial Visibility",
+    "status": "active",
+    "source_question_id": "FIN_02",
+    "linked_domain_id": "domain::demo-restaurant-001::finance",
+    "source_metric": "pressure",
+    "rationale": "Evidence generated from canonical intake answer FIN_02.",
+    "value": 2,
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 75,
+      "weight": 2
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_41_fin_03::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_03",
+    "status": "active",
+    "source_question_id": "FIN_03",
+    "source_metric": "margins",
+    "rationale": "Evidence generated from canonical intake answer FIN_03.",
+    "value": "yes",
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 100,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_42_fin_05::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_05",
+    "status": "active",
+    "source_question_id": "FIN_05",
+    "source_metric": "cost_visibility",
+    "rationale": "Evidence generated from canonical intake answer FIN_05.",
+    "value": 2,
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 25,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_43_fin_06::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_06",
+    "status": "active",
+    "source_question_id": "FIN_06",
+    "source_metric": "expense_disruption",
+    "rationale": "Evidence generated from canonical intake answer FIN_06.",
+    "value": 3,
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_44_fin_07::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_07",
+    "status": "active",
+    "source_question_id": "FIN_07",
+    "source_metric": "profitability_visibility",
+    "rationale": "Evidence generated from canonical intake answer FIN_07.",
+    "value": "no",
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 0,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_45_fin_08::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_08",
+    "status": "active",
+    "source_question_id": "FIN_08",
+    "source_metric": "payment_delay",
+    "rationale": "Evidence generated from canonical intake answer FIN_08.",
+    "value": 2,
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 75,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_46_fin_11::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_11",
+    "status": "active",
+    "source_question_id": "FIN_11",
+    "source_metric": "cash_forecasting",
+    "rationale": "Evidence generated from canonical intake answer FIN_11.",
+    "value": 3,
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 50,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_47_fin_12::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — FIN_12",
+    "status": "active",
+    "source_question_id": "FIN_12",
+    "source_metric": "hidden_margin_erosion",
+    "rationale": "Evidence generated from canonical intake answer FIN_12.",
+    "value": 2,
+    "metadata": {
+      "section": "finance",
+      "normalized_value": 75,
+      "weight": 1.9
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_48_sal_07::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — SAL_07",
+    "status": "active",
+    "source_question_id": "SAL_07",
+    "source_metric": "discount_pressure",
+    "rationale": "Evidence generated from canonical intake answer SAL_07.",
+    "value": 3,
+    "metadata": {
+      "section": "sales",
+      "normalized_value": 50,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_49_sal_08::demo-restaurant-001",
+    "evidence_type": "diagnostic_evidence",
+    "label": "Question Evidence — SAL_08",
+    "status": "active",
+    "source_question_id": "SAL_08",
+    "source_metric": "concentration_risk",
+    "rationale": "Evidence generated from canonical intake answer SAL_08.",
+    "value": 2,
+    "metadata": {
+      "section": "sales",
+      "normalized_value": 75,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  },
+  {
+    "evidence_id": "evidence::question_50_pln_04::demo-restaurant-001",
+    "evidence_type": "planning_signal",
+    "label": "Reactive Planning Load",
+    "status": "active",
+    "source_question_id": "PLN_04",
+    "linked_domain_id": "domain::demo-restaurant-001::governance",
+    "source_metric": "reactivity",
+    "rationale": "Evidence generated from canonical intake answer PLN_04.",
+    "value": 2,
+    "metadata": {
+      "section": "planning",
+      "normalized_value": 75,
+      "weight": 1.8
+    },
+    "created_at": "2026-03-23T10:23:36.924Z",
+    "updated_at": "2026-03-23T10:23:36.924Z"
+  }
+]

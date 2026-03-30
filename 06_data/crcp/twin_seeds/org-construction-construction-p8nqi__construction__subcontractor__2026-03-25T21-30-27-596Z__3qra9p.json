@@ -1,0 +1,53 @@
+{
+  "twin_seed_id": "twin_seed::org-construction-construction-p8nqi::construction::subcontractor::2026-03-25T21-30-27-622Z",
+  "context": {
+    "organization_id": "org-construction-construction-p8nqi",
+    "sector": "construction",
+    "subsector": "subcontractor",
+    "country": "PE",
+    "city": "Arequipa"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 52.8,
+      "financial_pressure": 58.41,
+      "reporting_reliability": 72.4,
+      "structural_risk": 60.01,
+      "commercial_strength": 0
+    }
+  },
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "CRITICAL",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "CRITICAL"
+    }
+  ],
+  "structural_hypothesis": "The client shows operational instability driven by inconsistent execution, process friction, or dependence on non-standardized work. The system likely lacks enough procedural stability to support scalable performance.",
+  "created_at": "2026-03-25T21:30:27.622Z"
+}

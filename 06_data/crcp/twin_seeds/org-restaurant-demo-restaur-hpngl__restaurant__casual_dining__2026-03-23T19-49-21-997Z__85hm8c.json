@@ -1,0 +1,30 @@
+{
+  "twin_seed_id": "twin_seed::org-restaurant-demo-restaur-hpngl::restaurant::casual_dining::2026-03-23T19-49-22-023Z",
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-hpngl",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": "Bogota"
+  },
+  "baseline_state": {
+    "state_label": "stable",
+    "scores": {
+      "operational_maturity": 66.64,
+      "financial_pressure": 61.07,
+      "reporting_reliability": 67.2,
+      "structural_risk": 65.63,
+      "commercial_strength": 54.17
+    }
+  },
+  "active_signals": [
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [],
+  "structural_hypothesis": "The client requires further observation to refine the structural hypothesis, but current diagnostic evidence suggests that structural performance is being shaped by a combination of visibility quality, execution maturity, financial control, and demand stability.",
+  "created_at": "2026-03-23T19:49:22.023Z"
+}

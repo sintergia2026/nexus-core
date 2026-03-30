@@ -1,0 +1,55 @@
+{
+  "context": {
+    "organization_id": "org-general-general-clea-t9evc",
+    "sector": "general",
+    "subsector": "other",
+    "country": "PE",
+    "city": "Cusco"
+  },
+  "scores": {
+    "operational_maturity": 46.54,
+    "financial_pressure": 37.02,
+    "reporting_reliability": 60.57,
+    "structural_risk": 56.28,
+    "commercial_strength": 63.82
+  },
+  "decision": {
+    "decision_label": "contain_risk",
+    "priority": "P1",
+    "readiness_level": "medium"
+  },
+  "state_label": "fragile",
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "HIGH",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a FRAGILE structural state. Recommended decision: contain_risk with priority P1. Lowest-performing dimension: financial_pressure (37.02). Primary signals detected: operational_instability_signal, financial_stress_signal, structural_fragility_signal. Primary constraints active: structural_fragility_constraint, financial_control_constraint, execution_standardization_constraint.",
+  "created_at": "2026-03-26T18:43:21.778Z"
+}

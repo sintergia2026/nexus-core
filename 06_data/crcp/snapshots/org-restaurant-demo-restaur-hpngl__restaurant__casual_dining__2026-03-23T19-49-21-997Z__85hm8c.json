@@ -1,0 +1,32 @@
+{
+  "context": {
+    "organization_id": "org-restaurant-demo-restaur-hpngl",
+    "sector": "restaurant",
+    "subsector": "casual_dining",
+    "country": "CO",
+    "city": "Bogota"
+  },
+  "scores": {
+    "operational_maturity": 66.64,
+    "financial_pressure": 61.07,
+    "reporting_reliability": 67.2,
+    "structural_risk": 65.63,
+    "commercial_strength": 54.17
+  },
+  "decision": {
+    "decision_label": "optimize_growth",
+    "priority": "P3",
+    "readiness_level": "medium"
+  },
+  "state_label": "stable",
+  "active_signals": [
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [],
+  "executive_summary": "The client is currently in a STABLE structural state. Recommended decision: optimize_growth with priority P3. Lowest-performing dimension: commercial_strength (54.17). Primary signals detected: commercial_weakness_signal. No active structural constraints detected.",
+  "created_at": "2026-03-23T19:49:22.023Z"
+}

@@ -1,0 +1,60 @@
+{
+  "context": {
+    "organization_id": "org-health-terapia-inte-s2zks",
+    "sector": "health",
+    "subsector": "therapy",
+    "country": "PE",
+    "city": "Lima"
+  },
+  "scores": {
+    "operational_maturity": 51.31,
+    "financial_pressure": 61.97,
+    "reporting_reliability": 47.45,
+    "structural_risk": 49.85,
+    "commercial_strength": 50
+  },
+  "decision": {
+    "decision_label": "contain_risk",
+    "priority": "P1",
+    "readiness_level": "medium"
+  },
+  "state_label": "fragile",
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "MEDIUM",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "executive_summary": "The client is currently in a FRAGILE structural state. Recommended decision: contain_risk with priority P1. Lowest-performing dimension: reporting_reliability (47.45). Primary signals detected: reporting_gap_signal, operational_instability_signal, structural_fragility_signal, commercial_weakness_signal. Primary constraints active: reporting_visibility_constraint, structural_fragility_constraint, execution_standardization_constraint.",
+  "created_at": "2026-03-30T17:26:15.584Z"
+}

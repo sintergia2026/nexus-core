@@ -1,0 +1,44 @@
+{
+  "twin_seed_id": "twin_seed::org-logistics-logistics-mx-0huq9::logistics::fleet_ops::2026-03-23T21-07-59-598Z",
+  "context": {
+    "organization_id": "org-logistics-logistics-mx-0huq9",
+    "sector": "logistics",
+    "subsector": "fleet_ops",
+    "country": "MX",
+    "city": "Guadalajara"
+  },
+  "baseline_state": {
+    "state_label": "degraded",
+    "scores": {
+      "operational_maturity": 73.29,
+      "financial_pressure": 58.09,
+      "reporting_reliability": 54.46,
+      "structural_risk": 63.02,
+      "commercial_strength": 62.5
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-23T21:07:59.598Z"
+}
