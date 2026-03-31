@@ -1,0 +1,62 @@
+{
+  "twin_seed_id": "twin_seed::org-construction-super-constr-3p6xp::construction::remodeling::2026-03-30T20-55-45-418Z",
+  "context": {
+    "organization_id": "org-construction-super-constr-3p6xp",
+    "sector": "construction",
+    "subsector": "remodeling",
+    "country": "CL",
+    "city": "Concepcion"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 42.18,
+      "financial_pressure": 41.59,
+      "reporting_reliability": 63.37,
+      "structural_risk": 48.23,
+      "commercial_strength": 0
+    }
+  },
+  "active_signals": [
+    {
+      "code": "operational_instability_signal",
+      "severity": "HIGH",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "HIGH",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "CRITICAL",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "CRITICAL"
+    }
+  ],
+  "structural_hypothesis": "The client shows operational instability driven by inconsistent execution, process friction, or dependence on non-standardized work. The system likely lacks enough procedural stability to support scalable performance.",
+  "created_at": "2026-03-30T20:55:45.418Z"
+}

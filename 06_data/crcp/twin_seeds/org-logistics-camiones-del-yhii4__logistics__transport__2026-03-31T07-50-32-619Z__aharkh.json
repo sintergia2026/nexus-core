@@ -1,0 +1,53 @@
+{
+  "twin_seed_id": "twin_seed::org-logistics-camiones-del-yhii4::logistics::transport::2026-03-31T07-50-32-640Z",
+  "context": {
+    "organization_id": "org-logistics-camiones-del-yhii4",
+    "sector": "logistics",
+    "subsector": "transport",
+    "country": "MX",
+    "city": "Guadalajara"
+  },
+  "baseline_state": {
+    "state_label": "degraded",
+    "scores": {
+      "operational_maturity": 53.03,
+      "financial_pressure": 69.26,
+      "reporting_reliability": 54.59,
+      "structural_risk": 59.23,
+      "commercial_strength": 62.5
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-31T07:50:32.640Z"
+}

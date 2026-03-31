@@ -1,0 +1,71 @@
+{
+  "twin_seed_id": "twin_seed::org-health-diente-feliz-e1vbv::health::dental::2026-03-30T20-33-50-480Z",
+  "context": {
+    "organization_id": "org-health-diente-feliz-e1vbv",
+    "sector": "health",
+    "subsector": "dental",
+    "country": "MX",
+    "city": "Monterrey"
+  },
+  "baseline_state": {
+    "state_label": "critical",
+    "scores": {
+      "operational_maturity": 29.67,
+      "financial_pressure": 52.53,
+      "reporting_reliability": 52.82,
+      "structural_risk": 35.25,
+      "commercial_strength": 24.73
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "CRITICAL",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "MEDIUM",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "HIGH",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "CRITICAL",
+      "source_metric": "commercial_strength"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "CRITICAL"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-30T20:33:50.480Z"
+}

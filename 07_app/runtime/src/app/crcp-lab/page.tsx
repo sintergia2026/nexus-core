@@ -1314,6 +1314,10 @@ const [expandedRepoNodes, setExpandedRepoNodes] = useState<Record<string, boolea
   governance_folder: false,
 });
 
+const [repoPriorityFilter, setRepoPriorityFilter] = useState<
+  "all" | "critical" | "program_linked" | "uncovered" | "evidence_poor"
+>("all");
+
   const [questionCatalog, setQuestionCatalog] =
     useState<CrcpQuestionsApiResponse["result"]>(null);
   const [questionsLoading, setQuestionsLoading] = useState(false);
@@ -1893,6 +1897,128 @@ const selectedNodeSystemType = useMemo(() => {
   return getSelectedNodeSystemType(selectedRepoNode);
 }, [selectedRepoNode]);
 
+const selectedNodeDirective = useMemo(() => {
+  return getSelectedNodeDirective({
+    selectedRepoNode,
+    selectedNodeExecutionLinked,
+    selectedNodeRiskBand,
+    selectedNodeExecutionActions,
+  });
+}, [
+  selectedRepoNode,
+  selectedNodeExecutionLinked,
+  selectedNodeRiskBand,
+  selectedNodeExecutionActions,
+]);
+
+const selectedNodeForecast = useMemo(() => {
+  if (!selectedRepoNode) {
+    return {
+      ifIgnored: "No node selected.",
+      ifStabilized: "No stabilization path available.",
+      propagation: "No propagation reading available.",
+      recommendation: "Select a structural node to generate forecast.",
+    };
+  }
+
+  const downstreamCount = selectedNodeDependencies.filter(
+    (edge) => edge.from_node_id === selectedRepoNode.node_id
+  ).length;
+
+  const upstreamCount = selectedNodeDependencies.filter(
+    (edge) => edge.to_node_id === selectedRepoNode.node_id
+  ).length;
+
+  const totalExposure = downstreamCount + upstreamCount;
+
+  const status = String(selectedRepoNodeStatus || "").toLowerCase();
+
+  const ignoredMessage =
+    status === "critical" || status === "fragile" || status === "degraded"
+      ? `Structural instability may continue propagating across ${totalExposure} connected relation(s).`
+      : totalExposure > 0
+      ? `This node may remain a latent weak point across ${totalExposure} connected relation(s).`
+      : "Limited visible propagation if ignored.";
+
+  const stabilizedMessage = selectedNodeExecutionLinked
+    ? "Active intervention coverage can improve structural coherence and reduce local pressure."
+    : "Stabilization would reduce exposure and improve route eligibility for execution.";
+
+  const propagationMessage =
+    downstreamCount > 0
+      ? `${downstreamCount} downstream relation(s) may be influenced by this node.`
+      : "No direct downstream propagation detected.";
+
+  const recommendationMessage = selectedNodeExecutionLinked
+    ? "Execute current linked action and re-evaluate downstream effects."
+    : selectedNodeRiskBand === "critical"
+    ? "Escalate node into execution path or assign explicit containment logic."
+    : "Monitor evidence growth and determine whether execution routing is justified.";
+
+  return {
+    ifIgnored: ignoredMessage,
+    ifStabilized: stabilizedMessage,
+    propagation: propagationMessage,
+    recommendation: recommendationMessage,
+  };
+}, [
+  selectedRepoNode,
+  selectedNodeDependencies,
+  selectedRepoNodeStatus,
+  selectedNodeExecutionLinked,
+  selectedNodeRiskBand,
+]);
+
+const selectedNodeSequence = useMemo(() => {
+  const currentAction =
+    selectedNodeExecutionActions.length > 0
+      ? selectedNodeExecutionActions[0].title
+      : "No active action";
+
+  const nextAction =
+    selectedNodeExecutionActions.length > 1
+      ? selectedNodeExecutionActions[1].title
+      : selectedNodeExecutionLinked
+      ? "No second queued action"
+      : "Node not yet routed";
+
+  const nextStructuralTarget = selectedNodeDependencies.find(
+    (edge) => edge.from_node_id === selectedRepoNode?.node_id
+  )?.to_node_id || "No downstream target";
+
+  const executionRoute = selectedNodeExecutionLinked
+    ? "Node is inside active CRCP route"
+    : "Node remains outside active CRCP route";
+
+  return {
+    currentAction,
+    nextAction,
+    nextStructuralTarget,
+    executionRoute,
+  };
+}, [
+  selectedRepoNode,
+  selectedNodeDependencies,
+  selectedNodeExecutionActions,
+  selectedNodeExecutionLinked,
+]);
+
+const selectedNodePrioritySignal = useMemo(() => {
+  return getSelectedNodePrioritySignal({
+    selectedRepoNode,
+    selectedNodeExecutionLinked,
+    selectedNodeRiskBand,
+    selectedNodeDependenciesCount: selectedNodeDependencies.length,
+    selectedNodeExecutionActionsCount: selectedNodeExecutionActions.length,
+  });
+}, [
+  selectedRepoNode,
+  selectedNodeExecutionLinked,
+  selectedNodeRiskBand,
+  selectedNodeDependencies.length,
+  selectedNodeExecutionActions.length,
+]);
+
 function getRepoNodeStatus(node: RepoTreeNode): string {
   if (node.node_type === "root") {
     return twinStructure?.root.state_label || "planned";
@@ -1989,8 +2115,8 @@ const repoTree = useMemo<RepoTreeNode | null>(() => {
   return {
     id: "repo_root",
     label: `/${slugify(twinStructure.root.display_name || "company")}__${slugify(
-      twinStructure.root.sector || "general"
-    )}__runtime`,
+  twinStructure.root.sector || "general"
+)}__runtime_root`,
     node_type: "folder",
     selectable: false,
     children: [
@@ -2157,8 +2283,20 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
   const isSelected = selectedRepoNode?.node_id === node.id;
   const nodeStatus = getRepoNodeStatus(node);
   const toneStyle = getRepoNodeTone(nodeStatus);
+    const nodeMarkers = getRepoNodeMarkers(node, twinStructure, crcpProgram);
 
   const indent = `${depth * 18}px`;
+
+    if (
+    !shouldShowRepoNode(
+      node,
+      repoPriorityFilter,
+      twinStructure,
+      crcpProgram
+    )
+  ) {
+    return null;
+  }
 
   return (
     <div key={node.id} style={{ display: "grid", gap: 4 }}>
@@ -2190,35 +2328,59 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
           <div style={{ width: 18 }} />
         )}
 
-        <button
-          type="button"
-          onClick={() => {
-            if (!node.selectable) return;
-            if (node.node_type === "file" || node.node_type === "folder") return;
+                <div style={{ display: "flex", alignItems: "center", gap: 6, width: "100%" }}>
+          <button
+            type="button"
+            onClick={() => {
+              if (!node.selectable) return;
+              if (node.node_type === "file" || node.node_type === "folder") return;
 
-            setSelectedRepoNode({
-              node_type: node.node_type as RepoNodeType,
-              node_id: node.id,
-              node_label: node.label,
-            });
-          }}
-          style={{
-            background: isSelected ? "#1e293b" : "transparent",
-            border: isSelected ? "1px solid #3b82f6" : "1px solid transparent",
-            color: toneStyle.color || "#cbd5e1",
-            textAlign: "left",
-            padding: "3px 8px",
-            cursor: node.selectable ? "pointer" : "default",
-            fontFamily:
-              'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-            fontSize: 13,
-            borderRadius: 6,
-            width: "100%",
-            opacity: node.selectable ? 1 : 0.82,
-          }}
-        >
-          {node.label}
-        </button>
+              setSelectedRepoNode({
+                node_type: node.node_type as RepoNodeType,
+                node_id: node.id,
+                node_label: node.label,
+              });
+            }}
+            style={{
+              background: isSelected ? "#1e293b" : "transparent",
+              border: isSelected ? "1px solid #3b82f6" : "1px solid transparent",
+              color: toneStyle.color || "#cbd5e1",
+              textAlign: "left",
+              padding: "3px 8px",
+              cursor: node.selectable ? "pointer" : "default",
+              fontFamily:
+                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+              fontSize: 13,
+              borderRadius: 6,
+              width: "100%",
+              opacity: node.selectable ? 1 : 0.82,
+            }}
+          >
+            {node.label}
+          </button>
+
+          {node.selectable ? (
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {nodeMarkers.isCritical ? (
+                <span className={toneClass("critical")} style={{ fontSize: 10, padding: "2px 6px" }}>
+                  C
+                </span>
+              ) : null}
+
+              {nodeMarkers.isProgramLinked ? (
+                <span className={toneClass("active")} style={{ fontSize: 10, padding: "2px 6px" }}>
+                  P
+                </span>
+              ) : null}
+
+              {nodeMarkers.isEvidencePoor ? (
+                <span className={toneClass("pending")} style={{ fontSize: 10, padding: "2px 6px" }}>
+                  E
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {isFolder && isExpanded && node.children?.length
@@ -2226,6 +2388,159 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
         : null}
     </div>
   );
+}
+
+function getRepoNodeEvidenceCount(
+  node: RepoTreeNode,
+  twinStructure: TwinStructure | null
+): number {
+  if (!twinStructure) return 0;
+
+  if (node.node_type === "root") {
+    return twinStructure.evidence.length;
+  }
+
+  if (node.node_type === "domain") {
+    return twinStructure.evidence.filter(
+      (item) => item.linked_domain_id === node.id
+    ).length;
+  }
+
+  if (node.node_type === "role") {
+    return twinStructure.evidence.filter(
+      (item) => item.linked_role_id === node.id
+    ).length;
+  }
+
+  if (node.node_type === "evidence") {
+    return twinStructure.evidence.length;
+  }
+
+  return 0;
+}
+
+function isRepoNodeProgramLinked(
+  node: RepoTreeNode,
+  twinStructure: TwinStructure | null,
+  crcpProgram: CrcpProgram | null
+): boolean {
+  if (!crcpProgram) return false;
+
+  if (node.node_type === "execution") {
+    return true;
+  }
+
+  if (node.node_type === "domain") {
+    const domainName =
+      twinStructure?.domains.find((domain) => domain.domain_id === node.id)
+        ?.domain_name || "";
+
+    return (
+      crcpProgram.target_domains.includes(domainName) ||
+      crcpProgram.actions.some((action) => action.domain === domainName)
+    );
+  }
+
+  if (node.node_type === "role") {
+    const roleName =
+      twinStructure?.roles.find((role) => role.role_id === node.id)?.role_name ||
+      "";
+
+    return crcpProgram.actions.some((action) => action.owner_role === roleName);
+  }
+
+  return false;
+}
+
+function shouldShowRepoNode(
+  node: RepoTreeNode,
+  filter: "all" | "critical" | "program_linked" | "uncovered" | "evidence_poor",
+  twinStructure: TwinStructure | null,
+  crcpProgram: CrcpProgram | null
+): boolean {
+  if (node.node_type === "folder" || node.node_type === "file") {
+    return true;
+  }
+
+  if (filter === "all") {
+    return true;
+  }
+
+  const status = getRepoNodeStatusStatic(node, twinStructure, crcpProgram);
+  const evidenceCount = getRepoNodeEvidenceCount(node, twinStructure);
+  const programLinked = isRepoNodeProgramLinked(node, twinStructure, crcpProgram);
+
+  if (filter === "critical") {
+    return ["critical", "fragile", "degraded"].includes(status.toLowerCase());
+  }
+
+  if (filter === "program_linked") {
+    return programLinked;
+  }
+
+  if (filter === "uncovered") {
+    return !programLinked && node.selectable === true;
+  }
+
+  if (filter === "evidence_poor") {
+    return node.selectable === true && evidenceCount <= 1;
+  }
+
+  return true;
+}
+
+function getRepoNodeStatusStatic(
+  node: RepoTreeNode,
+  twinStructure: TwinStructure | null,
+  programExecutionState: CrcpProgram | null | string
+): string {
+  if (node.node_type === "root") {
+    return twinStructure?.root.state_label || "planned";
+  }
+
+  if (node.node_type === "domain") {
+    const domain = twinStructure?.domains.find((d) => d.domain_id === node.id);
+    return domain?.status || "planned";
+  }
+
+  if (node.node_type === "role") {
+    const role = twinStructure?.roles.find((r) => r.role_id === node.id);
+    return role?.status || "planned";
+  }
+
+  if (node.node_type === "execution") {
+    return typeof programExecutionState === "string"
+      ? programExecutionState
+      : "planned";
+  }
+
+  if (node.node_type === "evidence") {
+    return twinStructure?.evidence.length ? "active" : "pending";
+  }
+
+  if (node.node_type === "activation") {
+    return twinStructure?.activation.activation_status || "planned";
+  }
+
+  if (node.node_type === "simulation") {
+    return twinStructure?.simulation?.simulation_status || "planned";
+  }
+
+  if (node.node_type === "commercial") {
+    const commercialDomain = twinStructure?.domains.find(
+      (domain) => domain.domain_name === "commercial"
+    );
+    return commercialDomain?.status || "planned";
+  }
+
+  if (node.node_type === "governance") {
+    const governanceDomain = twinStructure?.domains.find(
+      (domain) => domain.domain_name === "governance"
+    );
+    return governanceDomain?.status || "planned";
+  }
+
+  return node.status || "planned";
 }
 
 function getRepoNodeButtonStyle(isActive: boolean): CSSProperties {
@@ -2372,6 +2687,185 @@ function getSelectedNodeSystemType(
   if (selectedRepoNode.node_type === "evidence") return "evidence_node";
 
   return `${selectedRepoNode.node_type}_node`;
+}
+
+function getSelectedNodeDirective(input: {
+  selectedRepoNode: SelectedRepoNode | null;
+  selectedNodeExecutionLinked: boolean;
+  selectedNodeRiskBand: "critical" | "elevated" | "stable";
+  selectedNodeExecutionActions: Array<{
+    action_id: string;
+    domain: string;
+    title: string;
+    description: string;
+    owner_role: string;
+    expected_outcome: string;
+    phase: string;
+  }>;
+}): {
+  directive: string;
+  why_it_matters: string;
+  next_move: string;
+} {
+  const {
+    selectedRepoNode,
+    selectedNodeExecutionLinked,
+    selectedNodeRiskBand,
+    selectedNodeExecutionActions,
+  } = input;
+
+  if (!selectedRepoNode) {
+    return {
+      directive: "Select structural node",
+      why_it_matters:
+        "No node is currently selected, so no node-level directive can be issued.",
+      next_move: "Choose a node from the runtime repository.",
+    };
+  }
+
+  if (selectedNodeExecutionActions.length > 0) {
+    return {
+      directive: selectedNodeExecutionActions[0].title,
+      why_it_matters: selectedNodeExecutionLinked
+        ? "This node is already attached to the active execution path and directly influences structural recovery."
+        : "This node has actionable logic available and should be evaluated for routing into execution.",
+      next_move:
+        selectedNodeExecutionActions.length > 1
+          ? selectedNodeExecutionActions[1].title
+          : "No second queued action.",
+    };
+  }
+
+  if (selectedNodeRiskBand === "critical") {
+    return {
+      directive: "Contain structural degradation",
+      why_it_matters:
+        "The selected node shows critical fragility or degradation and may propagate instability across dependent layers.",
+      next_move: selectedNodeExecutionLinked
+        ? "Review current intervention coverage."
+        : "Attach node to execution path.",
+    };
+  }
+
+  if (selectedNodeExecutionLinked) {
+    return {
+      directive: "Monitor active intervention coverage",
+      why_it_matters:
+        "The node is already inside the active program path and should be tracked for intervention effectiveness.",
+      next_move: "Inspect evidence and downstream effects.",
+    };
+  }
+
+  return {
+    directive: "Evaluate structural exposure",
+    why_it_matters:
+      "This node is currently outside the active execution path and may still represent latent structural risk.",
+    next_move: "Review dependencies, evidence, and intervention eligibility.",
+  };
+}
+
+function getSelectedNodePrioritySignal(input: {
+  selectedRepoNode: SelectedRepoNode | null;
+  selectedNodeExecutionLinked: boolean;
+  selectedNodeRiskBand: "critical" | "elevated" | "stable";
+  selectedNodeDependenciesCount: number;
+  selectedNodeExecutionActionsCount: number;
+}): {
+  priority_label: "P1" | "P2" | "P3";
+  coverage_state: "covered" | "uncovered";
+  structural_urgency: "critical" | "high" | "medium" | "stable";
+  cascade_risk: "critical" | "high" | "medium" | "stable";
+  operator_command: string;
+} {
+  const {
+    selectedRepoNode,
+    selectedNodeExecutionLinked,
+    selectedNodeRiskBand,
+    selectedNodeDependenciesCount,
+    selectedNodeExecutionActionsCount,
+  } = input;
+
+  if (!selectedRepoNode) {
+    return {
+      priority_label: "P3",
+      coverage_state: "uncovered",
+      structural_urgency: "stable",
+      cascade_risk: "stable",
+      operator_command: "Select node",
+    };
+  }
+
+  const coverage_state = selectedNodeExecutionLinked ? "covered" : "uncovered";
+
+  const structural_urgency =
+    selectedNodeRiskBand === "critical"
+      ? selectedNodeExecutionLinked
+        ? "high"
+        : "critical"
+      : selectedNodeRiskBand === "elevated"
+      ? "medium"
+      : "stable";
+
+  const cascade_risk =
+    selectedNodeDependenciesCount >= 5
+      ? "critical"
+      : selectedNodeDependenciesCount >= 3
+      ? "high"
+      : selectedNodeDependenciesCount >= 1
+      ? "medium"
+      : "stable";
+
+  const priority_label =
+    structural_urgency === "critical"
+      ? "P1"
+      : structural_urgency === "high"
+      ? "P1"
+      : structural_urgency === "medium"
+      ? "P2"
+      : "P3";
+
+  const operator_command =
+    selectedNodeExecutionActionsCount > 0
+      ? "Execute linked action"
+      : coverage_state === "uncovered" && structural_urgency === "critical"
+      ? "Route node into program"
+      : coverage_state === "covered"
+      ? "Monitor intervention path"
+      : "Inspect structural exposure";
+
+  return {
+    priority_label,
+    coverage_state,
+    structural_urgency,
+    cascade_risk,
+    operator_command,
+  };
+}
+
+function getRepoNodeMarkers(
+  node: RepoTreeNode,
+  twinStructure: TwinStructure | null,
+  crcpProgram: CrcpProgram | null
+): {
+  isCritical: boolean;
+  isProgramLinked: boolean;
+  isEvidencePoor: boolean;
+} {
+  const status = getRepoNodeStatusStatic(node, twinStructure, crcpProgram);
+  const evidenceCount = getRepoNodeEvidenceCount(node, twinStructure);
+  const isProgramLinked = isRepoNodeProgramLinked(
+    node,
+    twinStructure,
+    crcpProgram
+  );
+
+  return {
+    isCritical: ["critical", "fragile", "degraded"].includes(
+      String(status).toLowerCase()
+    ),
+    isProgramLinked,
+    isEvidencePoor: node.selectable === true && evidenceCount <= 1,
+  };
 }
 
 // ===============================
@@ -4497,7 +4991,9 @@ function autofillSimulation() {
           <div className={styles.miniCardBody}>
             <div className={styles.miniStat}>
               <div className={styles.miniStatLabel}>Twin Name</div>
-              <div className={styles.miniStatValue}>{twinStructure.twin_name}</div>
+              <div className={styles.miniStatValue}>
+                {twinStructure.twin_name}
+              </div>
             </div>
           </div>
         </div>
@@ -4573,193 +5069,533 @@ function autofillSimulation() {
       </div>
 
       <div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "minmax(260px, 0.8fr) minmax(420px, 1.25fr) minmax(340px, 0.75fr)",
-    gap: 18,
-    marginTop: 18,
-  }}
->
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Runtime Repository
-    </div>
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(180px, 1fr))",
+          gap: 14,
+          marginTop: 18,
+        }}
+      >
+        <div style={sectionBlockStyle}>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
+            Active Objective
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#e2e8f0" }}>
+            {selectedNodeExecutionLinked
+              ? "Stabilize program-linked structural node"
+              : "Recover structural visibility and execution readiness"}
+          </div>
+        </div>
 
-    {repoTree ? (
+        <div style={sectionBlockStyle}>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
+            Critical Constraint
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#e2e8f0" }}>
+            {criticalFocusDomain?.domain_label || "n/a"}
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <span className={toneClass(criticalFocusDomain?.status || "pending")}>
+              {prettyLabel(criticalFocusDomain?.status || "pending")}
+            </span>
+          </div>
+        </div>
+
+        <div style={sectionBlockStyle}>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
+            Primary Unlock
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#e2e8f0" }}>
+            {selectedNodeExecutionLinked
+              ? "Execution already attached"
+              : "Link node to intervention path"}
+          </div>
+          <div style={{ marginTop: 8, color: "#94a3b8", fontSize: 13 }}>
+            {selectedNodeExecutionLinked
+              ? "This node is already exposed to the active CRCP program."
+              : "This node is still structurally outside the direct execution path."}
+          </div>
+        </div>
+
+        <div style={sectionBlockStyle}>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
+            Execution Coverage
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#e2e8f0" }}>
+            {executionProgressPercent}%
+          </div>
+          <div className={styles.progressTrack} style={{ marginTop: 10 }}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${executionProgressPercent}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
       <div
         style={{
           display: "grid",
-          gap: 6,
-          maxHeight: 720,
-          overflowY: "auto",
-          paddingRight: 4,
+          gridTemplateColumns:
+            "minmax(260px, 0.8fr) minmax(420px, 1.25fr) minmax(340px, 0.75fr)",
+          gap: 18,
+          marginTop: 18,
         }}
       >
-        {renderRepoTreeNode(repoTree)}
+        <div style={sectionBlockStyle}>
+          <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+            Runtime Repository
+            <div
+  style={{
+    display: "flex",
+    gap: 8,
+    flexWrap: "wrap",
+    marginBottom: 12,
+  }}
+>
+  {[
+    ["all", "All"],
+    ["critical", "Critical"],
+    ["program_linked", "Program Linked"],
+    ["uncovered", "Uncovered"],
+    ["evidence_poor", "Evidence Poor"],
+  ].map(([value, label]) => {
+    const active = repoPriorityFilter === value;
+
+    return (
+      <button
+        key={value}
+        type="button"
+        onClick={() =>
+          setRepoPriorityFilter(
+            value as
+              | "all"
+              | "critical"
+              | "program_linked"
+              | "uncovered"
+              | "evidence_poor"
+          )
+        }
+        style={{
+          ...actionButtonBaseStyle,
+          padding: "6px 10px",
+          fontSize: 12,
+          background: active ? "#1e293b" : "#0f172a",
+          cursor: "pointer",
+        }}
+      >
+        {label}
+      </button>
+    );
+  })}
+</div>
+          </div>
+
+          {repoTree ? (
+            <div
+              style={{
+                display: "grid",
+                gap: 6,
+                maxHeight: 720,
+                overflowY: "auto",
+                paddingRight: 4,
+              }}
+            >
+              {renderRepoTreeNode(repoTree)}
+            </div>
+          ) : (
+            <div className={styles.empty}>Repository runtime unavailable.</div>
+          )}
+        </div>
+
+        <div style={{ display: "grid", gap: 18 }}>
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Priority Signal
+    </div>
+
+    <Row label="Priority">
+      <span className={toneClass(selectedNodePrioritySignal.priority_label)}>
+        {selectedNodePrioritySignal.priority_label}
+      </span>
+    </Row>
+
+    <Row label="Coverage">
+      <span
+        className={toneClass(
+          selectedNodePrioritySignal.coverage_state === "covered"
+            ? "active"
+            : "pending"
+        )}
+      >
+        {prettyLabel(selectedNodePrioritySignal.coverage_state)}
+      </span>
+    </Row>
+
+    <Row label="Structural Urgency">
+      <span className={toneClass(selectedNodePrioritySignal.structural_urgency)}>
+        {prettyLabel(selectedNodePrioritySignal.structural_urgency)}
+      </span>
+    </Row>
+
+    <Row label="Cascade Risk">
+      <span className={toneClass(selectedNodePrioritySignal.cascade_risk)}>
+        {prettyLabel(selectedNodePrioritySignal.cascade_risk)}
+      </span>
+    </Row>
+
+    <Row label="Operator Command">
+      <div style={{ fontWeight: 800, color: "#e2e8f0" }}>
+        {selectedNodePrioritySignal.operator_command}
       </div>
-    ) : (
-      <div className={styles.empty}>Repository runtime unavailable.</div>
-    )}
+    </Row>
   </div>
 
   <div
     style={{
       ...sectionBlockStyle,
-      overflowX: "auto",
+      border: "1px solid #3b82f6",
+      boxShadow: "0 0 0 1px rgba(59,130,246,0.15) inset",
     }}
   >
-          <div style={sectionBlockStyle}>
-            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-              Selected Node
-            </div>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Node Directive
+    </div>
 
-            {selectedRepoNode ? (
-              <>
-                <Row label="Node">{selectedRepoNode.node_label}</Row>
-                <Row label="Type">{prettyLabel(selectedRepoNode.node_type)}</Row>
-                <Row label="Status">
-                  <span className={toneClass(selectedRepoNodeStatus)}>
-                    {prettyLabel(selectedRepoNodeStatus)}
-                  </span>
-                </Row>
-                <Row label="Node ID">{selectedRepoNode.node_id}</Row>
-                <Row label="Score">{selectedRepoNodeScore}</Row>
-                <Row label="Evidence Count">
-                  {String(selectedRepoNodeEvidenceCount)}
-                </Row>
-                <Row label="Dependencies">
-                  {String(selectedNodeDependencies.length)}
-                </Row>
-                <Row label="Execution Linked">
-                  <span
-                    className={toneClass(
-                      selectedNodeExecutionLinked ? "active" : "pending"
-                    )}
-                  >
-                    {selectedNodeExecutionLinked ? "Yes" : "No"}
-                  </span>
-                </Row>
-                <Row label="Program Actions">
-                  {String(selectedNodeExecutionActions.length)}
-                </Row>
+    <Row label="Directive">
+      <div style={{ fontWeight: 800, color: "#f8fafc", fontSize: 18, lineHeight: 1.3 }}>
+        {selectedNodeDirective.directive}
+      </div>
+    </Row>
 
-                {selectedDomainNode ? (
-                  <>
-                    <Row label="Owner Role">
-                      {selectedDomainNode.owner_role_id || "n/a"}
-                    </Row>
-                    <Row label="Summary">
-                      {selectedDomainNode.summary || "n/a"}
-                    </Row>
-                  </>
-                ) : null}
+    <Row label="Why It Matters">
+      <div style={{ color: "#94a3b8" }}>
+        {selectedNodeDirective.why_it_matters}
+      </div>
+    </Row>
 
-                {selectedRoleNode ? (
-                  <>
-                    <Row label="Domain">
-                      {selectedRoleNode.domain_id || "n/a"}
-                    </Row>
-                    <Row label="Responsibility">
-                      {selectedRoleNode.responsibility_summary || "n/a"}
-                    </Row>
-                  </>
-                ) : null}
-              </>
-            ) : (
-              <div className={styles.empty}>No node selected.</div>
+    <Row label="Next Move">
+      <div style={{ color: "#94a3b8" }}>
+        {selectedNodeDirective.next_move}
+      </div>
+    </Row>
+  </div>
+
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Selected Node
+    </div>
+
+    {selectedRepoNode ? (
+      <>
+        <Row label="Node">{selectedRepoNode.node_label}</Row>
+        <Row label="Type">{prettyLabel(selectedRepoNode.node_type)}</Row>
+        <Row label="Status">
+          <span className={toneClass(selectedRepoNodeStatus)}>
+            {prettyLabel(selectedRepoNodeStatus)}
+          </span>
+        </Row>
+        <Row label="Node ID">{selectedRepoNode.node_id}</Row>
+        <Row label="Score">{selectedRepoNodeScore}</Row>
+        <Row label="Evidence Count">
+          {String(selectedRepoNodeEvidenceCount)}
+        </Row>
+        <Row label="Dependencies">
+          {String(selectedNodeDependencies.length)}
+        </Row>
+        <Row label="Execution Linked">
+          <span
+            className={toneClass(
+              selectedNodeExecutionLinked ? "active" : "pending"
             )}
-          </div>
+          >
+            {selectedNodeExecutionLinked ? "Yes" : "No"}
+          </span>
+        </Row>
 
-          <div style={sectionBlockStyle}>
-            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-              Node Evidence Preview
+        {selectedDomainNode ? (
+          <>
+            <Row label="Owner Role">
+              {selectedDomainNode.owner_role_id || "n/a"}
+            </Row>
+            <Row label="Summary">
+              {selectedDomainNode.summary || "n/a"}
+            </Row>
+          </>
+        ) : null}
+
+        {selectedRoleNode ? (
+          <>
+            <Row label="Domain">
+              {selectedRoleNode.domain_id || "n/a"}
+            </Row>
+            <Row label="Responsibility">
+              {selectedRoleNode.responsibility_summary || "n/a"}
+            </Row>
+          </>
+        ) : null}
+      </>
+    ) : (
+      <div className={styles.empty}>No node selected.</div>
+    )}
+  </div>
+
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Node Reading
+    </div>
+
+    <Row label="Summary">{selectedNodeInterpretation.summary}</Row>
+
+    <Row label="Actionability">
+      <span className={toneClass(selectedNodeInterpretation.actionability)}>
+        {prettyLabel(selectedNodeInterpretation.actionability)}
+      </span>
+    </Row>
+
+    <Row label="Risk Band">
+      <span className={toneClass(selectedNodeRiskBand)}>
+        {prettyLabel(selectedNodeRiskBand)}
+      </span>
+    </Row>
+
+    <Row label="System Type">
+      {prettyLabel(selectedNodeSystemType)}
+    </Row>
+
+    <Row label="Recommended Reading">
+      <div style={{ color: "#94a3b8" }}>
+        {selectedNodeInterpretation.recommended_reading}
+      </div>
+    </Row>
+  </div>
+
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Node Evidence Preview
+    </div>
+
+    {selectedNodeEvidencePreview.length > 0 ? (
+      <div style={{ display: "grid", gap: 10 }}>
+        {selectedNodeEvidencePreview.map((item) => (
+          <div
+            key={item.evidence_id}
+            style={{
+              borderBottom: "1px solid #24324a",
+              paddingBottom: 8,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: "#e2e8f0",
+              }}
+            >
+              {item.label}
             </div>
+            <div
+              style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+            >
+              {item.evidence_type} ·{" "}
+              {item.source_question_id || "no_question_ref"}
+            </div>
+            <div style={{ marginTop: 6 }}>
+              <span className={toneClass(item.status)}>
+                {prettyLabel(item.status)}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className={styles.empty}>No evidence preview available.</div>
+    )}
+  </div>
 
-            {selectedNodeEvidencePreview.length > 0 ? (
-              <div style={{ display: "grid", gap: 10 }}>
-                {selectedNodeEvidencePreview.map((item) => (
-                  <div
-                    key={item.evidence_id}
-                    style={{
-                      borderBottom: "1px solid #24324a",
-                      paddingBottom: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "#e2e8f0",
-                      }}
-                    >
-                      {item.label}
-                    </div>
-                    <div
-                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
-                    >
-                      {item.evidence_type} ·{" "}
-                      {item.source_question_id || "no_question_ref"}
-                    </div>
-                    <div style={{ marginTop: 6 }}>
-                      <span className={toneClass(item.status)}>
-                        {prettyLabel(item.status)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Dependency Reading
+    </div>
+
+    <Row label="Immediate Risk">
+      <span className={toneClass(selectedRepoNodeStatus)}>
+        {selectedRepoNodeStatus === "n/a"
+          ? "Unknown"
+          : prettyLabel(selectedRepoNodeStatus)}
+      </span>
+    </Row>
+
+    <Row label="Downstream Exposure">
+      <div style={{ color: "#94a3b8" }}>
+        {selectedNodeDependencies.length > 0
+          ? `${selectedNodeDependencies.length} structural relation(s) currently exposed to this node.`
+          : "No visible downstream structural propagation detected."}
+      </div>
+    </Row>
+
+    <Row label="Upstream Inputs">
+      <div style={{ color: "#94a3b8" }}>
+        {selectedNodeDependencies.length > 0
+          ? "This node is embedded in an active dependency chain."
+          : "No upstream dependency chain is currently visible."}
+      </div>
+    </Row>
+
+    <Row label="Unlock Potential">
+      <span
+        className={toneClass(
+          selectedNodeExecutionLinked || selectedNodeExecutionActions.length > 0
+            ? "high"
+            : "medium"
+        )}
+      >
+        {selectedNodeExecutionLinked || selectedNodeExecutionActions.length > 0
+          ? "High"
+          : "Medium"}
+      </span>
+    </Row>
+  </div>
+
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Upstream Inputs
+    </div>
+
+    {selectedNodeDependencies.filter(
+      (edge) => edge.to_node_id === selectedRepoNode?.node_id
+    ).length > 0 ? (
+      <div style={{ display: "grid", gap: 10 }}>
+        {selectedNodeDependencies
+          .filter((edge) => edge.to_node_id === selectedRepoNode?.node_id)
+          .slice(0, 6)
+          .map((edge) => (
+            <div
+              key={`upstream-${edge.edge_id}`}
+              style={{
+                borderBottom: "1px solid #24324a",
+                paddingBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#e2e8f0",
+                }}
+              >
+                {edge.relation}
               </div>
-            ) : (
-              <div className={styles.empty}>No evidence preview available.</div>
-            )}
-          </div>
-
-          <div style={sectionBlockStyle}>
-            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-              Node Dependencies
-            </div>
-
-            {selectedNodeDependencies.length > 0 ? (
-              <div style={{ display: "grid", gap: 10 }}>
-                {selectedNodeDependencies.slice(0, 6).map((edge) => (
-                  <div
-                    key={edge.edge_id}
-                    style={{
-                      borderBottom: "1px solid #24324a",
-                      paddingBottom: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "#e2e8f0",
-                      }}
-                    >
-                      {edge.relation}
-                    </div>
-                    <div
-                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
-                    >
-                      from: {edge.from_node_id}
-                    </div>
-                    <div style={{ fontSize: 12, color: "#94a3b8" }}>
-                      to: {edge.to_node_id}
-                    </div>
-                    <div style={{ marginTop: 6 }}>
-                      <span className={toneClass(edge.status || "planned")}>
-                        {prettyLabel(edge.status || "planned")}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+              <div
+                style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+              >
+                from: {edge.from_node_id}
               </div>
-            ) : (
-              <div className={styles.empty}>No dependency relations found.</div>
-            )}
-          </div>
-        </div>
+              <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                to: {edge.to_node_id}
+              </div>
+              <div style={{ marginTop: 6 }}>
+                <span className={toneClass(edge.status || "planned")}>
+                  {prettyLabel(edge.status || "planned")}
+                </span>
+              </div>
+            </div>
+          ))}
+      </div>
+    ) : (
+      <div className={styles.empty}>No upstream inputs found.</div>
+    )}
+  </div>
+
+  <div style={sectionBlockStyle}>
+    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+      Downstream Exposure
+    </div>
+
+    {selectedNodeDependencies.filter(
+      (edge) => edge.from_node_id === selectedRepoNode?.node_id
+    ).length > 0 ? (
+      <div style={{ display: "grid", gap: 10 }}>
+        {selectedNodeDependencies
+          .filter((edge) => edge.from_node_id === selectedRepoNode?.node_id)
+          .slice(0, 6)
+          .map((edge) => (
+            <div
+              key={`downstream-${edge.edge_id}`}
+              style={{
+                borderBottom: "1px solid #24324a",
+                paddingBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#e2e8f0",
+                }}
+              >
+                {edge.relation}
+              </div>
+              <div
+                style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+              >
+                from: {edge.from_node_id}
+              </div>
+              <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                to: {edge.to_node_id}
+              </div>
+              <div style={{ marginTop: 6 }}>
+                <span className={toneClass(edge.status || "planned")}>
+                  {prettyLabel(edge.status || "planned")}
+                </span>
+              </div>
+            </div>
+          ))}
+      </div>
+    ) : (
+      <div className={styles.empty}>No downstream exposure found.</div>
+    )}
+  </div>
+</div>
 
         <div style={{ display: "grid", gap: 18 }}>
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Mission Control
+            </div>
+
+            <Row label="Selected Node">
+              {selectedRepoNode?.node_label || "n/a"}
+            </Row>
+
+            <Row label="Execution Exposure">
+              <span
+                className={toneClass(
+                  selectedNodeExecutionLinked ? "active" : "pending"
+                )}
+              >
+                {selectedNodeExecutionLinked ? "Program Linked" : "Outside Path"}
+              </span>
+            </Row>
+
+            <Row label="Primary Focus">
+              {criticalFocusDomain?.domain_label || "n/a"}
+            </Row>
+
+            <Row label="Root Stability">
+              <span className={toneClass(twinStructure.root.state_label)}>
+                {prettyLabel(twinStructure.root.state_label)}
+              </span>
+            </Row>
+            <Row label="Node Severity">
+              <span className={toneClass(selectedRepoNodeStatus)}>
+                {selectedRepoNodeStatus === "n/a"
+                 ? "Unknown"
+                 : prettyLabel(selectedRepoNodeStatus)}
+              </span>
+            </Row>
+          </div>
+
           <div style={sectionBlockStyle}>
             <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
               System Reading
@@ -4798,75 +5634,60 @@ function autofillSimulation() {
           </div>
 
           <div style={sectionBlockStyle}>
-            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-              Execution Relevance
-            </div>
-            <Row label="Linked to Program">
-              <span
-                className={toneClass(
-                  selectedNodeExecutionLinked ? "active" : "pending"
-                )}
-              >
-                {selectedNodeExecutionLinked ? "Yes" : "No"}
-              </span>
-            </Row>
-            <Row label="Action Count">
-              {String(selectedNodeExecutionActions.length)}
-            </Row>
-            <Row label="Priority">
-              <span
-                className={toneClass(
-                  crcpProgram?.recommended_priority || "planned"
-                )}
-              >
-                {crcpProgram?.recommended_priority || "n/a"}
-              </span>
-            </Row>
-            <Row label="Execution Status">
-              <span
-                className={toneClass(
-                  selectedNodeExecutionLinked ? "active" : "pending"
-                )}
-              >
-                {selectedNodeExecutionLinked
-                  ? "program_linked"
-                  : "not_linked"}
-              </span>
-            </Row>
+  <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+    Intervention Sequence
+  </div>
 
-            {selectedNodeExecutionActions.length > 0 ? (
-              <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
-                {selectedNodeExecutionActions.slice(0, 4).map((action) => (
-                  <div
-                    key={action.action_id}
-                    style={{
-                      borderBottom: "1px solid #24324a",
-                      paddingBottom: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "#e2e8f0",
-                      }}
-                    >
-                      {action.title}
-                    </div>
-                    <div
-                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
-                    >
-                      {prettyLabel(action.phase)} · {prettyLabel(action.domain)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className={styles.empty} style={{ marginTop: 10 }}>
-                No linked program actions.
-              </div>
-            )}
-          </div>
+  <Row label="Current Action">
+    {selectedNodeSequence.currentAction}
+  </Row>
+
+  <Row label="Next Action">
+    {selectedNodeSequence.nextAction}
+  </Row>
+
+  <Row label="Next Structural Target">
+    <div style={{ color: "#94a3b8", wordBreak: "break-word" }}>
+      {selectedNodeSequence.nextStructuralTarget}
+    </div>
+  </Row>
+
+  <Row label="Execution Route">
+    <div style={{ color: "#94a3b8" }}>
+      {selectedNodeSequence.executionRoute}
+    </div>
+  </Row>
+</div>
+
+<div style={sectionBlockStyle}>
+  <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+    Consequence Forecast
+  </div>
+
+  <Row label="If Ignored">
+    <div style={{ color: "#94a3b8" }}>
+      {selectedNodeForecast.ifIgnored}
+    </div>
+  </Row>
+
+  <Row label="If Stabilized">
+    <div style={{ color: "#94a3b8" }}>
+      {selectedNodeForecast.ifStabilized}
+    </div>
+  </Row>
+
+  <Row label="Likely Propagation">
+    <div style={{ color: "#94a3b8" }}>
+      {selectedNodeForecast.propagation}
+    </div>
+  </Row>
+
+  <Row label="Recommendation">
+    <div style={{ color: "#94a3b8" }}>
+      {selectedNodeForecast.recommendation}
+    </div>
+  </Row>
+</div>
 
           <div style={sectionBlockStyle}>
             <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>

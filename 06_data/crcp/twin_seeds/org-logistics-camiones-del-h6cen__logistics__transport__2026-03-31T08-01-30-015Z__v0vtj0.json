@@ -1,0 +1,62 @@
+{
+  "twin_seed_id": "twin_seed::org-logistics-camiones-del-h6cen::logistics::transport::2026-03-31T08-01-30-033Z",
+  "context": {
+    "organization_id": "org-logistics-camiones-del-h6cen",
+    "sector": "logistics",
+    "subsector": "transport",
+    "country": "PE",
+    "city": "Arequipa"
+  },
+  "baseline_state": {
+    "state_label": "fragile",
+    "scores": {
+      "operational_maturity": 48.6,
+      "financial_pressure": 24.9,
+      "reporting_reliability": 54.46,
+      "structural_risk": 51.78,
+      "commercial_strength": 62.5
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "MEDIUM",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "MEDIUM",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "CRITICAL",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "MEDIUM",
+      "source_metric": "structural_risk"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "HIGH"
+    }
+  ],
+  "structural_hypothesis": "The client is operating with weak reporting visibility, which is likely obscuring operational and financial control gaps. Until visibility becomes reliable, downstream scores should be treated as structurally constrained rather than fully trustworthy.",
+  "created_at": "2026-03-31T08:01:30.033Z"
+}
