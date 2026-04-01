@@ -1,0 +1,85 @@
+{
+  "twin_seed_id": "twin_seed::org-education-colegio-cope-f2x7c::education::training_center::2026-04-01T08-22-41-497Z",
+  "context": {
+    "organization_id": "org-education-colegio-cope-f2x7c",
+    "sector": "education",
+    "subsector": "training_center",
+    "country": "MX",
+    "city": "Guadalajara"
+  },
+  "baseline_state": {
+    "state_label": "critical",
+    "scores": {
+      "operational_maturity": 37.9,
+      "financial_pressure": 39.93,
+      "reporting_reliability": 34.86,
+      "structural_risk": 33.17,
+      "commercial_strength": 28.12
+    }
+  },
+  "active_signals": [
+    {
+      "code": "reporting_gap_signal",
+      "severity": "CRITICAL",
+      "source_metric": "reporting_reliability"
+    },
+    {
+      "code": "operational_instability_signal",
+      "severity": "HIGH",
+      "source_metric": "operational_maturity"
+    },
+    {
+      "code": "financial_stress_signal",
+      "severity": "HIGH",
+      "source_metric": "financial_pressure"
+    },
+    {
+      "code": "structural_fragility_signal",
+      "severity": "CRITICAL",
+      "source_metric": "structural_risk"
+    },
+    {
+      "code": "commercial_weakness_signal",
+      "severity": "CRITICAL",
+      "source_metric": "commercial_strength"
+    },
+    {
+      "code": "visibility_risk_compound_signal",
+      "severity": "CRITICAL",
+      "source_metric": "compound_visibility_structural"
+    },
+    {
+      "code": "multi_domain_fragility_signal",
+      "severity": "CRITICAL",
+      "source_metric": "compound_multi_domain"
+    }
+  ],
+  "active_constraints": [
+    {
+      "code": "reporting_visibility_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "structural_fragility_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "financial_control_constraint",
+      "severity": "HIGH"
+    },
+    {
+      "code": "execution_standardization_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "commercial_instability_constraint",
+      "severity": "CRITICAL"
+    },
+    {
+      "code": "visibility_structural_compound_constraint",
+      "severity": "CRITICAL"
+    }
+  ],
+  "structural_hypothesis": "The client is showing multi-domain fragility across visibility, structure, and financial control. This suggests the business is not facing an isolated weakness, but a systemic degradation pattern in which multiple control layers are deteriorating at the same time.",
+  "created_at": "2026-04-01T08:22:41.497Z"
+}

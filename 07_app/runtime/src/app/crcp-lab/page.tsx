@@ -4929,9 +4929,9 @@ function autofillSimulation() {
                 </section>
 
                <section className={`${styles.card} ${styles.fullWidth}`}>
-  <h2 className={styles.cardTitle}>Block D15 — Repository Runtime</h2>
+  <h2 className={styles.cardTitle}>Block D15 — Digital Twin Structure Navigator</h2>
   <div className={styles.meta}>
-    primary navigable structural interface for the true digital twin
+    true digital twin structural navigation surface
   </div>
 
   {twinStructure ? (
@@ -5137,68 +5137,221 @@ function autofillSimulation() {
         style={{
           display: "grid",
           gridTemplateColumns:
-            "minmax(260px, 0.8fr) minmax(420px, 1.25fr) minmax(340px, 0.75fr)",
+            "minmax(420px, 1.18fr) minmax(360px, 0.98fr) minmax(270px, 0.72fr)",
           gap: 18,
           marginTop: 18,
+          alignItems: "start",
         }}
       >
-        <div style={sectionBlockStyle}>
-          <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-            Runtime Repository
-            <div
+        <div
+          style={{
+            ...sectionBlockStyle,
+            alignSelf: "stretch",
+            minHeight: 980,
+            background:
+              "linear-gradient(180deg, rgba(15,23,42,0.96) 0%, rgba(24,34,53,0.98) 100%)",
+            border: "1px solid #2f3f5c",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+          }}
+        >
+          <div
   style={{
-    display: "flex",
-    gap: 8,
-    flexWrap: "wrap",
-    marginBottom: 12,
+    display: "grid",
+    gap: 10,
+    marginBottom: 14,
+    paddingBottom: 12,
+    borderBottom: "1px solid #24324a",
   }}
 >
-  {[
-    ["all", "All"],
-    ["critical", "Critical"],
-    ["program_linked", "Program Linked"],
-    ["uncovered", "Uncovered"],
-    ["evidence_poor", "Evidence Poor"],
-  ].map(([value, label]) => {
-    const active = repoPriorityFilter === value;
+  <div>
+    <div
+      style={{
+        fontSize: 15,
+        fontWeight: 800,
+        color: "#f8fafc",
+        marginBottom: 4,
+        letterSpacing: 0.2,
+      }}
+    >
+      Digital Twin Structure Navigator
+    </div>
 
-    return (
-      <button
-        key={value}
-        type="button"
-        onClick={() =>
-          setRepoPriorityFilter(
-            value as
-              | "all"
-              | "critical"
-              | "program_linked"
-              | "uncovered"
-              | "evidence_poor"
-          )
-        }
-        style={{
-          ...actionButtonBaseStyle,
-          padding: "6px 10px",
-          fontSize: 12,
-          background: active ? "#1e293b" : "#0f172a",
-          cursor: "pointer",
-        }}
-      >
-        {label}
-      </button>
-    );
-  })}
+    <div
+      style={{
+        fontSize: 11,
+        color: "#94a3b8",
+        letterSpacing: 0.5,
+        textTransform: "uppercase",
+      }}
+    >
+      True Digital Twin · Structural Navigation Surface
+    </div>
+  </div>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+      gap: 8,
+    }}
+  >
+    <div
+      style={{
+        background: "#0f172a",
+        border: "1px solid #22314a",
+        borderRadius: 10,
+        padding: "8px 10px",
+      }}
+    >
+      <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
+        Visible Nodes
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 800, color: "#e2e8f0" }}>
+        {repoTree ? "Live" : "0"}
+      </div>
+    </div>
+
+    <div
+      style={{
+        background: "#0f172a",
+        border: "1px solid #22314a",
+        borderRadius: 10,
+        padding: "8px 10px",
+      }}
+    >
+      <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
+        Domains
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 800, color: "#e2e8f0" }}>
+        {twinStructure.domains.length}
+      </div>
+    </div>
+
+    <div
+      style={{
+        background: "#0f172a",
+        border: "1px solid #22314a",
+        borderRadius: 10,
+        padding: "8px 10px",
+      }}
+    >
+      <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
+        Roles
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 800, color: "#e2e8f0" }}>
+        {twinStructure.roles.length}
+      </div>
+    </div>
+
+    <div
+      style={{
+        background: "#0f172a",
+        border: "1px solid #22314a",
+        borderRadius: 10,
+        padding: "8px 10px",
+      }}
+    >
+      <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
+        Dependencies
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 800, color: "#e2e8f0" }}>
+        {twinStructure.dependencies.length}
+      </div>
+    </div>
+  </div>
 </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              flexWrap: "wrap",
+              marginBottom: 10,
+              paddingBottom: 12,
+              borderBottom: "1px solid #22314a",
+            }}
+          >
+            {[
+              ["all", "All"],
+              ["critical", "Critical"],
+              ["program_linked", "Program Linked"],
+              ["uncovered", "Uncovered"],
+              ["evidence_poor", "Evidence Poor"],
+            ].map(([value, label]) => {
+              const active = repoPriorityFilter === value;
+
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() =>
+                    setRepoPriorityFilter(
+                      value as
+                        | "all"
+                        | "critical"
+                        | "program_linked"
+                        | "uncovered"
+                        | "evidence_poor"
+                    )
+                  }
+                  style={{
+                    ...actionButtonBaseStyle,
+                    padding: "6px 10px",
+                    fontSize: 12,
+                    background: active ? "#1e293b" : "#0f172a",
+                    cursor: "pointer",
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
+
+          <div
+  style={{
+    display: "flex",
+    gap: 12,
+    flexWrap: "wrap",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 14,
+    fontSize: 11,
+    color: "#94a3b8",
+  }}
+>
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <span className={toneClass("critical")} style={{ fontSize: 10, padding: "2px 6px" }}>
+      C
+    </span>
+    <span>Critical</span>
+  </div>
+
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <span className={toneClass("active")} style={{ fontSize: 10, padding: "2px 6px" }}>
+      P
+    </span>
+    <span>Program Linked</span>
+  </div>
+
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <span className={toneClass("pending")} style={{ fontSize: 10, padding: "2px 6px" }}>
+      E
+    </span>
+    <span>Evidence Poor</span>
+  </div>
+</div>
 
           {repoTree ? (
             <div
               style={{
                 display: "grid",
-                gap: 6,
-                maxHeight: 720,
-                overflowY: "auto",
-                paddingRight: 4,
+                gap: 8,
+                maxHeight: "none",
+                overflowY: "visible",
+                paddingRight: 6,
+                paddingBottom: 12,
+                paddingTop: 2,
               }}
             >
               {renderRepoTreeNode(repoTree)}
@@ -5209,354 +5362,361 @@ function autofillSimulation() {
         </div>
 
         <div style={{ display: "grid", gap: 18 }}>
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Priority Signal
-    </div>
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Priority Signal
+            </div>
 
-    <Row label="Priority">
-      <span className={toneClass(selectedNodePrioritySignal.priority_label)}>
-        {selectedNodePrioritySignal.priority_label}
-      </span>
-    </Row>
-
-    <Row label="Coverage">
-      <span
-        className={toneClass(
-          selectedNodePrioritySignal.coverage_state === "covered"
-            ? "active"
-            : "pending"
-        )}
-      >
-        {prettyLabel(selectedNodePrioritySignal.coverage_state)}
-      </span>
-    </Row>
-
-    <Row label="Structural Urgency">
-      <span className={toneClass(selectedNodePrioritySignal.structural_urgency)}>
-        {prettyLabel(selectedNodePrioritySignal.structural_urgency)}
-      </span>
-    </Row>
-
-    <Row label="Cascade Risk">
-      <span className={toneClass(selectedNodePrioritySignal.cascade_risk)}>
-        {prettyLabel(selectedNodePrioritySignal.cascade_risk)}
-      </span>
-    </Row>
-
-    <Row label="Operator Command">
-      <div style={{ fontWeight: 800, color: "#e2e8f0" }}>
-        {selectedNodePrioritySignal.operator_command}
-      </div>
-    </Row>
-  </div>
-
-  <div
-    style={{
-      ...sectionBlockStyle,
-      border: "1px solid #3b82f6",
-      boxShadow: "0 0 0 1px rgba(59,130,246,0.15) inset",
-    }}
-  >
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Node Directive
-    </div>
-
-    <Row label="Directive">
-      <div style={{ fontWeight: 800, color: "#f8fafc", fontSize: 18, lineHeight: 1.3 }}>
-        {selectedNodeDirective.directive}
-      </div>
-    </Row>
-
-    <Row label="Why It Matters">
-      <div style={{ color: "#94a3b8" }}>
-        {selectedNodeDirective.why_it_matters}
-      </div>
-    </Row>
-
-    <Row label="Next Move">
-      <div style={{ color: "#94a3b8" }}>
-        {selectedNodeDirective.next_move}
-      </div>
-    </Row>
-  </div>
-
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Selected Node
-    </div>
-
-    {selectedRepoNode ? (
-      <>
-        <Row label="Node">{selectedRepoNode.node_label}</Row>
-        <Row label="Type">{prettyLabel(selectedRepoNode.node_type)}</Row>
-        <Row label="Status">
-          <span className={toneClass(selectedRepoNodeStatus)}>
-            {prettyLabel(selectedRepoNodeStatus)}
-          </span>
-        </Row>
-        <Row label="Node ID">{selectedRepoNode.node_id}</Row>
-        <Row label="Score">{selectedRepoNodeScore}</Row>
-        <Row label="Evidence Count">
-          {String(selectedRepoNodeEvidenceCount)}
-        </Row>
-        <Row label="Dependencies">
-          {String(selectedNodeDependencies.length)}
-        </Row>
-        <Row label="Execution Linked">
-          <span
-            className={toneClass(
-              selectedNodeExecutionLinked ? "active" : "pending"
-            )}
-          >
-            {selectedNodeExecutionLinked ? "Yes" : "No"}
-          </span>
-        </Row>
-
-        {selectedDomainNode ? (
-          <>
-            <Row label="Owner Role">
-              {selectedDomainNode.owner_role_id || "n/a"}
+            <Row label="Priority">
+              <span className={toneClass(selectedNodePrioritySignal.priority_label)}>
+                {selectedNodePrioritySignal.priority_label}
+              </span>
             </Row>
-            <Row label="Summary">
-              {selectedDomainNode.summary || "n/a"}
+
+            <Row label="Coverage">
+              <span
+                className={toneClass(
+                  selectedNodePrioritySignal.coverage_state === "covered"
+                    ? "active"
+                    : "pending"
+                )}
+              >
+                {prettyLabel(selectedNodePrioritySignal.coverage_state)}
+              </span>
             </Row>
-          </>
-        ) : null}
 
-        {selectedRoleNode ? (
-          <>
-            <Row label="Domain">
-              {selectedRoleNode.domain_id || "n/a"}
+            <Row label="Structural Urgency">
+              <span className={toneClass(selectedNodePrioritySignal.structural_urgency)}>
+                {prettyLabel(selectedNodePrioritySignal.structural_urgency)}
+              </span>
             </Row>
-            <Row label="Responsibility">
-              {selectedRoleNode.responsibility_summary || "n/a"}
+
+            <Row label="Cascade Risk">
+              <span className={toneClass(selectedNodePrioritySignal.cascade_risk)}>
+                {prettyLabel(selectedNodePrioritySignal.cascade_risk)}
+              </span>
             </Row>
-          </>
-        ) : null}
-      </>
-    ) : (
-      <div className={styles.empty}>No node selected.</div>
-    )}
-  </div>
 
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Node Reading
-    </div>
+            <Row label="Operator Command">
+              <div style={{ fontWeight: 800, color: "#e2e8f0" }}>
+                {selectedNodePrioritySignal.operator_command}
+              </div>
+            </Row>
+          </div>
 
-    <Row label="Summary">{selectedNodeInterpretation.summary}</Row>
-
-    <Row label="Actionability">
-      <span className={toneClass(selectedNodeInterpretation.actionability)}>
-        {prettyLabel(selectedNodeInterpretation.actionability)}
-      </span>
-    </Row>
-
-    <Row label="Risk Band">
-      <span className={toneClass(selectedNodeRiskBand)}>
-        {prettyLabel(selectedNodeRiskBand)}
-      </span>
-    </Row>
-
-    <Row label="System Type">
-      {prettyLabel(selectedNodeSystemType)}
-    </Row>
-
-    <Row label="Recommended Reading">
-      <div style={{ color: "#94a3b8" }}>
-        {selectedNodeInterpretation.recommended_reading}
-      </div>
-    </Row>
-  </div>
-
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Node Evidence Preview
-    </div>
-
-    {selectedNodeEvidencePreview.length > 0 ? (
-      <div style={{ display: "grid", gap: 10 }}>
-        {selectedNodeEvidencePreview.map((item) => (
           <div
-            key={item.evidence_id}
             style={{
-              borderBottom: "1px solid #24324a",
-              paddingBottom: 8,
+              ...sectionBlockStyle,
+              border: "1px solid #3b82f6",
+              boxShadow: "0 0 0 1px rgba(59,130,246,0.15) inset",
             }}
           >
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#e2e8f0",
-              }}
-            >
-              {item.label}
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Node Directive
             </div>
-            <div
-              style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
-            >
-              {item.evidence_type} ·{" "}
-              {item.source_question_id || "no_question_ref"}
-            </div>
-            <div style={{ marginTop: 6 }}>
-              <span className={toneClass(item.status)}>
-                {prettyLabel(item.status)}
-              </span>
-            </div>
+
+            <Row label="Directive">
+              <div
+                style={{
+                  fontWeight: 800,
+                  color: "#f8fafc",
+                  fontSize: 18,
+                  lineHeight: 1.3,
+                }}
+              >
+                {selectedNodeDirective.directive}
+              </div>
+            </Row>
+
+            <Row label="Why It Matters">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeDirective.why_it_matters}
+              </div>
+            </Row>
+
+            <Row label="Next Move">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeDirective.next_move}
+              </div>
+            </Row>
           </div>
-        ))}
-      </div>
-    ) : (
-      <div className={styles.empty}>No evidence preview available.</div>
-    )}
-  </div>
 
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Dependency Reading
-    </div>
-
-    <Row label="Immediate Risk">
-      <span className={toneClass(selectedRepoNodeStatus)}>
-        {selectedRepoNodeStatus === "n/a"
-          ? "Unknown"
-          : prettyLabel(selectedRepoNodeStatus)}
-      </span>
-    </Row>
-
-    <Row label="Downstream Exposure">
-      <div style={{ color: "#94a3b8" }}>
-        {selectedNodeDependencies.length > 0
-          ? `${selectedNodeDependencies.length} structural relation(s) currently exposed to this node.`
-          : "No visible downstream structural propagation detected."}
-      </div>
-    </Row>
-
-    <Row label="Upstream Inputs">
-      <div style={{ color: "#94a3b8" }}>
-        {selectedNodeDependencies.length > 0
-          ? "This node is embedded in an active dependency chain."
-          : "No upstream dependency chain is currently visible."}
-      </div>
-    </Row>
-
-    <Row label="Unlock Potential">
-      <span
-        className={toneClass(
-          selectedNodeExecutionLinked || selectedNodeExecutionActions.length > 0
-            ? "high"
-            : "medium"
-        )}
-      >
-        {selectedNodeExecutionLinked || selectedNodeExecutionActions.length > 0
-          ? "High"
-          : "Medium"}
-      </span>
-    </Row>
-  </div>
-
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Upstream Inputs
-    </div>
-
-    {selectedNodeDependencies.filter(
-      (edge) => edge.to_node_id === selectedRepoNode?.node_id
-    ).length > 0 ? (
-      <div style={{ display: "grid", gap: 10 }}>
-        {selectedNodeDependencies
-          .filter((edge) => edge.to_node_id === selectedRepoNode?.node_id)
-          .slice(0, 6)
-          .map((edge) => (
-            <div
-              key={`upstream-${edge.edge_id}`}
-              style={{
-                borderBottom: "1px solid #24324a",
-                paddingBottom: 8,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: "#e2e8f0",
-                }}
-              >
-                {edge.relation}
-              </div>
-              <div
-                style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
-              >
-                from: {edge.from_node_id}
-              </div>
-              <div style={{ fontSize: 12, color: "#94a3b8" }}>
-                to: {edge.to_node_id}
-              </div>
-              <div style={{ marginTop: 6 }}>
-                <span className={toneClass(edge.status || "planned")}>
-                  {prettyLabel(edge.status || "planned")}
-                </span>
-              </div>
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Selected Node
             </div>
-          ))}
-      </div>
-    ) : (
-      <div className={styles.empty}>No upstream inputs found.</div>
-    )}
-  </div>
 
-  <div style={sectionBlockStyle}>
-    <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-      Downstream Exposure
-    </div>
+            {selectedRepoNode ? (
+              <>
+                <Row label="Node">{selectedRepoNode.node_label}</Row>
+                <Row label="Type">{prettyLabel(selectedRepoNode.node_type)}</Row>
+                <Row label="Status">
+                  <span className={toneClass(selectedRepoNodeStatus)}>
+                    {prettyLabel(selectedRepoNodeStatus)}
+                  </span>
+                </Row>
+                <Row label="Node ID">{selectedRepoNode.node_id}</Row>
+                <Row label="Score">{selectedRepoNodeScore}</Row>
+                <Row label="Evidence Count">
+                  {String(selectedRepoNodeEvidenceCount)}
+                </Row>
+                <Row label="Dependencies">
+                  {String(selectedNodeDependencies.length)}
+                </Row>
+                <Row label="Execution Linked">
+                  <span
+                    className={toneClass(
+                      selectedNodeExecutionLinked ? "active" : "pending"
+                    )}
+                  >
+                    {selectedNodeExecutionLinked ? "Yes" : "No"}
+                  </span>
+                </Row>
 
-    {selectedNodeDependencies.filter(
-      (edge) => edge.from_node_id === selectedRepoNode?.node_id
-    ).length > 0 ? (
-      <div style={{ display: "grid", gap: 10 }}>
-        {selectedNodeDependencies
-          .filter((edge) => edge.from_node_id === selectedRepoNode?.node_id)
-          .slice(0, 6)
-          .map((edge) => (
-            <div
-              key={`downstream-${edge.edge_id}`}
-              style={{
-                borderBottom: "1px solid #24324a",
-                paddingBottom: 8,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: "#e2e8f0",
-                }}
-              >
-                {edge.relation}
-              </div>
-              <div
-                style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
-              >
-                from: {edge.from_node_id}
-              </div>
-              <div style={{ fontSize: 12, color: "#94a3b8" }}>
-                to: {edge.to_node_id}
-              </div>
-              <div style={{ marginTop: 6 }}>
-                <span className={toneClass(edge.status || "planned")}>
-                  {prettyLabel(edge.status || "planned")}
-                </span>
-              </div>
+                {selectedDomainNode ? (
+                  <>
+                    <Row label="Owner Role">
+                      {selectedDomainNode.owner_role_id || "n/a"}
+                    </Row>
+                    <Row label="Summary">
+                      {selectedDomainNode.summary || "n/a"}
+                    </Row>
+                  </>
+                ) : null}
+
+                {selectedRoleNode ? (
+                  <>
+                    <Row label="Domain">
+                      {selectedRoleNode.domain_id || "n/a"}
+                    </Row>
+                    <Row label="Responsibility">
+                      {selectedRoleNode.responsibility_summary || "n/a"}
+                    </Row>
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <div className={styles.empty}>No node selected.</div>
+            )}
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Node Reading
             </div>
-          ))}
-      </div>
-    ) : (
-      <div className={styles.empty}>No downstream exposure found.</div>
-    )}
-  </div>
-</div>
+
+            <Row label="Summary">{selectedNodeInterpretation.summary}</Row>
+
+            <Row label="Actionability">
+              <span className={toneClass(selectedNodeInterpretation.actionability)}>
+                {prettyLabel(selectedNodeInterpretation.actionability)}
+              </span>
+            </Row>
+
+            <Row label="Risk Band">
+              <span className={toneClass(selectedNodeRiskBand)}>
+                {prettyLabel(selectedNodeRiskBand)}
+              </span>
+            </Row>
+
+            <Row label="System Type">
+              {prettyLabel(selectedNodeSystemType)}
+            </Row>
+
+            <Row label="Recommended Reading">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeInterpretation.recommended_reading}
+              </div>
+            </Row>
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Node Evidence Preview
+            </div>
+
+            {selectedNodeEvidencePreview.length > 0 ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                {selectedNodeEvidencePreview.map((item) => (
+                  <div
+                    key={item.evidence_id}
+                    style={{
+                      borderBottom: "1px solid #24324a",
+                      paddingBottom: 8,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#e2e8f0",
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                    <div
+                      style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+                    >
+                      {item.evidence_type} ·{" "}
+                      {item.source_question_id || "no_question_ref"}
+                    </div>
+                    <div style={{ marginTop: 6 }}>
+                      <span className={toneClass(item.status)}>
+                        {prettyLabel(item.status)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.empty}>No evidence preview available.</div>
+            )}
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Dependency Reading
+            </div>
+
+            <Row label="Immediate Risk">
+              <span className={toneClass(selectedRepoNodeStatus)}>
+                {selectedRepoNodeStatus === "n/a"
+                  ? "Unknown"
+                  : prettyLabel(selectedRepoNodeStatus)}
+              </span>
+            </Row>
+
+            <Row label="Downstream Exposure">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeDependencies.length > 0
+                  ? `${selectedNodeDependencies.length} structural relation(s) currently exposed to this node.`
+                  : "No visible downstream structural propagation detected."}
+              </div>
+            </Row>
+
+            <Row label="Upstream Inputs">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeDependencies.length > 0
+                  ? "This node is embedded in an active dependency chain."
+                  : "No upstream dependency chain is currently visible."}
+              </div>
+            </Row>
+
+            <Row label="Unlock Potential">
+              <span
+                className={toneClass(
+                  selectedNodeExecutionLinked || selectedNodeExecutionActions.length > 0
+                    ? "high"
+                    : "medium"
+                )}
+              >
+                {selectedNodeExecutionLinked || selectedNodeExecutionActions.length > 0
+                  ? "High"
+                  : "Medium"}
+              </span>
+            </Row>
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Upstream Inputs
+            </div>
+
+            {selectedNodeDependencies.filter(
+              (edge) => edge.to_node_id === selectedRepoNode?.node_id
+            ).length > 0 ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                {selectedNodeDependencies
+                  .filter((edge) => edge.to_node_id === selectedRepoNode?.node_id)
+                  .slice(0, 6)
+                  .map((edge) => (
+                    <div
+                      key={`upstream-${edge.edge_id}`}
+                      style={{
+                        borderBottom: "1px solid #24324a",
+                        paddingBottom: 8,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: "#e2e8f0",
+                        }}
+                      >
+                        {edge.relation}
+                      </div>
+                      <div
+                        style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+                      >
+                        from: {edge.from_node_id}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                        to: {edge.to_node_id}
+                      </div>
+                      <div style={{ marginTop: 6 }}>
+                        <span className={toneClass(edge.status || "planned")}>
+                          {prettyLabel(edge.status || "planned")}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className={styles.empty}>No upstream inputs found.</div>
+            )}
+          </div>
+
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Downstream Exposure
+            </div>
+
+            {selectedNodeDependencies.filter(
+              (edge) => edge.from_node_id === selectedRepoNode?.node_id
+            ).length > 0 ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                {selectedNodeDependencies
+                  .filter((edge) => edge.from_node_id === selectedRepoNode?.node_id)
+                  .slice(0, 6)
+                  .map((edge) => (
+                    <div
+                      key={`downstream-${edge.edge_id}`}
+                      style={{
+                        borderBottom: "1px solid #24324a",
+                        paddingBottom: 8,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: "#e2e8f0",
+                        }}
+                      >
+                        {edge.relation}
+                      </div>
+                      <div
+                        style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}
+                      >
+                        from: {edge.from_node_id}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                        to: {edge.to_node_id}
+                      </div>
+                      <div style={{ marginTop: 6 }}>
+                        <span className={toneClass(edge.status || "planned")}>
+                          {prettyLabel(edge.status || "planned")}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className={styles.empty}>No downstream exposure found.</div>
+            )}
+          </div>
+        </div>
 
         <div style={{ display: "grid", gap: 18 }}>
           <div style={sectionBlockStyle}>
@@ -5590,8 +5750,8 @@ function autofillSimulation() {
             <Row label="Node Severity">
               <span className={toneClass(selectedRepoNodeStatus)}>
                 {selectedRepoNodeStatus === "n/a"
-                 ? "Unknown"
-                 : prettyLabel(selectedRepoNodeStatus)}
+                  ? "Unknown"
+                  : prettyLabel(selectedRepoNodeStatus)}
               </span>
             </Row>
           </div>
@@ -5634,68 +5794,70 @@ function autofillSimulation() {
           </div>
 
           <div style={sectionBlockStyle}>
-  <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-    Intervention Sequence
-  </div>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Intervention Sequence
+            </div>
 
-  <Row label="Current Action">
-    {selectedNodeSequence.currentAction}
-  </Row>
+            <Row label="Current Action">
+              {selectedNodeSequence.currentAction}
+            </Row>
 
-  <Row label="Next Action">
-    {selectedNodeSequence.nextAction}
-  </Row>
+            <Row label="Next Action">
+              {selectedNodeSequence.nextAction}
+            </Row>
 
-  <Row label="Next Structural Target">
-    <div style={{ color: "#94a3b8", wordBreak: "break-word" }}>
-      {selectedNodeSequence.nextStructuralTarget}
-    </div>
-  </Row>
+            <Row label="Next Structural Target">
+              <div style={{ color: "#94a3b8", wordBreak: "break-word" }}>
+                {selectedNodeSequence.nextStructuralTarget}
+              </div>
+            </Row>
 
-  <Row label="Execution Route">
-    <div style={{ color: "#94a3b8" }}>
-      {selectedNodeSequence.executionRoute}
-    </div>
-  </Row>
-</div>
+            <Row label="Execution Route">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeSequence.executionRoute}
+              </div>
+            </Row>
+          </div>
 
-<div style={sectionBlockStyle}>
-  <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
-    Consequence Forecast
-  </div>
+          <div style={sectionBlockStyle}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
+              Consequence Forecast
+            </div>
 
-  <Row label="If Ignored">
-    <div style={{ color: "#94a3b8" }}>
-      {selectedNodeForecast.ifIgnored}
-    </div>
-  </Row>
+            <Row label="If Ignored">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeForecast.ifIgnored}
+              </div>
+            </Row>
 
-  <Row label="If Stabilized">
-    <div style={{ color: "#94a3b8" }}>
-      {selectedNodeForecast.ifStabilized}
-    </div>
-  </Row>
+            <Row label="If Stabilized">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeForecast.ifStabilized}
+              </div>
+            </Row>
 
-  <Row label="Likely Propagation">
-    <div style={{ color: "#94a3b8" }}>
-      {selectedNodeForecast.propagation}
-    </div>
-  </Row>
+            <Row label="Likely Propagation">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeForecast.propagation}
+              </div>
+            </Row>
 
-  <Row label="Recommendation">
-    <div style={{ color: "#94a3b8" }}>
-      {selectedNodeForecast.recommendation}
-    </div>
-  </Row>
-</div>
+            <Row label="Recommendation">
+              <div style={{ color: "#94a3b8" }}>
+                {selectedNodeForecast.recommendation}
+              </div>
+            </Row>
+          </div>
 
           <div style={sectionBlockStyle}>
             <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 10 }}>
               Execution Surface
             </div>
+
             <Row label="Program">
               {crcpProgram?.program_label || "n/a"}
             </Row>
+
             <Row label="Priority">
               <span
                 className={toneClass(
@@ -5705,6 +5867,7 @@ function autofillSimulation() {
                 {crcpProgram?.recommended_priority || "n/a"}
               </span>
             </Row>
+
             <Row label="Operational Meaning">
               <div style={{ color: "#94a3b8" }}>
                 {selectedNodeExecutionLinked
@@ -5712,11 +5875,13 @@ function autofillSimulation() {
                   : "This node is currently outside the direct execution path."}
               </div>
             </Row>
+
             <Row label="Phase">
               <span className={toneClass(crcpProgram?.current_phase || "planned")}>
                 {prettyLabel(crcpProgram?.current_phase || "planned")}
               </span>
             </Row>
+
             <Row label="Progress">{executionProgressPercent}%</Row>
           </div>
         </div>
