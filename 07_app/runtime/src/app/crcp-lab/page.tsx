@@ -2109,6 +2109,23 @@ function toggleRepoNode(nodeId: string) {
   }));
 }
 
+function isPrimaryRepoSection(node: RepoTreeNode): boolean {
+  return [
+    "root_folder",
+    "domains_folder",
+    "roles_folder",
+    "evidence_folder",
+    "execution_folder",
+    "automation_folder",
+    "finance_folder",
+    "commercial_folder",
+    "activation_folder",
+    "simulation_folder",
+    "lineage_folder",
+    "governance_folder",
+  ].includes(node.id);
+}
+
 const repoTree = useMemo<RepoTreeNode | null>(() => {
   if (!twinStructure) return null;
 
@@ -2281,6 +2298,7 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
   const isFolder = node.node_type === "folder";
   const isExpanded = expandedRepoNodes[node.id] ?? false;
   const isSelected = selectedRepoNode?.node_id === node.id;
+  const isPrimarySection = isPrimaryRepoSection(node);
   const nodeStatus = getRepoNodeStatus(node);
   const toneStyle = getRepoNodeTone(nodeStatus);
     const nodeMarkers = getRepoNodeMarkers(node, twinStructure, crcpProgram);
@@ -2300,12 +2318,16 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
 
   return (
     <div key={node.id} style={{ display: "grid", gap: 4 }}>
-      <div
+            <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 8,
           marginLeft: indent,
+          marginTop: isPrimarySection ? 10 : 0,
+          paddingTop: isPrimarySection ? 6 : 0,
+          paddingBottom: isPrimarySection ? 4 : 0,
+          borderTop: isPrimarySection ? "1px solid #22314a" : "none",
           ...toneStyle,
         }}
       >
@@ -2329,7 +2351,7 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
         )}
 
                 <div style={{ display: "flex", alignItems: "center", gap: 6, width: "100%" }}>
-          <button
+                    <button
             type="button"
             onClick={() => {
               if (!node.selectable) return;
@@ -2342,18 +2364,31 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
               });
             }}
             style={{
-              background: isSelected ? "#1e293b" : "transparent",
-              border: isSelected ? "1px solid #3b82f6" : "1px solid transparent",
-              color: toneStyle.color || "#cbd5e1",
+              background: isSelected
+                ? "#1e293b"
+                : isPrimarySection
+                ? "rgba(255,255,255,0.02)"
+                : "transparent",
+              border: isSelected
+                ? "1px solid #3b82f6"
+                : isPrimarySection
+                ? "1px solid rgba(148,163,184,0.12)"
+                : "1px solid transparent",
+              color: isPrimarySection ? "#f8fafc" : toneStyle.color || "#cbd5e1",
               textAlign: "left",
-              padding: "3px 8px",
+              padding: isPrimarySection ? "6px 10px" : "3px 8px",
               cursor: node.selectable ? "pointer" : "default",
               fontFamily:
                 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-              fontSize: 13,
+              fontSize: isPrimarySection ? 13.5 : 13,
+              fontWeight: isPrimarySection ? 800 : 500,
+              letterSpacing: isPrimarySection ? 0.2 : 0,
               borderRadius: 6,
               width: "100%",
-              opacity: node.selectable ? 1 : 0.82,
+              opacity: node.selectable ? 1 : 0.9,
+              boxShadow: isPrimarySection
+                ? "inset 0 1px 0 rgba(255,255,255,0.03)"
+                : "none",
             }}
           >
             {node.label}
@@ -5149,28 +5184,32 @@ function autofillSimulation() {
             alignSelf: "stretch",
             minHeight: 980,
             background:
-              "linear-gradient(180deg, rgba(15,23,42,0.96) 0%, rgba(24,34,53,0.98) 100%)",
-            border: "1px solid #2f3f5c",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+              "linear-gradient(180deg, rgba(10,16,28,0.98) 0%, rgba(19,29,46,0.99) 19,29,46,0.99 100%)",
+            border: "1px solid #31425f",
+            boxShadow: 
+              "inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 30px rgba(2,6,23,0.26)",
+            borderRadius: 14,
+            padding: "16px 16px 18px 16px",  
           }}
         >
           <div
   style={{
     display: "grid",
-    gap: 10,
-    marginBottom: 14,
-    paddingBottom: 12,
-    borderBottom: "1px solid #24324a",
+    gap: 12,
+    marginBottom: 16,
+    paddingBottom: 14,
+    borderBottom: "1px solid #2a3952",
   }}
 >
   <div>
     <div
       style={{
-        fontSize: 15,
+        fontSize: 17,
         fontWeight: 800,
         color: "#f8fafc",
         marginBottom: 4,
-        letterSpacing: 0.2,
+        letterSpacing: 0.25,
+        lineHeight: 1.2,
       }}
     >
       Digital Twin Structure Navigator
@@ -5179,9 +5218,10 @@ function autofillSimulation() {
     <div
       style={{
         fontSize: 11,
-        color: "#94a3b8",
-        letterSpacing: 0.5,
+        color: "#8fa3bf",
+        letterSpacing: 0.7,
         textTransform: "uppercase",
+        fontWeight: 700,
       }}
     >
       True Digital Twin · Structural Navigation Surface
@@ -5192,15 +5232,16 @@ function autofillSimulation() {
     style={{
       display: "grid",
       gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-      gap: 8,
+      gap: 10,
     }}
   >
     <div
       style={{
-        background: "#0f172a",
-        border: "1px solid #22314a",
-        borderRadius: 10,
-        padding: "8px 10px",
+        background: "rgba(15,23,42,0.9)",
+  border: "1px solid #263650",
+  borderRadius: 10,
+  padding: "9px 10px",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
       }}
     >
       <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
@@ -5213,10 +5254,11 @@ function autofillSimulation() {
 
     <div
       style={{
-        background: "#0f172a",
-        border: "1px solid #22314a",
-        borderRadius: 10,
-        padding: "8px 10px",
+        background: "rgba(15,23,42,0.9)",
+  border: "1px solid #263650",
+  borderRadius: 10,
+  padding: "9px 10px",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
       }}
     >
       <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
@@ -5229,10 +5271,11 @@ function autofillSimulation() {
 
     <div
       style={{
-        background: "#0f172a",
-        border: "1px solid #22314a",
-        borderRadius: 10,
-        padding: "8px 10px",
+        background: "rgba(15,23,42,0.9)",
+  border: "1px solid #263650",
+  borderRadius: 10,
+  padding: "9px 10px",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
       }}
     >
       <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
@@ -5245,10 +5288,11 @@ function autofillSimulation() {
 
     <div
       style={{
-        background: "#0f172a",
-        border: "1px solid #22314a",
-        borderRadius: 10,
-        padding: "8px 10px",
+        background: "rgba(15,23,42,0.9)",
+  border: "1px solid #263650",
+  borderRadius: 10,
+  padding: "9px 10px",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
       }}
     >
       <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>
@@ -5262,15 +5306,15 @@ function autofillSimulation() {
 </div>
 
           <div
-            style={{
-              display: "flex",
-              gap: 8,
-              flexWrap: "wrap",
-              marginBottom: 10,
-              paddingBottom: 12,
-              borderBottom: "1px solid #22314a",
-            }}
-          >
+  style={{
+    display: "flex",
+    gap: 8,
+    flexWrap: "wrap",
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottom: "1px solid #263650",
+  }}
+>
             {[
               ["all", "All"],
               ["critical", "Critical"],
@@ -5295,12 +5339,15 @@ function autofillSimulation() {
                     )
                   }
                   style={{
-                    ...actionButtonBaseStyle,
-                    padding: "6px 10px",
-                    fontSize: 12,
-                    background: active ? "#1e293b" : "#0f172a",
-                    cursor: "pointer",
-                  }}
+  ...actionButtonBaseStyle,
+  padding: "6px 10px",
+  fontSize: 12,
+  background: active ? "#1e293b" : "#0f172a",
+  border: active ? "1px solid #3b82f6" : "1px solid #2a3952",
+  color: active ? "#f8fafc" : "#cbd5e1",
+  boxShadow: active ? "0 0 0 1px rgba(59,130,246,0.18) inset" : "none",
+  cursor: "pointer",
+}}
                 >
                   {label}
                 </button>
@@ -5311,11 +5358,13 @@ function autofillSimulation() {
           <div
   style={{
     display: "flex",
-    gap: 12,
+    gap: 14,
     flexWrap: "wrap",
     alignItems: "center",
-    marginTop: 10,
-    marginBottom: 14,
+    marginTop: 12,
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottom: "1px solid #22314a",
     fontSize: 11,
     color: "#94a3b8",
   }}
@@ -5344,16 +5393,16 @@ function autofillSimulation() {
 
           {repoTree ? (
             <div
-              style={{
-                display: "grid",
-                gap: 8,
-                maxHeight: "none",
-                overflowY: "visible",
-                paddingRight: 6,
-                paddingBottom: 12,
-                paddingTop: 2,
-              }}
-            >
+  style={{
+    display: "grid",
+    gap: 10,
+    maxHeight: "none",
+    overflowY: "visible",
+    paddingRight: 8,
+    paddingBottom: 18,
+    paddingTop: 4,
+  }}
+>
               {renderRepoTreeNode(repoTree)}
             </div>
           ) : (
