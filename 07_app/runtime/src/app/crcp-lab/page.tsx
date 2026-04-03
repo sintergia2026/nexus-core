@@ -2304,6 +2304,7 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
     const nodeMarkers = getRepoNodeMarkers(node, twinStructure, crcpProgram);
 
   const indent = `${depth * 18}px`;
+  const folderCount = isFolder ? getRepoFolderCount(node, twinStructure) : null;
 
     if (
     !shouldShowRepoNode(
@@ -2352,47 +2353,52 @@ function renderRepoTreeNode(node: RepoTreeNode, depth = 0): ReactNode {
 
                 <div style={{ display: "flex", alignItems: "center", gap: 6, width: "100%" }}>
                     <button
-            type="button"
-            onClick={() => {
-              if (!node.selectable) return;
-              if (node.node_type === "file" || node.node_type === "folder") return;
+  type="button"
+  onClick={() => {
+    if (!node.selectable) return;
+    if (node.node_type === "file" || node.node_type === "folder") return;
 
-              setSelectedRepoNode({
-                node_type: node.node_type as RepoNodeType,
-                node_id: node.id,
-                node_label: node.label,
-              });
-            }}
-            style={{
-              background: isSelected
-                ? "#1e293b"
-                : isPrimarySection
-                ? "rgba(255,255,255,0.02)"
-                : "transparent",
-              border: isSelected
-                ? "1px solid #3b82f6"
-                : isPrimarySection
-                ? "1px solid rgba(148,163,184,0.12)"
-                : "1px solid transparent",
-              color: isPrimarySection ? "#f8fafc" : toneStyle.color || "#cbd5e1",
-              textAlign: "left",
-              padding: isPrimarySection ? "6px 10px" : "3px 8px",
-              cursor: node.selectable ? "pointer" : "default",
-              fontFamily:
-                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-              fontSize: isPrimarySection ? 13.5 : 13,
-              fontWeight: isPrimarySection ? 800 : 500,
-              letterSpacing: isPrimarySection ? 0.2 : 0,
-              borderRadius: 6,
-              width: "100%",
-              opacity: node.selectable ? 1 : 0.9,
-              boxShadow: isPrimarySection
-                ? "inset 0 1px 0 rgba(255,255,255,0.03)"
-                : "none",
-            }}
-          >
-            {node.label}
-          </button>
+    setSelectedRepoNode({
+      node_type: node.node_type as RepoNodeType,
+      node_id: node.id,
+      node_label: node.label,
+    });
+  }}
+  style={{
+    background: isSelected ? "#1e293b" : "transparent",
+    border: isSelected ? "1px solid #3b82f6" : "1px solid transparent",
+    color: toneStyle.color || "#cbd5e1",
+    textAlign: "left",
+    padding: "3px 8px",
+    cursor: node.selectable ? "pointer" : "default",
+    fontFamily:
+      'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+    fontSize: 13,
+    borderRadius: 6,
+    width: "100%",
+    opacity: node.selectable ? 1 : 0.82,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  }}
+>
+  <span>{node.label}</span>
+
+  {isFolder && folderCount !== null ? (
+    <span
+      style={{
+        fontSize: 11,
+        color: "#94a3b8",
+        fontWeight: 700,
+        letterSpacing: 0.2,
+        opacity: 0.9,
+      }}
+    >
+      {folderCount}
+    </span>
+  ) : null}
+</button>
 
           {node.selectable ? (
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -2452,6 +2458,63 @@ function getRepoNodeEvidenceCount(
   }
 
   return 0;
+}
+
+function getRepoFolderCount(
+  node: RepoTreeNode,
+  twinStructure: TwinStructure | null
+): number | null {
+  if (!twinStructure) return null;
+
+  if (node.id === "domains_folder") {
+    return twinStructure.domains.length;
+  }
+
+  if (node.id === "roles_folder") {
+    return twinStructure.roles.length;
+  }
+
+  if (node.id === "evidence_folder") {
+    return twinStructure.evidence.length;
+  }
+
+  if (node.id === "execution_folder") {
+    return 4;
+  }
+
+  if (node.id === "automation_folder") {
+    return 4;
+  }
+
+  if (node.id === "finance_folder") {
+    return 5;
+  }
+
+  if (node.id === "commercial_folder") {
+    return 4;
+  }
+
+  if (node.id === "activation_folder") {
+    return 3;
+  }
+
+  if (node.id === "simulation_folder") {
+    return 3;
+  }
+
+  if (node.id === "lineage_folder") {
+    return 3;
+  }
+
+  if (node.id === "governance_folder") {
+    return 3;
+  }
+
+  if (node.id === "root_folder") {
+    return 7;
+  }
+
+  return null;
 }
 
 function isRepoNodeProgramLinked(
@@ -2589,6 +2652,7 @@ function getRepoNodeButtonStyle(isActive: boolean): CSSProperties {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
     fontSize: 13,
     borderRadius: 6,
+    width: "100%",
   };
 }
 
