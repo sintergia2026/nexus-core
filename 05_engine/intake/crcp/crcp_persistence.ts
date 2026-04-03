@@ -46,7 +46,11 @@ function looksLikeRepoRoot(candidate: string): boolean {
   );
 }
 
-function resolveRepoRoot(): string {
+function isVercelRuntime(): boolean {
+  return Boolean(process.env.VERCEL);
+}
+
+function resolveLocalRepoRoot(): string {
   let current = process.cwd();
 
   for (let i = 0; i < 8; i += 1) {
@@ -84,8 +88,8 @@ function buildArtifactBaseName(intake: CrcpIntakePayload): string {
   return `${organizationId}__${sector}__${subsector}__${capturedAt}__${suffix}`;
 }
 
-function toRepoRelativePath(repoRoot: string, absolutePath: string): string {
-  return path.relative(repoRoot, absolutePath).replace(/\\/g, "/");
+function toDisplayPath(baseRoot: string, absolutePath: string): string {
+  return path.relative(baseRoot, absolutePath).replace(/\\/g, "/");
 }
 
 function writeJsonFile(targetPath: string, payload: unknown): void {
@@ -99,11 +103,23 @@ export function persistCrcpArtifacts(input: {
 }): CrcpPersistenceResult {
   const { intake, snapshot, twinSeed } = input;
 
-  const repoRoot = resolveRepoRoot();
+  const runningOnVercel = isVercelRuntime();
 
-  const intakeDir = path.join(repoRoot, "06_data", "crcp", "intakes");
-  const snapshotDir = path.join(repoRoot, "06_data", "crcp", "snapshots");
-  const twinSeedDir = path.join(repoRoot, "06_data", "crcp", "twin_seeds");
+  const baseRoot = runningOnVercel
+    ? path.join("/tmp", "nexus-runtime-data")
+    : resolveLocalRepoRoot();
+
+  const intakeDir = runningOnVercel
+    ? path.join(baseRoot, "crcp", "intakes")
+    : path.join(baseRoot, "06_data", "crcp", "intakes");
+
+  const snapshotDir = runningOnVercel
+    ? path.join(baseRoot, "crcp", "snapshots")
+    : path.join(baseRoot, "06_data", "crcp", "snapshots");
+
+  const twinSeedDir = runningOnVercel
+    ? path.join(baseRoot, "crcp", "twin_seeds")
+    : path.join(baseRoot, "06_data", "crcp", "twin_seeds");
 
   ensureDir(intakeDir);
   ensureDir(snapshotDir);
@@ -120,8 +136,8 @@ export function persistCrcpArtifacts(input: {
   writeJsonFile(twinSeedPath, twinSeed);
 
   return {
-    intake_path: toRepoRelativePath(repoRoot, intakePath),
-    snapshot_path: toRepoRelativePath(repoRoot, snapshotPath),
-    twin_seed_path: toRepoRelativePath(repoRoot, twinSeedPath),
+    intake_path: toDisplayPath(baseRoot, intakePath),
+    snapshot_path: toDisplayPath(baseRoot, snapshotPath),
+    twin_seed_path: toDisplayPath(baseRoot, twinSeedPath),
   };
 }
