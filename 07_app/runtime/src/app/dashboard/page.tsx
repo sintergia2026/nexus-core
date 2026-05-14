@@ -11,21 +11,12 @@ import {
   INTERNAL_RECORDS_COMPARE,
   MultiRecordSummaryEnvelope,
   SingleRecordSummaryEnvelope,
+  getActiveRecordSummaryByContext,
+  queryRecordSummaries,
+  getActiveDiagnosticByContext,
+  compareRecordsById,
 } from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
-
-async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status} ${response.statusText}`);
-  }
-
-  return (await response.json()) as T;
-}
 
 function metricValue(
   metrics: Array<{ code: string; value: number | string }>,
@@ -47,39 +38,12 @@ export default async function DashboardPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const activeUrl = `http://localhost:3000/api/internal/records/active?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
-  const historyUrl = `http://localhost:3000/api/internal/records/query?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
-  const diagnosticUrl = `http://localhost:3000/api/internal/diagnostics/active?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
   const [activeEnvelope, historyEnvelope, diagnosticEnvelope, comparisonEnvelope] =
     await Promise.all([
-      getJson<SingleRecordSummaryEnvelope>(activeUrl),
-      getJson<MultiRecordSummaryEnvelope>(historyUrl),
-      getJson<ActiveDiagnosticEnvelope>(diagnosticUrl),
-      getJson<ComparisonEnvelope>(
-        "http://localhost:3000/api/internal/records/compare",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(INTERNAL_RECORDS_COMPARE),
-        }
-      ),
+      getActiveRecordSummaryByContext(context),
+      queryRecordSummaries(context),
+      getActiveDiagnosticByContext(context),
+      compareRecordsById(INTERNAL_RECORDS_COMPARE),
     ]);
 
   const activeRecord = activeEnvelope.record;
