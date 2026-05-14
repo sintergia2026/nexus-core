@@ -39,6 +39,9 @@
     "phase4:route-contract-check": "npx tsx scripts/run-phase4-route-contract-check.ts",
     "phase4:local-view-server": "npx tsx scripts/run-phase4-local-view-server.ts",
 
+    "phase5:engine-dry-run": "npx tsx scripts/run-phase5-engine-dry-run.ts",
+    "phase5:engine-run": "npx tsx scripts/run-phase5-engine-run.ts",
+
     "crcp:select": "npx tsx scripts/run-crcp-question-selection.ts",
     "crcp:select:restaurant": "npx tsx scripts/run-crcp-question-selection.ts restaurant",
     "crcp:select:retail": "npx tsx scripts/run-crcp-question-selection.ts retail",
