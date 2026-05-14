@@ -1,33 +1,27 @@
 import fs from "fs/promises";
 import path from "path";
 
-export interface ApiErrorBlock {
-  code: string;
-  message: string;
-  details?: Record<string, unknown>;
-}
+import type {
+  ApiErrorBlock,
+  SingleRecordSummaryEnvelope,
+  MultiRecordSummaryEnvelope,
+  ComparisonMetricDifference,
+  ComparisonEnvelope,
+} from "../../../../05_engine/types/ApiEnvelope";
+import type { ApiRecordSummary } from "../../../../05_engine/types/ApiRecordSummary";
+import type {
+  PersistedRecordIndexEntry,
+  PersistedRecordIndex,
+} from "../../../../05_engine/types/PersistedRecordIndex";
 
-export interface ApiRecordSummary {
-  persistedBundleId: string;
-  recordStatus: "active" | "superseded" | "archived";
-  organizationId: string;
-  siteId: string;
-  sectorType: string;
-  weekId: string;
-  calendarYear: number;
-  weekNumber: number;
-  bundleVersion: string;
-  persistenceVersion: string;
-  snapshotId: string;
-  twinId: string;
-  reportId: string;
-  stateLabel: string;
-  decisionLabel: string;
-  priority: string;
-  activeSignals: string[];
-  activeConstraints: string[];
-  storedAt: string;
-}
+export type {
+  ApiErrorBlock,
+  SingleRecordSummaryEnvelope,
+  MultiRecordSummaryEnvelope,
+  ComparisonMetricDifference,
+  ComparisonEnvelope,
+};
+export type { ApiRecordSummary };
 
 export interface DiagnosticMetric {
   code: string;
@@ -69,106 +63,6 @@ export interface ActiveDiagnosticEnvelope {
   } | null;
   servedAt: string;
   error: ApiErrorBlock | null;
-}
-
-export interface SingleRecordSummaryEnvelope {
-  responseType: "single_record_summary";
-  responseVersion: string;
-  requestedContext: Record<string, unknown>;
-  found: boolean;
-  record: ApiRecordSummary | null;
-  servedAt: string;
-  error: ApiErrorBlock | null;
-}
-
-export interface MultiRecordSummaryEnvelope {
-  responseType: "multi_record_summary";
-  responseVersion: string;
-  query: Record<string, unknown>;
-  resultCount: number;
-  records: ApiRecordSummary[];
-  servedAt: string;
-  error: ApiErrorBlock | null;
-}
-
-export interface ComparisonMetricDifference {
-  code: string;
-  leftValue: number | string | null;
-  rightValue: number | string | null;
-}
-
-export interface ComparisonEnvelope {
-  responseType: "record_comparison";
-  responseVersion: string;
-  leftRecordId: string;
-  rightRecordId: string;
-  contextSummary: {
-    left: {
-      organizationId: string;
-      siteId: string;
-      weekId: string;
-      recordStatus: string;
-    };
-    right: {
-      organizationId: string;
-      siteId: string;
-      weekId: string;
-      recordStatus: string;
-    };
-  };
-  postureComparison: {
-    stateLabelChanged: boolean;
-    decisionLabelChanged: boolean;
-    priorityChanged: boolean;
-    leftStateLabel: string;
-    rightStateLabel: string;
-    leftDecisionLabel: string;
-    rightDecisionLabel: string;
-    leftPriority: string;
-    rightPriority: string;
-  };
-  signalComparison: {
-    leftActiveSignals: string[];
-    rightActiveSignals: string[];
-    addedSignals: string[];
-    removedSignals: string[];
-  };
-  constraintComparison: {
-    leftActiveConstraints: string[];
-    rightActiveConstraints: string[];
-    addedConstraints: string[];
-    removedConstraints: string[];
-  };
-  metricDifferences: ComparisonMetricDifference[];
-  executiveReading: string;
-  servedAt: string;
-  error: ApiErrorBlock | null;
-}
-
-interface PersistedRecordIndexEntry {
-  persistedBundleId: string;
-  recordStatus: "active" | "superseded" | "archived";
-  organizationId: string;
-  siteId: string;
-  sectorType: string;
-  weekId: string;
-  calendarYear: number;
-  weekNumber: number;
-  snapshotId: string;
-  twinId: string;
-  reportId: string;
-  bundleVersion: string;
-  persistenceVersion: string;
-  storagePath: string;
-  storedAt: string;
-}
-
-interface PersistedRecordIndex {
-  indexType: "persisted_record_index";
-  indexVersion: string;
-  generatedAt: string;
-  recordCount: number;
-  entries: PersistedRecordIndexEntry[];
 }
 
 interface PersistedBundleRecord {
