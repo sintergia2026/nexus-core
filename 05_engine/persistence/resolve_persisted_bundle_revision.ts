@@ -3,21 +3,25 @@ import path from "path";
 import { DiagnosticRunBundle } from "../types/DiagnosticRunBundle";
 import { PersistedRecordIndex } from "../types/PersistedRecordIndex";
 
-function readJsonFile<T>(relativePath: string): T {
-  const fullPath = path.resolve(__dirname, `../../${relativePath}`);
-  const raw = fs.readFileSync(fullPath, "utf-8");
-  return JSON.parse(raw) as T;
+function getRecordsDirectory(): string {
+  return (
+    process.env.NEXUS_RECORDS_DIR ??
+    path.resolve(__dirname, "../../10_examples/persisted_records")
+  );
 }
 
 function loadPersistedRecordIndexSafe(): PersistedRecordIndex | null {
-  const relativePath = "10_examples/persisted_records/index.persisted_records.json";
-  const fullPath = path.resolve(__dirname, `../../${relativePath}`);
+  const fullPath = path.join(
+    getRecordsDirectory(),
+    "index.persisted_records.json"
+  );
 
   if (!fs.existsSync(fullPath)) {
     return null;
   }
 
-  return readJsonFile<PersistedRecordIndex>(relativePath);
+  const raw = fs.readFileSync(fullPath, "utf-8");
+  return JSON.parse(raw) as PersistedRecordIndex;
 }
 
 function getContextPrefix(bundle: DiagnosticRunBundle): string {
