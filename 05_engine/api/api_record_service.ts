@@ -16,7 +16,7 @@ import {
 } from "../types/ApiEnvelope";
 
 function getRecordsDirectory(): string {
-  return path.resolve(__dirname, "../../10_examples/persisted_records");
+  return process.env.NEXUS_RECORDS_DIR ?? path.resolve(__dirname, "../../10_examples/persisted_records");
 }
 
 function readRecordById(

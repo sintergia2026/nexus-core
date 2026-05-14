@@ -125,7 +125,7 @@ export const INTERNAL_RECORDS_COMPARE = {
 };
 
 function getPersistedRecordsDir(): string {
-  return path.resolve(process.cwd(), "../../10_examples/persisted_records");
+  return process.env.NEXUS_RECORDS_DIR ?? path.resolve(process.cwd(), "../../10_examples/persisted_records");
 }
 
 async function readJsonFile<T>(fullPath: string): Promise<T> {

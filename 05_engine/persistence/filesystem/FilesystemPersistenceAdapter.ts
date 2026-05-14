@@ -44,6 +44,7 @@ export class FilesystemPersistenceAdapter implements PersistenceAdapter {
   constructor(baseDirectory?: string) {
     this.baseDirectory =
       baseDirectory ??
+      process.env.NEXUS_RECORDS_DIR ??
       path.resolve(__dirname, "../../../10_examples/persisted_records");
   }
 
