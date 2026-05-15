@@ -133,7 +133,19 @@ export default async function ExecutiveReportPage({
             <div className={styles.flagGrid} style={{ marginBottom: 16 }}>
               <div className={styles.softPanel}>
                 <div className={styles.compactLabel}>Operational State</div>
-                <div className={styles.compactValue}>
+                <div
+                  className={styles.compactValue}
+                  style={{
+                    color:
+                      activeRecord.stateLabel === "degraded"
+                        ? "#fda4af"
+                        : activeRecord.stateLabel === "constrained"
+                        ? "#fcd34d"
+                        : activeRecord.stateLabel === "stable"
+                        ? "#86efac"
+                        : "#e2e8f0",
+                  }}
+                >
                   {activeRecord.stateLabel.toUpperCase()}
                 </div>
               </div>
@@ -254,16 +266,6 @@ export default async function ExecutiveReportPage({
               layer, which is reducing decision quality and allowing inefficiencies
               to persist under active operating volume.
             </p>
-
-            <div className={styles.list} style={{ marginTop: 16 }}>
-              <div className={styles.listItem}>
-                <Row label="Key Decision">{activeRecord.decisionLabel}</Row>
-                <Row label="Priority">{activeRecord.priority}</Row>
-                <Row label="Record Status">
-                  <StatusBadge status={activeRecord.recordStatus} />
-                </Row>
-              </div>
-            </div>
           </section>
 
           <section className={styles.card}>
