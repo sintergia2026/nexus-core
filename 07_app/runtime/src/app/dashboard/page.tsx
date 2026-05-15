@@ -8,13 +8,11 @@ import styles from "../internal-records-view/page.module.css";
 import {
   ActiveDiagnosticEnvelope,
   ComparisonEnvelope,
-  INTERNAL_RECORDS_COMPARE,
-  MultiRecordSummaryEnvelope,
-  SingleRecordSummaryEnvelope,
   getActiveRecordSummaryByContext,
   queryRecordSummaries,
   getActiveDiagnosticByContext,
   compareRecordsById,
+  getAvailableContexts,
 } from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
 
@@ -38,12 +36,12 @@ export default async function DashboardPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const [activeEnvelope, historyEnvelope, diagnosticEnvelope, comparisonEnvelope] =
+  const [activeEnvelope, historyEnvelope, diagnosticEnvelope, availableContextsEnvelope] =
     await Promise.all([
       getActiveRecordSummaryByContext(context),
       queryRecordSummaries(context),
       getActiveDiagnosticByContext(context),
-      compareRecordsById(INTERNAL_RECORDS_COMPARE),
+      getAvailableContexts(),
     ]);
 
   const activeRecord = activeEnvelope.record;
@@ -57,12 +55,24 @@ export default async function DashboardPage({
     return String(b.storedAt).localeCompare(String(a.storedAt));
   });
 
+  const comparisonEnvelope: ComparisonEnvelope | null =
+    historyRecords.length >= 2
+      ? await compareRecordsById({
+          leftRecordId: historyRecords[1].persistedBundleId,
+          rightRecordId: historyRecords[0].persistedBundleId,
+        })
+      : null;
+
   return (
     <AppShell
       title="NEXUS™ Dashboard"
       subtitle="Framework-native composition surface for governing snapshot, diagnostics, history, and comparison."
     >
-      <ContextSwitcher pathname="/dashboard" current={context} />
+      <ContextSwitcher
+        pathname="/dashboard"
+        current={context}
+        availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
+      />
 
       <div className={styles.grid}>
         <section className={styles.card}>
@@ -173,10 +183,14 @@ export default async function DashboardPage({
             Block D — Comparison Executive Reading
           </h2>
           <div className={styles.meta}>
-            servedAt: {comparisonEnvelope.servedAt || "unknown"}
+            servedAt: {comparisonEnvelope?.servedAt || "unknown"}
           </div>
 
-          {comparisonEnvelope.error ? (
+          {!comparisonEnvelope ? (
+            <div className={styles.empty}>
+              Comparison requires at least two records for this context.
+            </div>
+          ) : comparisonEnvelope.error ? (
             <div className={styles.error}>
               Comparison executive block could not be loaded.
             </div>
