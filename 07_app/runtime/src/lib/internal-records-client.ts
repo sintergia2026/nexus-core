@@ -121,18 +121,6 @@ interface PersistedBundleRecord {
   };
 }
 
-export const INTERNAL_RECORDS_CONTEXT = {
-  organizationId: "org-sintergia-demo",
-  siteId: "site-004",
-  weekId: "site-004::2026-W11",
-};
-
-export const INTERNAL_RECORDS_COMPARE = {
-  leftRecordId:
-    "pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0001",
-  rightRecordId:
-    "pbr::org-sintergia-demo::site-004::site-004::2026-W11::1.0.0::rev-0002",
-};
 
 function getPersistedRecordsDir(): string {
   return process.env.NEXUS_RECORDS_DIR ?? path.resolve(process.cwd(), "../../10_examples/persisted_records");
