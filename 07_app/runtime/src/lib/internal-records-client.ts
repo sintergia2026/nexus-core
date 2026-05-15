@@ -65,6 +65,16 @@ export interface ActiveDiagnosticEnvelope {
   error: ApiErrorBlock | null;
 }
 
+export interface AvailableContextsEnvelope {
+  contexts: Array<{
+    organizationId: string;
+    siteId: string;
+    weekId: string;
+  }>;
+  servedAt: string;
+  error: string | null;
+}
+
 interface PersistedBundleRecord {
   persistedBundleId: string;
   persistenceVersion: string;
@@ -671,4 +681,48 @@ export async function compareRecordsById(params: {
     servedAt,
     error: null,
   };
+}
+
+export async function getAvailableContexts(): Promise<AvailableContextsEnvelope> {
+  const servedAt = new Date().toISOString();
+
+  try {
+    const index = await loadIndex();
+
+    const contextMap = new Map<
+      string,
+      { organizationId: string; siteId: string; weekId: string; storedAt: string }
+    >();
+
+    for (const entry of index.entries) {
+      const key = `${entry.organizationId}::${entry.siteId}::${entry.weekId}`;
+      const existing = contextMap.get(key);
+      if (!existing || entry.storedAt > existing.storedAt) {
+        contextMap.set(key, {
+          organizationId: entry.organizationId,
+          siteId: entry.siteId,
+          weekId: entry.weekId,
+          storedAt: entry.storedAt,
+        });
+      }
+    }
+
+    const contexts = Array.from(contextMap.values())
+      .sort((a, b) => b.storedAt.localeCompare(a.storedAt))
+      .map(({ organizationId, siteId, weekId }) => ({ organizationId, siteId, weekId }));
+
+    return { contexts, servedAt, error: null };
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      (error as NodeJS.ErrnoException).code === "ENOENT"
+    ) {
+      return { contexts: [], servedAt, error: null };
+    }
+    return {
+      contexts: [],
+      servedAt,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
