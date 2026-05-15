@@ -7,18 +7,10 @@ import styles from "../internal-records-view/page.module.css";
 import {
   ActiveDiagnosticEnvelope,
   SingleRecordSummaryEnvelope,
+  getActiveRecordSummaryByContext,
+  getActiveDiagnosticByContext,
 } from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
-
-async function getJson<T>(url: string): Promise<T> {
-  const response = await fetch(url, { cache: "no-store" });
-
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status} ${response.statusText}`);
-  }
-
-  return (await response.json()) as T;
-}
 
 function metricValue(
   metrics: Array<{ code: string; value: number | string }>,
@@ -62,21 +54,9 @@ export default async function ExecutiveReportPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const activeUrl = `http://localhost:3000/api/internal/records/active?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
-  const diagnosticUrl = `http://localhost:3000/api/internal/diagnostics/active?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
   const [activeEnvelope, diagnosticEnvelope] = await Promise.all([
-    getJson<SingleRecordSummaryEnvelope>(activeUrl),
-    getJson<ActiveDiagnosticEnvelope>(diagnosticUrl),
+    getActiveRecordSummaryByContext(context),
+    getActiveDiagnosticByContext(context),
   ]);
 
   const activeRecord = activeEnvelope.record;
