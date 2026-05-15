@@ -107,8 +107,8 @@ export default async function ExecutiveReportPage({
 
   return (
     <AppShell
-      title="NEXUS™ Executive Report"
-      subtitle="Business-facing executive interpretation layer above the NEXUS diagnostic core."
+      title="NEXUS™ Situation"
+      subtitle="Operational judgment, risk exposure, and immediate action requirements."
     >
       <ContextSwitcher
         pathname="/executive-report"
@@ -129,6 +129,117 @@ export default async function ExecutiveReportPage({
         </section>
       ) : (
         <div className={styles.grid}>
+          <section className={`${styles.card} ${styles.fullWidth}`}>
+            <div className={styles.flagGrid} style={{ marginBottom: 16 }}>
+              <div className={styles.softPanel}>
+                <div className={styles.compactLabel}>Operational State</div>
+                <div className={styles.compactValue}>
+                  {activeRecord.stateLabel.toUpperCase()}
+                </div>
+              </div>
+              <div className={styles.softPanel}>
+                <div className={styles.compactLabel}>Governing Decision</div>
+                <div className={styles.compactValue}>{activeRecord.decisionLabel}</div>
+              </div>
+              <div className={styles.softPanel}>
+                <div className={styles.compactLabel}>Priority</div>
+                <div
+                  className={styles.compactValue}
+                  style={{
+                    color:
+                      activeRecord.priority === "P1"
+                        ? "#fda4af"
+                        : activeRecord.priority === "P2"
+                        ? "#fcd34d"
+                        : "#86efac",
+                  }}
+                >
+                  {activeRecord.priority}
+                </div>
+              </div>
+            </div>
+
+            {(activeSignals.length > 0 || activeConstraints.length > 0) && (
+              <div className={styles.softPanel} style={{ marginBottom: 16 }}>
+                {activeSignals.length > 0 && (
+                  <div style={{ marginBottom: activeConstraints.length > 0 ? 10 : 0 }}>
+                    <div className={styles.compactLabel} style={{ marginBottom: 6 }}>
+                      Active Signals
+                    </div>
+                    <Chips values={activeSignals} />
+                  </div>
+                )}
+                {activeConstraints.length > 0 && (
+                  <div>
+                    <div className={styles.compactLabel} style={{ marginBottom: 6 }}>
+                      Active Constraints
+                    </div>
+                    <Chips values={activeConstraints} />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className={styles.miniGrid}>
+              <div className={styles.miniCard}>
+                <div className={styles.miniCardHeader}>
+                  <p className={styles.miniCardTitle}>Revenue Leakage</p>
+                </div>
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Detected</div>
+                    <div className={styles.miniStatValue}>
+                      {revenueLeakage > 0 ? `$${revenueLeakage}` : "None"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.miniCard}>
+                <div className={styles.miniCardHeader}>
+                  <p className={styles.miniCardTitle}>Reporting Reliability</p>
+                </div>
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Score</div>
+                    <div className={styles.miniStatValue}>{reportingReliability}</div>
+                  </div>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Risk</div>
+                    <div className={styles.miniStatValue}>
+                      {reportingRiskLabel(reportingReliability)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.miniCard}>
+                <div className={styles.miniCardHeader}>
+                  <p className={styles.miniCardTitle}>Latency</p>
+                </div>
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Value</div>
+                    <div className={styles.miniStatValue}>{latency}</div>
+                  </div>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Level</div>
+                    <div className={styles.miniStatValue}>{latencyLabel(latency)}</div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.miniCard}>
+                <div className={styles.miniCardHeader}>
+                  <p className={styles.miniCardTitle}>Throughput</p>
+                </div>
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Value</div>
+                    <div className={styles.miniStatValue}>{throughput}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section className={`${styles.card} ${styles.fullWidth}`}>
             <h2 className={styles.cardTitle}>1. Executive Summary</h2>
 
