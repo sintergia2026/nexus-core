@@ -10,10 +10,10 @@ import {
 import styles from "./AppShell.module.css";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/internal-records-view", label: "Internal Records" },
-  { href: "/diagnostics-view", label: "Diagnostics" },
-  { href: "/executive-report", label: "Executive Report" },
+  { href: "/executive-report",      label: "Situation"      },
+  { href: "/dashboard",             label: "Overview"       },
+  { href: "/diagnostics-view",      label: "Posture"        },
+  { href: "/internal-records-view", label: "Record History" },
 ];
 
 type AppShellProps = {

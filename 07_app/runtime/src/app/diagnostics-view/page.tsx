@@ -34,8 +34,8 @@ export default async function DiagnosticsViewPage({
     const availableContextsEnvelope = await getAvailableContexts();
     return (
       <AppShell
-        title="NEXUS™ Diagnostics View"
-        subtitle="Framework-native diagnostic surface for active system posture, constraints, and metric state."
+        title="NEXUS™ Posture"
+        subtitle="Active signals, governing constraints, and metric state for the selected context."
       >
         <ContextSwitcher
           pathname="/diagnostics-view"
@@ -78,7 +78,7 @@ export default async function DiagnosticsViewPage({
       ) : (
         <div className={styles.grid}>
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>Block A — Diagnostic Posture</h2>
+            <h2 className={styles.cardTitle}>Current Posture</h2>
             <div className={styles.meta}>servedAt: {envelope.servedAt}</div>
 
             <Row label="Persisted Bundle ID">
@@ -94,9 +94,7 @@ export default async function DiagnosticsViewPage({
           </section>
 
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>
-              Block B — Active Signals & Constraints
-            </h2>
+            <h2 className={styles.cardTitle}>Active Signals & Constraints</h2>
             <div className={styles.meta}>diagnostic surface</div>
 
             <Row label="Signals">
@@ -118,7 +116,7 @@ export default async function DiagnosticsViewPage({
           </section>
 
           <section className={`${styles.card} ${styles.fullWidth}`}>
-            <h2 className={styles.cardTitle}>Block C — Metric Overview</h2>
+            <h2 className={styles.cardTitle}>Metric Overview</h2>
             <div className={styles.meta}>active snapshot metric surface</div>
 
             <div className={styles.list}>

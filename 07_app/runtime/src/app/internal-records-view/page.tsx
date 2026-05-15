@@ -39,8 +39,8 @@ export default async function InternalRecordsViewPage({
     const availableContextsEnvelope = await getAvailableContexts();
     return (
       <AppShell
-        title="NEXUS™ Internal Records View"
-        subtitle="Framework-native records surface for active summary, historical summaries, and comparison."
+        title="NEXUS™ Record History"
+        subtitle="Active record, historical chain, and posture comparison for the selected context."
       >
         <ContextSwitcher
           pathname="/internal-records-view"
@@ -94,7 +94,7 @@ export default async function InternalRecordsViewPage({
 
       <div className={styles.grid}>
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Block A — Active Record Summary</h2>
+          <h2 className={styles.cardTitle}>Active Record</h2>
           <div className={styles.meta}>
             servedAt: {activeEnvelope.servedAt || "unknown"}
           </div>
@@ -138,9 +138,7 @@ export default async function InternalRecordsViewPage({
         </section>
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>
-            Block B — Historical Record Summaries
-          </h2>
+          <h2 className={styles.cardTitle}>Historical Records</h2>
           <div className={styles.meta}>
             resultCount: {historyEnvelope.resultCount ?? 0} | servedAt:{" "}
             {historyEnvelope.servedAt || "unknown"}
@@ -183,7 +181,7 @@ export default async function InternalRecordsViewPage({
         </section>
 
         <section className={`${styles.card} ${styles.fullWidth}`}>
-          <h2 className={styles.cardTitle}>Block C — Comparison Panel</h2>
+          <h2 className={styles.cardTitle}>Posture Comparison</h2>
           <div className={styles.meta}>
             servedAt: {comparisonEnvelope?.servedAt || "unknown"}
           </div>

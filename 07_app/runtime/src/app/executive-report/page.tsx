@@ -59,8 +59,8 @@ export default async function ExecutiveReportPage({
     const availableContextsEnvelope = await getAvailableContexts();
     return (
       <AppShell
-        title="NEXUS™ Executive Report"
-        subtitle="Business-facing executive interpretation layer above the NEXUS diagnostic core."
+        title="NEXUS™ Situation"
+        subtitle="Operational judgment, risk exposure, and immediate action requirements."
       >
         <ContextSwitcher
           pathname="/executive-report"

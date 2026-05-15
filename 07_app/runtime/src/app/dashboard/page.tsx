@@ -40,8 +40,8 @@ export default async function DashboardPage({
     const availableContextsEnvelope = await getAvailableContexts();
     return (
       <AppShell
-        title="NEXUS™ Dashboard"
-        subtitle="Framework-native composition surface for governing snapshot, diagnostics, history, and comparison."
+        title="NEXUS™ Overview"
+        subtitle="Governing posture, active risk surface, record history, and posture comparison."
       >
         <ContextSwitcher
           pathname="/dashboard"
@@ -99,7 +99,7 @@ export default async function DashboardPage({
 
       <div className={styles.grid}>
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Block A — Governing Snapshot</h2>
+          <h2 className={styles.cardTitle}>Governing Posture</h2>
           <div className={styles.meta}>
             servedAt: {activeEnvelope.servedAt || "unknown"}
           </div>
@@ -127,7 +127,7 @@ export default async function DashboardPage({
         </section>
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Block B — Diagnostic Risk Surface</h2>
+          <h2 className={styles.cardTitle}>Active Risk Surface</h2>
           <div className={styles.meta}>
             servedAt: {diagnosticEnvelope.servedAt || "unknown"}
           </div>
@@ -169,7 +169,7 @@ export default async function DashboardPage({
         </section>
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Block C — Historical Chain</h2>
+          <h2 className={styles.cardTitle}>Record History</h2>
           <div className={styles.meta}>
             resultCount: {historyEnvelope.resultCount ?? 0} | servedAt:{" "}
             {historyEnvelope.servedAt || "unknown"}
@@ -202,9 +202,7 @@ export default async function DashboardPage({
         </section>
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>
-            Block D — Comparison Executive Reading
-          </h2>
+          <h2 className={styles.cardTitle}>Posture Change</h2>
           <div className={styles.meta}>
             servedAt: {comparisonEnvelope?.servedAt || "unknown"}
           </div>

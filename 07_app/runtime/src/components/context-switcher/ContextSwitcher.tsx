@@ -23,7 +23,7 @@ export default function ContextSwitcher({
 }) {
   return (
     <section className={styles.wrap}>
-      <div className={styles.heading}>Context Switcher</div>
+      <div className={styles.heading}>Active Context</div>
 
       <div className={styles.current}>
         {current === null ? (
