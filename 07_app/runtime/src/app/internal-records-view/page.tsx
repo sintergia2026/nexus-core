@@ -10,6 +10,9 @@ import {
   INTERNAL_RECORDS_COMPARE,
   MultiRecordSummaryEnvelope,
   SingleRecordSummaryEnvelope,
+  getActiveRecordSummaryByContext,
+  queryRecordSummaries,
+  compareRecordsById,
 } from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
 
@@ -18,19 +21,6 @@ function truncateId(value: string, head = 28, tail = 14): string {
     return value;
   }
   return `${value.slice(0, head)}...${value.slice(-tail)}`;
-}
-
-async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status} ${response.statusText}`);
-  }
-
-  return (await response.json()) as T;
 }
 
 export default async function InternalRecordsViewPage({
@@ -45,32 +35,11 @@ export default async function InternalRecordsViewPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const activeUrl = `http://localhost:3000/api/internal/records/active?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
-  const queryUrl = `http://localhost:3000/api/internal/records/query?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
   const [activeEnvelope, historyEnvelope, comparisonEnvelope] =
     await Promise.all([
-      getJson<SingleRecordSummaryEnvelope>(activeUrl),
-      getJson<MultiRecordSummaryEnvelope>(queryUrl),
-      getJson<ComparisonEnvelope>(
-        "http://localhost:3000/api/internal/records/compare",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(INTERNAL_RECORDS_COMPARE),
-        }
-      ),
+      getActiveRecordSummaryByContext(context),
+      queryRecordSummaries(context),
+      compareRecordsById(INTERNAL_RECORDS_COMPARE),
     ]);
 
   const activeRecord = activeEnvelope.record;
