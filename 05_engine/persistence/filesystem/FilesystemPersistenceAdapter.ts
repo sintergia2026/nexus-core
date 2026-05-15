@@ -7,6 +7,10 @@ import {
   PersistenceSaveResult,
 } from "../PersistenceAdapter";
 import { PersistedBundleRecord } from "../../types/PersistedBundleRecord";
+import {
+  PersistedRecordIndex,
+  PersistedRecordIndexEntry,
+} from "../../types/PersistedRecordIndex";
 
 function isPersistedBundleRecord(value: unknown): value is PersistedBundleRecord {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -50,11 +54,9 @@ export class FilesystemPersistenceAdapter implements PersistenceAdapter {
 
   async save(record: PersistedBundleRecord): Promise<PersistenceSaveResult> {
     const filePath = this.buildRecordPath(record.persistedBundleId);
-    const storedAt = new Date().toISOString();
 
     const persistedRecord: PersistedBundleRecord = {
       ...record,
-      storedAt,
       storageMeta: {
         ...record.storageMeta,
         storageBackend: "filesystem",
@@ -68,6 +70,8 @@ export class FilesystemPersistenceAdapter implements PersistenceAdapter {
       JSON.stringify(persistedRecord, null, 2) + "\n",
       "utf-8"
     );
+
+    this.updateIndex(persistedRecord);
 
     return {
       persistedBundleId: persistedRecord.persistedBundleId,
@@ -108,6 +112,61 @@ export class FilesystemPersistenceAdapter implements PersistenceAdapter {
   async query(query: PersistenceQuery): Promise<PersistedBundleRecord[]> {
     const allRecords = this.readAllRecords();
     return allRecords.filter((record) => this.matchesQuery(record, query));
+  }
+
+  private updateIndex(record: PersistedBundleRecord): void {
+    const indexPath = path.join(
+      this.baseDirectory,
+      "index.persisted_records.json"
+    );
+    const tmpPath = `${indexPath}.tmp`;
+
+    let existing: PersistedRecordIndex;
+    if (fs.existsSync(indexPath)) {
+      const raw = fs.readFileSync(indexPath, "utf-8");
+      existing = JSON.parse(raw) as PersistedRecordIndex;
+    } else {
+      existing = {
+        indexType: "persisted_record_index",
+        indexVersion: "1.0.0",
+        generatedAt: new Date().toISOString(),
+        recordCount: 0,
+        entries: [],
+      };
+    }
+
+    const entry: PersistedRecordIndexEntry = {
+      persistedBundleId: record.persistedBundleId,
+      recordStatus: record.recordStatus,
+      organizationId: record.retrieval.organizationId,
+      siteId: record.retrieval.siteId,
+      sectorType: record.retrieval.sectorType,
+      weekId: record.retrieval.weekId,
+      calendarYear: record.retrieval.calendarYear,
+      weekNumber: record.retrieval.weekNumber,
+      snapshotId: record.identity.snapshotId,
+      twinId: record.identity.twinId,
+      reportId: record.identity.reportId,
+      bundleVersion: record.identity.bundleVersion,
+      persistenceVersion: record.persistenceVersion,
+      storagePath: record.storageMeta.storagePath,
+      storedAt: record.storedAt,
+    };
+
+    const filteredEntries = existing.entries.filter(
+      (e) => e.persistedBundleId !== record.persistedBundleId
+    );
+    filteredEntries.push(entry);
+
+    const updated: PersistedRecordIndex = {
+      ...existing,
+      generatedAt: new Date().toISOString(),
+      recordCount: filteredEntries.length,
+      entries: filteredEntries,
+    };
+
+    fs.writeFileSync(tmpPath, JSON.stringify(updated, null, 2) + "\n", "utf-8");
+    fs.renameSync(tmpPath, indexPath);
   }
 
   private buildRecordPath(persistedBundleId: string): string {

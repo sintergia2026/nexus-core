@@ -19,16 +19,29 @@ export interface PersistedRecordIndexQuery {
   recordStatus?: "active" | "superseded" | "archived";
 }
 
-function readJsonFile<T>(relativePath: string): T {
-  const fullPath = path.resolve(__dirname, `../../${relativePath}`);
-  const raw = fs.readFileSync(fullPath, "utf-8");
-  return JSON.parse(raw) as T;
+function getRecordsDirectory(): string {
+  return (
+    process.env.NEXUS_RECORDS_DIR ??
+    path.resolve(__dirname, "../../10_examples/persisted_records")
+  );
 }
 
 export function loadPersistedRecordIndex(): PersistedRecordIndex {
-  return readJsonFile<PersistedRecordIndex>(
-    "10_examples/persisted_records/index.persisted_records.json"
+  const fullPath = path.join(
+    getRecordsDirectory(),
+    "index.persisted_records.json"
   );
+  if (!fs.existsSync(fullPath)) {
+    return {
+      indexType: "persisted_record_index",
+      indexVersion: "1.0.0",
+      generatedAt: new Date().toISOString(),
+      recordCount: 0,
+      entries: [],
+    };
+  }
+  const raw = fs.readFileSync(fullPath, "utf-8");
+  return JSON.parse(raw) as PersistedRecordIndex;
 }
 
 export function queryPersistedRecordIndex(
