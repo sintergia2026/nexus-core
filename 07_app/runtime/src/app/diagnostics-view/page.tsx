@@ -28,7 +28,30 @@ export default async function DiagnosticsViewPage({
   }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const context = resolveRuntimeContext(resolvedSearchParams);
+  const resolution = resolveRuntimeContext(resolvedSearchParams);
+
+  if (resolution.status === "unresolved") {
+    const availableContextsEnvelope = await getAvailableContexts();
+    return (
+      <AppShell
+        title="NEXUS™ Diagnostics View"
+        subtitle="Framework-native diagnostic surface for active system posture, constraints, and metric state."
+      >
+        <ContextSwitcher
+          pathname="/diagnostics-view"
+          current={null}
+          availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
+        />
+        <section className={styles.card}>
+          <div className={styles.empty}>
+            No context selected. Choose a context from the panel above.
+          </div>
+        </section>
+      </AppShell>
+    );
+  }
+
+  const context = resolution.context;
 
   const [envelope, availableContextsEnvelope] = await Promise.all([
     getActiveDiagnosticByContext(context),

@@ -19,12 +19,18 @@ export function resolveRuntimeContext(searchParams?: {
   organizationId?: string;
   siteId?: string;
   weekId?: string;
-}): RuntimeContext {
+}): ContextResolutionResult {
+  const org  = searchParams?.organizationId?.trim();
+  const site = searchParams?.siteId?.trim();
+  const week = searchParams?.weekId?.trim();
+
+  if (!org || !site || !week) {
+    return { status: "unresolved" };
+  }
+
   return {
-    organizationId:
-      searchParams?.organizationId?.trim() || DEV_FALLBACK_CONTEXT.organizationId,
-    siteId: searchParams?.siteId?.trim() || DEV_FALLBACK_CONTEXT.siteId,
-    weekId: searchParams?.weekId?.trim() || DEV_FALLBACK_CONTEXT.weekId,
+    status: "resolved",
+    context: { organizationId: org, siteId: site, weekId: week },
   };
 }
 

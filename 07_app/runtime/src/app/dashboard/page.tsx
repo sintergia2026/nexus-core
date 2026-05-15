@@ -34,7 +34,30 @@ export default async function DashboardPage({
   }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const context = resolveRuntimeContext(resolvedSearchParams);
+  const resolution = resolveRuntimeContext(resolvedSearchParams);
+
+  if (resolution.status === "unresolved") {
+    const availableContextsEnvelope = await getAvailableContexts();
+    return (
+      <AppShell
+        title="NEXUS™ Dashboard"
+        subtitle="Framework-native composition surface for governing snapshot, diagnostics, history, and comparison."
+      >
+        <ContextSwitcher
+          pathname="/dashboard"
+          current={null}
+          availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
+        />
+        <section className={styles.card}>
+          <div className={styles.empty}>
+            No context selected. Choose a context from the panel above.
+          </div>
+        </section>
+      </AppShell>
+    );
+  }
+
+  const context = resolution.context;
 
   const [activeEnvelope, historyEnvelope, diagnosticEnvelope, availableContextsEnvelope] =
     await Promise.all([
