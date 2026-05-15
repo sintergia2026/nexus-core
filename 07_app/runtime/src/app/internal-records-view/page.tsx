@@ -95,9 +95,6 @@ export default async function InternalRecordsViewPage({
       <div className={styles.grid}>
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Active Record</h2>
-          <div className={styles.meta}>
-            servedAt: {activeEnvelope.servedAt || "unknown"}
-          </div>
 
           {!activeEnvelope.found || activeEnvelope.error || !activeRecord ? (
             <div className={styles.error}>
@@ -139,10 +136,6 @@ export default async function InternalRecordsViewPage({
 
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Historical Records</h2>
-          <div className={styles.meta}>
-            resultCount: {historyEnvelope.resultCount ?? 0} | servedAt:{" "}
-            {historyEnvelope.servedAt || "unknown"}
-          </div>
 
           {historyEnvelope.error ? (
             <div className={styles.error}>
@@ -182,9 +175,6 @@ export default async function InternalRecordsViewPage({
 
         <section className={`${styles.card} ${styles.fullWidth}`}>
           <h2 className={styles.cardTitle}>Posture Comparison</h2>
-          <div className={styles.meta}>
-            servedAt: {comparisonEnvelope?.servedAt || "unknown"}
-          </div>
 
           {!comparisonEnvelope ? (
             <div className={styles.empty}>

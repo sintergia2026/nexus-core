@@ -100,9 +100,6 @@ export default async function DashboardPage({
       <div className={styles.grid}>
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Governing Posture</h2>
-          <div className={styles.meta}>
-            servedAt: {activeEnvelope.servedAt || "unknown"}
-          </div>
 
           {activeEnvelope.error || !activeEnvelope.found || !activeRecord ? (
             <div className={styles.error}>
@@ -128,9 +125,6 @@ export default async function DashboardPage({
 
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Active Risk Surface</h2>
-          <div className={styles.meta}>
-            servedAt: {diagnosticEnvelope.servedAt || "unknown"}
-          </div>
 
           {diagnosticEnvelope.error || !diagnosticEnvelope.found || !diagnostic ? (
             <div className={styles.error}>
@@ -170,10 +164,6 @@ export default async function DashboardPage({
 
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Record History</h2>
-          <div className={styles.meta}>
-            resultCount: {historyEnvelope.resultCount ?? 0} | servedAt:{" "}
-            {historyEnvelope.servedAt || "unknown"}
-          </div>
 
           {historyEnvelope.error ? (
             <div className={styles.error}>
@@ -203,9 +193,6 @@ export default async function DashboardPage({
 
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Posture Change</h2>
-          <div className={styles.meta}>
-            servedAt: {comparisonEnvelope?.servedAt || "unknown"}
-          </div>
 
           {!comparisonEnvelope ? (
             <div className={styles.empty}>

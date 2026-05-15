@@ -79,7 +79,6 @@ export default async function DiagnosticsViewPage({
         <div className={styles.grid}>
           <section className={styles.card}>
             <h2 className={styles.cardTitle}>Current Posture</h2>
-            <div className={styles.meta}>servedAt: {envelope.servedAt}</div>
 
             <Row label="Persisted Bundle ID">
               <div className={styles.mutedMono}>
@@ -95,7 +94,6 @@ export default async function DiagnosticsViewPage({
 
           <section className={styles.card}>
             <h2 className={styles.cardTitle}>Active Signals & Constraints</h2>
-            <div className={styles.meta}>diagnostic surface</div>
 
             <Row label="Signals">
               <Chips
@@ -117,7 +115,6 @@ export default async function DiagnosticsViewPage({
 
           <section className={`${styles.card} ${styles.fullWidth}`}>
             <h2 className={styles.cardTitle}>Metric Overview</h2>
-            <div className={styles.meta}>active snapshot metric surface</div>
 
             <div className={styles.list}>
               <div className={styles.listItem}>

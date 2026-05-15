@@ -131,9 +131,6 @@ export default async function ExecutiveReportPage({
         <div className={styles.grid}>
           <section className={`${styles.card} ${styles.fullWidth}`}>
             <h2 className={styles.cardTitle}>1. Executive Summary</h2>
-            <div className={styles.meta}>
-              servedAt: {activeEnvelope.servedAt || "unknown"}
-            </div>
 
             <p>
               During the evaluated operational week, this business is currently
