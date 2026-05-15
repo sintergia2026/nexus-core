@@ -103,23 +103,30 @@ export function persistCrcpArtifacts(input: {
 }): CrcpPersistenceResult {
   const { intake, snapshot, twinSeed } = input;
 
+  const nexusCrcpDir = process.env["NEXUS_CRCP_DIR"];
   const runningOnVercel = isVercelRuntime();
 
-  const baseRoot = runningOnVercel
-    ? path.join("/tmp", "nexus-runtime-data")
-    : resolveLocalRepoRoot();
+  let baseRoot: string;
+  let intakeDir: string;
+  let snapshotDir: string;
+  let twinSeedDir: string;
 
-  const intakeDir = runningOnVercel
-    ? path.join(baseRoot, "crcp", "intakes")
-    : path.join(baseRoot, "06_data", "crcp", "intakes");
-
-  const snapshotDir = runningOnVercel
-    ? path.join(baseRoot, "crcp", "snapshots")
-    : path.join(baseRoot, "06_data", "crcp", "snapshots");
-
-  const twinSeedDir = runningOnVercel
-    ? path.join(baseRoot, "crcp", "twin_seeds")
-    : path.join(baseRoot, "06_data", "crcp", "twin_seeds");
+  if (nexusCrcpDir) {
+    baseRoot = nexusCrcpDir;
+    intakeDir = path.join(baseRoot, "intakes");
+    snapshotDir = path.join(baseRoot, "snapshots");
+    twinSeedDir = path.join(baseRoot, "twin_seeds");
+  } else if (runningOnVercel) {
+    baseRoot = path.join("/tmp", "nexus-runtime-data");
+    intakeDir = path.join(baseRoot, "crcp", "intakes");
+    snapshotDir = path.join(baseRoot, "crcp", "snapshots");
+    twinSeedDir = path.join(baseRoot, "crcp", "twin_seeds");
+  } else {
+    baseRoot = resolveLocalRepoRoot();
+    intakeDir = path.join(baseRoot, "06_data", "crcp", "intakes");
+    snapshotDir = path.join(baseRoot, "06_data", "crcp", "snapshots");
+    twinSeedDir = path.join(baseRoot, "06_data", "crcp", "twin_seeds");
+  }
 
   ensureDir(intakeDir);
   ensureDir(snapshotDir);
