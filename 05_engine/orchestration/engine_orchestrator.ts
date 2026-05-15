@@ -14,6 +14,8 @@ import { DiagnosticRunBundle } from "../types/DiagnosticRunBundle";
 export interface EngineRunOptions {
   dryRun?: boolean;
   adapter?: PersistenceAdapter;
+  recordsDirectory?: string;
+  scenarioFile?: string;
 }
 
 export interface EngineRunResult {
@@ -29,8 +31,19 @@ export async function runEngine(
 ): Promise<EngineRunResult> {
   const executedAt = new Date().toISOString();
   const dryRun = options?.dryRun ?? false;
+  const resolvedDirectory = options?.recordsDirectory;
   const adapter: PersistenceAdapter =
-    options?.adapter ?? new FilesystemPersistenceAdapter();
+    options?.adapter ?? new FilesystemPersistenceAdapter(resolvedDirectory);
+
+  // Align NEXUS_RECORDS_DIR with the adapter's base directory for the duration
+  // of this call so that queryPersistedRecordIndex and resolveNextPersistedBundleRevision
+  // read from the same path that the adapter writes to.
+  const originalRecordsDir = process.env["NEXUS_RECORDS_DIR"];
+  if (resolvedDirectory !== undefined) {
+    process.env["NEXUS_RECORDS_DIR"] = resolvedDirectory;
+  }
+
+  try {
 
   // Stage 1 — Normalize
   const normalized = normalizeOperationalIntakePayload(payload);
@@ -67,7 +80,7 @@ export async function runEngine(
     bundleType: "diagnostic_run_bundle",
     bundleVersion: "1.0.0",
     generatedAt: executedAt,
-    scenarioFile: "",
+    scenarioFile: options?.scenarioFile ?? "",
     unitKey: snapshot.unitKey,
     normalizedPayload: normalized,
     metrics: metricsResult.metrics,
@@ -125,8 +138,41 @@ export async function runEngine(
   });
 
   // Stage 9 — Persist (skipped if dryRun)
+  let finalRecord = record;
+
   if (!dryRun) {
     await adapter.save(record);
+
+    // Load-back integrity check — only mark "passed" when the record actually
+    // round-trips cleanly off disk.
+    const loadBackResult = await adapter.loadByPersistedBundleId(
+      record.persistedBundleId
+    );
+
+    if (!loadBackResult.found || loadBackResult.record === null) {
+      throw new Error(
+        `INTEGRITY_FAILURE: Record ${record.persistedBundleId} was saved ` +
+          `but failed load-back verification.`
+      );
+    }
+
+    if (loadBackResult.record.persistedBundleId !== record.persistedBundleId) {
+      throw new Error(
+        `INTEGRITY_FAILURE: Load-back id mismatch: ` +
+          `expected ${record.persistedBundleId}, ` +
+          `got ${loadBackResult.record.persistedBundleId}`
+      );
+    }
+
+    const verifiedRecord: PersistedBundleRecord = {
+      ...loadBackResult.record,
+      storageMeta: {
+        ...loadBackResult.record.storageMeta,
+        integrityCheckStatus: "passed",
+      },
+    };
+    await adapter.save(verifiedRecord);
+    finalRecord = verifiedRecord;
 
     if (priorActiveId !== null) {
       const priorLoadResult =
@@ -142,5 +188,15 @@ export async function runEngine(
   }
 
   // Stage 10 — Return
-  return { record, supersededRecordId: priorActiveId, executedAt, dryRun };
+  return { record: finalRecord, supersededRecordId: priorActiveId, executedAt, dryRun };
+
+  } finally {
+    if (resolvedDirectory !== undefined) {
+      if (originalRecordsDir === undefined) {
+        delete process.env["NEXUS_RECORDS_DIR"];
+      } else {
+        process.env["NEXUS_RECORDS_DIR"] = originalRecordsDir;
+      }
+    }
+  }
 }
