@@ -37,9 +37,11 @@ function buildHref(pathname: string, context: RuntimeContext): string {
 export default function ContextSwitcher({
   pathname,
   current,
+  availableContexts,
 }: {
   pathname: string;
   current: RuntimeContext;
+  availableContexts?: RuntimeContext[];
 }) {
   return (
     <section className={styles.wrap}>
@@ -61,15 +63,25 @@ export default function ContextSwitcher({
       </div>
 
       <div className={styles.presets}>
-        {PRESETS.map((preset) => (
-          <Link
-            key={`${preset.context.organizationId}-${preset.context.siteId}-${preset.context.weekId}-${preset.label}`}
-            href={buildHref(pathname, preset.context)}
-            className={styles.preset}
-          >
-            {preset.label}
-          </Link>
-        ))}
+        {availableContexts && availableContexts.length > 0
+          ? availableContexts.map((ctx) => (
+              <Link
+                key={`${ctx.organizationId}::${ctx.siteId}::${ctx.weekId}`}
+                href={buildHref(pathname, ctx)}
+                className={styles.preset}
+              >
+                {`${ctx.siteId} / ${ctx.weekId}`}
+              </Link>
+            ))
+          : PRESETS.map((preset) => (
+              <Link
+                key={`${preset.context.organizationId}-${preset.context.siteId}-${preset.context.weekId}-${preset.label}`}
+                href={buildHref(pathname, preset.context)}
+                className={styles.preset}
+              >
+                {preset.label}
+              </Link>
+            ))}
       </div>
     </section>
   );
