@@ -12,6 +12,7 @@ import {
   getActiveRecordSummaryByContext,
   queryRecordSummaries,
   compareRecordsById,
+  getAvailableContexts,
 } from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
 
@@ -34,9 +35,10 @@ export default async function InternalRecordsViewPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const [activeEnvelope, historyEnvelope] = await Promise.all([
+  const [activeEnvelope, historyEnvelope, availableContextsEnvelope] = await Promise.all([
     getActiveRecordSummaryByContext(context),
     queryRecordSummaries(context),
+    getAvailableContexts(),
   ]);
 
   const activeRecord = activeEnvelope.record;
@@ -61,7 +63,11 @@ export default async function InternalRecordsViewPage({
       title="NEXUS™ Internal Records View"
       subtitle="Framework-native records surface for active summary, historical summaries, and comparison."
     >
-      <ContextSwitcher pathname="/internal-records-view" current={context} />
+      <ContextSwitcher
+        pathname="/internal-records-view"
+        current={context}
+        availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
+      />
 
       <div className={styles.grid}>
         <section className={styles.card}>

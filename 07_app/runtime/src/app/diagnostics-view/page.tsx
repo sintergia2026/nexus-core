@@ -6,6 +6,7 @@ import styles from "../internal-records-view/page.module.css";
 import {
   ActiveDiagnosticEnvelope,
   getActiveDiagnosticByContext,
+  getAvailableContexts,
 } from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
 
@@ -29,14 +30,21 @@ export default async function DiagnosticsViewPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const envelope = await getActiveDiagnosticByContext(context);
+  const [envelope, availableContextsEnvelope] = await Promise.all([
+    getActiveDiagnosticByContext(context),
+    getAvailableContexts(),
+  ]);
 
   return (
     <AppShell
       title="NEXUS™ Diagnostics View"
       subtitle="Framework-native diagnostic surface for active system posture, constraints, and metric state."
     >
-      <ContextSwitcher pathname="/diagnostics-view" current={context} />
+      <ContextSwitcher
+        pathname="/diagnostics-view"
+        current={context}
+        availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
+      />
 
       {envelope.error || !envelope.found || !envelope.diagnostic ? (
         <section className={styles.card}>

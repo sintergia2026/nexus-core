@@ -9,6 +9,7 @@ import {
   SingleRecordSummaryEnvelope,
   getActiveRecordSummaryByContext,
   getActiveDiagnosticByContext,
+  getAvailableContexts,
 } from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
 
@@ -54,9 +55,10 @@ export default async function ExecutiveReportPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const [activeEnvelope, diagnosticEnvelope] = await Promise.all([
+  const [activeEnvelope, diagnosticEnvelope, availableContextsEnvelope] = await Promise.all([
     getActiveRecordSummaryByContext(context),
     getActiveDiagnosticByContext(context),
+    getAvailableContexts(),
   ]);
 
   const activeRecord = activeEnvelope.record;
@@ -85,7 +87,11 @@ export default async function ExecutiveReportPage({
       title="NEXUS™ Executive Report"
       subtitle="Business-facing executive interpretation layer above the NEXUS diagnostic core."
     >
-      <ContextSwitcher pathname="/executive-report" current={context} />
+      <ContextSwitcher
+        pathname="/executive-report"
+        current={context}
+        availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
+      />
 
       {!activeEnvelope.found ||
       activeEnvelope.error ||
