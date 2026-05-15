@@ -3,18 +3,11 @@ import ContextSwitcher from "@/components/context-switcher/ContextSwitcher";
 import Chips from "@/components/ui/Chips";
 import Row from "@/components/ui/Row";
 import styles from "../internal-records-view/page.module.css";
-import { ActiveDiagnosticEnvelope } from "@/lib/internal-records-client";
+import {
+  ActiveDiagnosticEnvelope,
+  getActiveDiagnosticByContext,
+} from "@/lib/internal-records-client";
 import { resolveRuntimeContext } from "@/lib/runtime-context";
-
-async function getJson<T>(url: string): Promise<T> {
-  const response = await fetch(url, { cache: "no-store" });
-
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status} ${response.statusText}`);
-  }
-
-  return (await response.json()) as T;
-}
 
 function metricValue(
   metrics: Array<{ code: string; value: number | string }>,
@@ -36,13 +29,7 @@ export default async function DiagnosticsViewPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const diagnosticsUrl = `http://localhost:3000/api/internal/diagnostics/active?organizationId=${encodeURIComponent(
-    context.organizationId
-  )}&siteId=${encodeURIComponent(context.siteId)}&weekId=${encodeURIComponent(
-    context.weekId
-  )}`;
-
-  const envelope = await getJson<ActiveDiagnosticEnvelope>(diagnosticsUrl);
+  const envelope = await getActiveDiagnosticByContext(context);
 
   return (
     <AppShell
