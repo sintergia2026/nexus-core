@@ -7,7 +7,6 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import styles from "./page.module.css";
 import {
   ComparisonEnvelope,
-  INTERNAL_RECORDS_COMPARE,
   MultiRecordSummaryEnvelope,
   SingleRecordSummaryEnvelope,
   getActiveRecordSummaryByContext,
@@ -35,12 +34,10 @@ export default async function InternalRecordsViewPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const context = resolveRuntimeContext(resolvedSearchParams);
 
-  const [activeEnvelope, historyEnvelope, comparisonEnvelope] =
-    await Promise.all([
-      getActiveRecordSummaryByContext(context),
-      queryRecordSummaries(context),
-      compareRecordsById(INTERNAL_RECORDS_COMPARE),
-    ]);
+  const [activeEnvelope, historyEnvelope] = await Promise.all([
+    getActiveRecordSummaryByContext(context),
+    queryRecordSummaries(context),
+  ]);
 
   const activeRecord = activeEnvelope.record;
   const historyRecords = [...(historyEnvelope.records ?? [])].sort((a, b) => {
@@ -50,6 +47,14 @@ export default async function InternalRecordsViewPage({
     }
     return String(b.storedAt).localeCompare(String(a.storedAt));
   });
+
+  const comparisonEnvelope: ComparisonEnvelope | null =
+    historyRecords.length >= 2
+      ? await compareRecordsById({
+          leftRecordId: historyRecords[1].persistedBundleId,
+          rightRecordId: historyRecords[0].persistedBundleId,
+        })
+      : null;
 
   return (
     <AppShell
@@ -151,10 +156,14 @@ export default async function InternalRecordsViewPage({
         <section className={`${styles.card} ${styles.fullWidth}`}>
           <h2 className={styles.cardTitle}>Block C — Comparison Panel</h2>
           <div className={styles.meta}>
-            servedAt: {comparisonEnvelope.servedAt || "unknown"}
+            servedAt: {comparisonEnvelope?.servedAt || "unknown"}
           </div>
 
-          {comparisonEnvelope.error ? (
+          {!comparisonEnvelope ? (
+            <div className={styles.empty}>
+              Comparison requires at least two records for this context.
+            </div>
+          ) : comparisonEnvelope.error ? (
             <div className={styles.error}>Comparison could not be completed.</div>
           ) : (
             <div className={styles.delta}>
