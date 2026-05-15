@@ -10,7 +10,10 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": ".",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./07_app/runtime/src/*"]
+    }
   },
   "include": [
     "02_contracts/**/*.ts",
