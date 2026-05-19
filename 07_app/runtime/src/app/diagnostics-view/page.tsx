@@ -128,7 +128,7 @@ export default async function DiagnosticsViewPage({
             <>
               {signalGroups.high.length > 0 && (
                 <div className={styles.severityGroup}>
-                  <div className={styles.groupLabel}>HIGH</div>
+                  <div className={`${styles.groupLabel} ${styles.groupLabelHigh}`}>HIGH</div>
                   <Chips values={signalGroups.high.map((s) => s.code)} />
                   {signalGroups.high.some((s) => s.message) && (
                     <div className={styles.groupNotes}>
@@ -145,7 +145,7 @@ export default async function DiagnosticsViewPage({
               )}
               {signalGroups.medium.length > 0 && (
                 <div className={styles.severityGroup}>
-                  <div className={styles.groupLabel}>MEDIUM</div>
+                  <div className={`${styles.groupLabel} ${styles.groupLabelMedium}`}>MEDIUM</div>
                   <Chips values={signalGroups.medium.map((s) => s.code)} />
                   {signalGroups.medium.some((s) => s.message) && (
                     <div className={styles.groupNotes}>
@@ -182,7 +182,7 @@ export default async function DiagnosticsViewPage({
             <>
               {constraintGroups.high.length > 0 && (
                 <div className={styles.severityGroup}>
-                  <div className={styles.groupLabel}>HIGH</div>
+                  <div className={`${styles.groupLabel} ${styles.groupLabelHigh}`}>HIGH</div>
                   <Chips values={constraintGroups.high.map((c) => c.code)} />
                   {constraintGroups.high.some((c) => c.description) && (
                     <div className={styles.groupNotes}>
@@ -199,7 +199,7 @@ export default async function DiagnosticsViewPage({
               )}
               {constraintGroups.medium.length > 0 && (
                 <div className={styles.severityGroup}>
-                  <div className={styles.groupLabel}>MEDIUM</div>
+                  <div className={`${styles.groupLabel} ${styles.groupLabelMedium}`}>MEDIUM</div>
                   <Chips values={constraintGroups.medium.map((c) => c.code)} />
                   {constraintGroups.medium.some((c) => c.description) && (
                     <div className={styles.groupNotes}>
