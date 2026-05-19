@@ -83,8 +83,8 @@ export default async function InternalRecordsViewPage({
 
   return (
     <AppShell
-      title="NEXUS™ Internal Records View"
-      subtitle="Framework-native records surface for active summary, historical summaries, and comparison."
+      title="NEXUS™ Record History"
+      subtitle="Active record, historical chain, and posture comparison for the selected context."
     >
       <ContextSwitcher
         pathname="/internal-records-view"
