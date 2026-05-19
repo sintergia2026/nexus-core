@@ -2,11 +2,8 @@ import AppShell from "@/components/app-shell/AppShell";
 import ContextSwitcher from "@/components/context-switcher/ContextSwitcher";
 import Row from "@/components/ui/Row";
 import Chips from "@/components/ui/Chips";
-import StatusBadge from "@/components/ui/StatusBadge";
 import styles from "./page.module.css";
 import {
-  ActiveDiagnosticEnvelope,
-  SingleRecordSummaryEnvelope,
   getActiveRecordSummaryByContext,
   getActiveDiagnosticByContext,
   getAvailableContexts,

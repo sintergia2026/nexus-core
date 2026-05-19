@@ -156,14 +156,6 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
-.compactRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-}
-
 .compactLabel {
   color: #94a3b8;
   font-size: 0.74rem;
