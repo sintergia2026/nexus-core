@@ -58,10 +58,56 @@ export default async function DiagnosticsViewPage({
     getAvailableContexts(),
   ]);
 
+  if (envelope.error || !envelope.found || !envelope.diagnostic) {
+    return (
+      <AppShell
+        title="NEXUS™ Posture"
+        subtitle="Active signals, governing constraints, and metric state for the selected context."
+      >
+        <ContextSwitcher
+          pathname="/diagnostics-view"
+          current={context}
+          availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
+        />
+        <section className={styles.card}>
+          <div className={styles.error}>
+            Active diagnostic could not be loaded.
+          </div>
+        </section>
+      </AppShell>
+    );
+  }
+
+  const diagnostic = envelope.diagnostic;
+
+  const signalGroups = {
+    high: diagnostic.activeSignals.filter(
+      (s) => s.severity?.toLowerCase() === "high"
+    ),
+    medium: diagnostic.activeSignals.filter(
+      (s) => s.severity?.toLowerCase() === "medium"
+    ),
+    other: diagnostic.activeSignals.filter(
+      (s) => !s.severity || !["high", "medium"].includes(s.severity.toLowerCase())
+    ),
+  };
+
+  const constraintGroups = {
+    high: diagnostic.activeConstraints.filter(
+      (c) => c.severity.toLowerCase() === "high"
+    ),
+    medium: diagnostic.activeConstraints.filter(
+      (c) => c.severity.toLowerCase() === "medium"
+    ),
+    other: diagnostic.activeConstraints.filter(
+      (c) => !["high", "medium"].includes(c.severity.toLowerCase())
+    ),
+  };
+
   return (
     <AppShell
-      title="NEXUS™ Diagnostics View"
-      subtitle="Framework-native diagnostic surface for active system posture, constraints, and metric state."
+      title="NEXUS™ Posture"
+      subtitle="Active signals, governing constraints, and metric state for the selected context."
     >
       <ContextSwitcher
         pathname="/diagnostics-view"
@@ -69,81 +115,155 @@ export default async function DiagnosticsViewPage({
         availableContexts={availableContextsEnvelope.error ? [] : availableContextsEnvelope.contexts}
       />
 
-      {envelope.error || !envelope.found || !envelope.diagnostic ? (
+      <div className={styles.grid}>
         <section className={styles.card}>
-          <div className={styles.error}>
-            Active diagnostic could not be loaded.
+          <h2 className={styles.cardTitle}>Active Signals</h2>
+          <div className={styles.groupCount}>
+            {diagnostic.activeSignals.length} active
+          </div>
+
+          {diagnostic.activeSignals.length === 0 ? (
+            <div className={styles.empty}>No active signals.</div>
+          ) : (
+            <>
+              {signalGroups.high.length > 0 && (
+                <div className={styles.severityGroup}>
+                  <div className={styles.groupLabel}>HIGH</div>
+                  <Chips values={signalGroups.high.map((s) => s.code)} />
+                  {signalGroups.high.some((s) => s.message) && (
+                    <div className={styles.groupNotes}>
+                      {signalGroups.high
+                        .filter((s) => s.message)
+                        .map((s) => (
+                          <div key={s.code} className={styles.mutedMono}>
+                            {s.code}: {s.message}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {signalGroups.medium.length > 0 && (
+                <div className={styles.severityGroup}>
+                  <div className={styles.groupLabel}>MEDIUM</div>
+                  <Chips values={signalGroups.medium.map((s) => s.code)} />
+                  {signalGroups.medium.some((s) => s.message) && (
+                    <div className={styles.groupNotes}>
+                      {signalGroups.medium
+                        .filter((s) => s.message)
+                        .map((s) => (
+                          <div key={s.code} className={styles.mutedMono}>
+                            {s.code}: {s.message}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {signalGroups.other.length > 0 && (
+                <div className={styles.severityGroup}>
+                  <div className={styles.groupLabel}>OTHER</div>
+                  <Chips values={signalGroups.other.map((s) => s.code)} />
+                </div>
+              )}
+            </>
+          )}
+        </section>
+
+        <section className={styles.card}>
+          <h2 className={styles.cardTitle}>Active Constraints</h2>
+          <div className={styles.groupCount}>
+            {diagnostic.activeConstraints.length} active
+          </div>
+
+          {diagnostic.activeConstraints.length === 0 ? (
+            <div className={styles.empty}>No active constraints.</div>
+          ) : (
+            <>
+              {constraintGroups.high.length > 0 && (
+                <div className={styles.severityGroup}>
+                  <div className={styles.groupLabel}>HIGH</div>
+                  <Chips values={constraintGroups.high.map((c) => c.code)} />
+                  {constraintGroups.high.some((c) => c.description) && (
+                    <div className={styles.groupNotes}>
+                      {constraintGroups.high
+                        .filter((c) => c.description)
+                        .map((c) => (
+                          <div key={c.code} className={styles.mutedMono}>
+                            {c.code}: {c.description}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {constraintGroups.medium.length > 0 && (
+                <div className={styles.severityGroup}>
+                  <div className={styles.groupLabel}>MEDIUM</div>
+                  <Chips values={constraintGroups.medium.map((c) => c.code)} />
+                  {constraintGroups.medium.some((c) => c.description) && (
+                    <div className={styles.groupNotes}>
+                      {constraintGroups.medium
+                        .filter((c) => c.description)
+                        .map((c) => (
+                          <div key={c.code} className={styles.mutedMono}>
+                            {c.code}: {c.description}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {constraintGroups.other.length > 0 && (
+                <div className={styles.severityGroup}>
+                  <div className={styles.groupLabel}>OTHER</div>
+                  <Chips values={constraintGroups.other.map((c) => c.code)} />
+                  {constraintGroups.other.some((c) => c.description) && (
+                    <div className={styles.groupNotes}>
+                      {constraintGroups.other
+                        .filter((c) => c.description)
+                        .map((c) => (
+                          <div key={c.code} className={styles.mutedMono}>
+                            {c.code}: {c.description}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </section>
+
+        <section className={`${styles.card} ${styles.fullWidth}`}>
+          <h2 className={styles.cardTitle}>Metric Detail</h2>
+
+          <div className={styles.miniGrid}>
+            {[
+              { code: "throughput",            label: "Throughput"            },
+              { code: "utilization",           label: "Utilization"           },
+              { code: "latency",               label: "Latency"               },
+              { code: "revenue_leakage",       label: "Revenue Leakage"       },
+              { code: "staffing_pressure",     label: "Staffing Pressure"     },
+              { code: "reporting_reliability", label: "Reporting Reliability" },
+            ].map(({ code, label }) => (
+              <div key={code} className={styles.miniCard}>
+                <div className={styles.miniCardHeader}>
+                  <p className={styles.miniCardTitle}>{label}</p>
+                </div>
+                <div className={styles.miniCardBody}>
+                  <div className={styles.miniStat}>
+                    <div className={styles.miniStatLabel}>Value</div>
+                    <div className={styles.miniStatValue}>
+                      {metricValue(diagnostic.metrics, code)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
-      ) : (
-        <div className={styles.grid}>
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>Current Posture</h2>
-
-            <Row label="Persisted Bundle ID">
-              <div className={styles.mutedMono}>
-                {envelope.diagnostic.persistedBundleId}
-              </div>
-            </Row>
-            <Row label="Record Status">{envelope.diagnostic.recordStatus}</Row>
-            <Row label="State">{envelope.diagnostic.stateLabel}</Row>
-            <Row label="Decision">{envelope.diagnostic.decisionLabel}</Row>
-            <Row label="Priority">{envelope.diagnostic.priority}</Row>
-            <Row label="Stored At">{envelope.diagnostic.storedAt}</Row>
-          </section>
-
-          <section className={styles.card}>
-            <h2 className={styles.cardTitle}>Active Signals & Constraints</h2>
-
-            <Row label="Signals">
-              <Chips
-                values={envelope.diagnostic.activeSignals.map(
-                  (signal) =>
-                    `${signal.code}${signal.severity ? `:${signal.severity}` : ""}`
-                )}
-              />
-            </Row>
-
-            <Row label="Constraints">
-              <Chips
-                values={envelope.diagnostic.activeConstraints.map(
-                  (constraint) => `${constraint.code}:${constraint.severity}`
-                )}
-              />
-            </Row>
-          </section>
-
-          <section className={`${styles.card} ${styles.fullWidth}`}>
-            <h2 className={styles.cardTitle}>Metric Overview</h2>
-
-            <div className={styles.list}>
-              <div className={styles.listItem}>
-                <Row label="throughput">
-                  {metricValue(envelope.diagnostic.metrics, "throughput")}
-                </Row>
-                <Row label="utilization">
-                  {metricValue(envelope.diagnostic.metrics, "utilization")}
-                </Row>
-                <Row label="latency">
-                  {metricValue(envelope.diagnostic.metrics, "latency")}
-                </Row>
-                <Row label="revenue_leakage">
-                  {metricValue(envelope.diagnostic.metrics, "revenue_leakage")}
-                </Row>
-                <Row label="staffing_pressure">
-                  {metricValue(envelope.diagnostic.metrics, "staffing_pressure")}
-                </Row>
-                <Row label="reporting_reliability">
-                  {metricValue(
-                    envelope.diagnostic.metrics,
-                    "reporting_reliability"
-                  )}
-                </Row>
-              </div>
-            </div>
-          </section>
-        </div>
-      )}
+      </div>
     </AppShell>
   );
 }
