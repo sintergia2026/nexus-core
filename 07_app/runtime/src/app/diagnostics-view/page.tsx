@@ -2,7 +2,7 @@ import AppShell from "@/components/app-shell/AppShell";
 import ContextSwitcher from "@/components/context-switcher/ContextSwitcher";
 import Chips from "@/components/ui/Chips";
 import Row from "@/components/ui/Row";
-import styles from "../internal-records-view/page.module.css";
+import styles from "./page.module.css";
 import {
   ActiveDiagnosticEnvelope,
   getActiveDiagnosticByContext,

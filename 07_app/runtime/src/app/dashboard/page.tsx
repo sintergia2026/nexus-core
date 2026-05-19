@@ -4,7 +4,7 @@ import Chips from "@/components/ui/Chips";
 import ChangeFlag from "@/components/ui/ChangeFlag";
 import Row from "@/components/ui/Row";
 import StatusBadge from "@/components/ui/StatusBadge";
-import styles from "../internal-records-view/page.module.css";
+import styles from "./page.module.css";
 import {
   ActiveDiagnosticEnvelope,
   ComparisonEnvelope,
