@@ -1,4 +1,4 @@
-import styles from "@/app/internal-records-view/page.module.css";
+import styles from "./Chips.module.css";
 
 export default function Chips({ values }: { values: string[] }) {
   if (!values || values.length === 0) {

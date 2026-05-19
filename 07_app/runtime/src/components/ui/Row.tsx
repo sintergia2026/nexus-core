@@ -1,4 +1,4 @@
-    import styles from "@/app/internal-records-view/page.module.css";
+import styles from "./Row.module.css";
 
 export default function Row({
   label,

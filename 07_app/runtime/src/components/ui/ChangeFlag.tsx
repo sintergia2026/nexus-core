@@ -1,4 +1,4 @@
-import styles from "@/app/internal-records-view/page.module.css";
+import styles from "./ChangeFlag.module.css";
 
 export default function ChangeFlag({
   label,

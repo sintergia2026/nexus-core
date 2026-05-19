@@ -1,4 +1,4 @@
-import styles from "@/app/internal-records-view/page.module.css";
+import styles from "./StatusBadge.module.css";
 
 function statusClass(status: string): string {
   return status === "active" ? styles.statusActive : styles.statusSuperseded;
